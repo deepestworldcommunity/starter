@@ -1,0 +1,22 @@
+{
+  "name": "deepestworld-starter",
+  "version": "1.0.0",
+  "description": "A starter for creating bots for https://deepestworld.com/",
+  "main": "app.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "tsc --noEmit"
+  },
+  "engines": {
+    "node": "^18",
+    "npm": "^9"
+  },
+  "author": "Kevin Sandow",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^18.16.19",
+    "dotenv": "^16.3.1",
+    "electron": "^25.2.0",
+    "typescript": "^5.1.6"
+  }
+}
