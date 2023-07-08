@@ -17,7 +17,7 @@ DW_PASSWORD=secretPassword
 ```shell
 npm start <characterName>
 ```
-6. Go to src/default.js and change the first line to:
+6. Go to starter.js and change the first line to:
 ```js
 let attackMode = true
 ```

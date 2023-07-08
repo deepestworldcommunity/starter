@@ -1,4 +1,51 @@
 declare global {
+  const ARMOR_MULT: {
+    chest: number
+    helmet: number
+    gloves: number
+    boots: number
+  }
+
+  const BASE_ARMOR: {
+    chest: number
+    helmet: number
+    gloves: number
+    boots: number
+  }
+
+  const BASE_DMG: number
+
+  const BASE_MELEE_RANGE: number
+  const BASE_RANGED_RANGE: number
+
+  const DOWN: number
+  const LEFT: number
+  const RIGHT: number
+  const UP: number
+
+  const TERRAIN_WATER: number
+  const TERRAIN_EMPTY: number
+  const TERRAIN_GRASS: number
+  const TERRAIN_DIRT: number
+  const TERRAIN_DESERT: number
+  const TERRAIN_UNDERWATER: number
+  const TERRAIN_UNDERGROUND: number
+  const TERRAIN_WINTER: number
+  const TERRAIN_WOODWALL1: number
+  const TERRAIN_STONEROOF1: number
+  const TERRAIN_UGFOREST: number
+
+  const TIER_MODS: Array<number>
+
+  const TREE_MAPLE: number
+  const TREE_PINE: number
+  const TREE_2: number
+  const TREE_3: number
+
+  const mods: {
+    mission: Array<string>
+  }
+
   const dw: {
     abandonMission(): void
 
@@ -30,7 +77,7 @@ declare global {
      * @param from
      * @param to
      */
-    distance(from: Position, to: Position): number
+    distance(from: Coordinates, to: Coordinates): number
 
     // TODO: add more types to events
     emit(eventName: "chop", data: Target)
@@ -74,6 +121,10 @@ declare global {
 
     log(message: any): void
 
+    md: {
+      hitboxes: Record<string, { w: number, h: number }>
+    }
+
     /**
      * Moves towards x,y in a straight line
      * @param x
@@ -112,25 +163,29 @@ declare global {
   }
 }
 
-type Position = {
-  /** World layer pos */
-  l: number
+interface Coordinates {
   /** World x pos */
   x: number
   /** World y pos */
   y: number
 }
 
-type Target = {
+interface Position extends Coordinates {
+  /** World layer pos */
+  l: number
+}
+
+interface Target {
   id: number
 }
 
-type BaseEntity = Position & Target & {
+interface BaseEntity extends Position {
+  id: number
   /** Metadata ID */
   md: string
 }
 
-type LivingBaseEntity = BaseEntity & {
+interface LivingBaseEntity extends BaseEntity {
   level: number
   /** Life */
   hp: number
@@ -144,7 +199,7 @@ type LivingBaseEntity = BaseEntity & {
   targetId?: number
 }
 
-type Character = LivingBaseEntity & {
+interface Character extends LivingBaseEntity {
   /** Means that this is a player. Value is always 1. */
   player: 1
   /** Character's name */
@@ -155,7 +210,7 @@ type Character = LivingBaseEntity & {
   mtx: Record<string, unknown>
 }
 
-type YourCharacter = Character & {
+interface YourCharacter extends Character {
   /** Item inventory */
   bag: Array<Item>
 
@@ -210,34 +265,36 @@ type YourCharacter = Character & {
 
   /** Skill info for skills in skill bar */
   skills: Array<{
+    cost: number
     md: string
     range: number
+    val?: number
   } | 0>
 
   spawn: Position
 }
 
-type Monster = LivingBaseEntity & {
+interface Monster extends LivingBaseEntity {
   /** Means that this is a monster. Value is always 1. */
   ai: 1
   r: number // 1 is a normal monster. 2+ are bosses.
 }
 
-type Tree = BaseEntity & {
+interface Tree extends BaseEntity {
   /** Means that this is a tree. Value is always 1. */
   tree: 1
   /** Quality */
   qual: number
 }
 
-type Ore = BaseEntity & {
+interface Ore extends BaseEntity {
   /** Means that this is an ore. Value is always 1. */
   ore: 1
   /** Quality */
   qual: number
 }
 
-type Station = BaseEntity & {
+interface Station extends BaseEntity {
   /** Means that this is a station. Value is always 1. */
   station: 1
   /** Indicating whether you are the owner. */
@@ -248,7 +305,7 @@ type Station = BaseEntity & {
   storage: Array<Item | unknown | null>
 }
 
-type Entity = YourCharacter | Character | Monster | Tree | Ore | Station
+type Entity = YourCharacter & Character & Monster & Tree & Ore & Station
 
 type Chunk = Array<unknown>
 

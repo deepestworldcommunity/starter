@@ -25,7 +25,7 @@ if (process.argv.length < 3) {
 }
 
 const characterName = process.argv[2]
-const script = process.argv[3] ?? './src/default.js'
+const script = process.argv[3] ?? './starter.js'
 
 /**
  * @param {string} data

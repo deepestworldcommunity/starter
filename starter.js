@@ -1,4 +1,4 @@
-let attackMode = true
+const attackMode = true
 
 setInterval(function () {
   if (!attackMode) {
