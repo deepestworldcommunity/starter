@@ -122,7 +122,10 @@ declare global {
     log(message: any): void
 
     md: {
-      hitboxes: Record<string, { w: number, h: number }>
+      items: Record<string, {
+        collision?: number
+        hitbox: Record<string, { w: number, h: number }>
+      }>
     }
 
     /**
