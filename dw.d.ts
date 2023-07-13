@@ -308,7 +308,7 @@ export interface Station extends BaseEntity {
   storage: Array<Item | unknown | null>
 }
 
-export type Entity = YourCharacter & Character & Monster & Tree & Ore & Station
+export type Entity = YourCharacter | Character | Monster | Tree | Ore | Station
 
 export type Chunk = Array<unknown>
 
