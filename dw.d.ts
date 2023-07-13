@@ -166,19 +166,19 @@ declare global {
   }
 }
 
-interface Coordinates {
+export interface Coordinates {
   /** World x pos */
   x: number
   /** World y pos */
   y: number
 }
 
-interface Position extends Coordinates {
+export interface Position extends Coordinates {
   /** World layer pos */
   l: number
 }
 
-interface Target {
+export interface Target {
   id: number
 }
 
@@ -202,7 +202,7 @@ interface LivingBaseEntity extends BaseEntity {
   targetId?: number
 }
 
-interface Character extends LivingBaseEntity {
+export interface Character extends LivingBaseEntity {
   /** Means that this is a player. Value is always 1. */
   player: 1
   /** Character's name */
@@ -213,7 +213,7 @@ interface Character extends LivingBaseEntity {
   mtx: Record<string, unknown>
 }
 
-interface YourCharacter extends Character {
+export interface YourCharacter extends Character {
   /** Item inventory */
   bag: Array<Item>
 
@@ -277,27 +277,27 @@ interface YourCharacter extends Character {
   spawn: Position
 }
 
-interface Monster extends LivingBaseEntity {
+export interface Monster extends LivingBaseEntity {
   /** Means that this is a monster. Value is always 1. */
   ai: 1
   r: number // 1 is a normal monster. 2+ are bosses.
 }
 
-interface Tree extends BaseEntity {
+export interface Tree extends BaseEntity {
   /** Means that this is a tree. Value is always 1. */
   tree: 1
   /** Quality */
   qual: number
 }
 
-interface Ore extends BaseEntity {
+export interface Ore extends BaseEntity {
   /** Means that this is an ore. Value is always 1. */
   ore: 1
   /** Quality */
   qual: number
 }
 
-interface Station extends BaseEntity {
+export interface Station extends BaseEntity {
   /** Means that this is a station. Value is always 1. */
   station: 1
   /** Indicating whether you are the owner. */
@@ -308,9 +308,9 @@ interface Station extends BaseEntity {
   storage: Array<Item | unknown | null>
 }
 
-type Entity = YourCharacter & Character & Monster & Tree & Ore & Station
+export type Entity = YourCharacter & Character & Monster & Tree & Ore & Station
 
-type Chunk = Array<unknown>
+export type Chunk = Array<unknown>
 
 /**
  * Each property is a chunk of 1x16x16 voxels containing data about the terrain.
@@ -320,9 +320,9 @@ type Chunk = Array<unknown>
  *
  * Example: dw.chunks['0.0.0'][0][10][15] would return the terrain in chunk "0.0.0" at row 10 and col 15.
  */
-type Chunks = Record<string, Chunk>
+export type Chunks = Record<string, Chunk>
 
-type DefaultSkill = {
+export type DefaultSkill = {
   physDmg: number;
   coldDmg: number;
   elecDmg: number;
@@ -334,7 +334,7 @@ type DefaultSkill = {
   cost: null;
 };
 
-type Item = {
+export type Item = {
   /** Metadata ID */
   md: string;
 
