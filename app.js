@@ -1,5 +1,4 @@
-const fs = require('node:fs')
-const crypto = require('node:crypto')
+const esbuild = require('esbuild')
 
 require('dotenv').config()
 const { app, BrowserWindow } = require('electron')
@@ -25,15 +24,7 @@ if (process.argv.length < 3) {
 }
 
 const characterName = process.argv[2]
-const script = process.argv[3] ?? './starter.js'
-
-/**
- * @param {string} data
- * @returns {string}
- */
-function md5(data) {
-  return crypto.createHash('md5').update(data).digest("hex")
-}
+const script = process.argv[3] ?? './src/starter.js'
 
 async function run() {
   await app.whenReady()
@@ -45,6 +36,8 @@ async function run() {
     },
   })
 
+  let ctx
+
   await win.loadURL('https://deepestworld.com/')
 
   await win.webContents.executeJavaScript(`
@@ -55,6 +48,11 @@ async function run() {
   `)
 
   win.webContents.on('did-navigate', async (event, url) => {
+    if (ctx) {
+      console.log('Pausing file watcher')
+      await ctx.dispose()
+    }
+
     if (url === 'https://deepestworld.com/login') {
       await win.webContents.executeJavaScript(`
         document.querySelector("input#username").value = ${JSON.stringify(username)};
@@ -75,40 +73,43 @@ async function run() {
     }
 
     if (url.startsWith('https://deepestworld.com/game/')) {
+      ctx = await esbuild.context({
+        entryPoints: [script],
+        bundle: true,
+        plugins: [{
+          name: 'watch-plugin',
+          setup: build => {
+            build.onEnd((result) => {
+              if (result.errors.length > 0) {
+                result.errors.map((message) => {
+                  console.error(message)
+                })
+                return
+              }
+
+              result.warnings.map((message) => {
+                console.warn(message)
+              })
+
+              console.log('Updating code in game')
+
+              win.webContents.executeJavaScript(`
+            document.querySelector("#stop-code").click();
+            document.querySelector("textarea#code-editor").value = ${JSON.stringify(result.outputFiles[0].text)};
+            document.querySelector("#start-code").click();
+          `)
+            })
+          }
+        }],
+        write: false,
+      })
+
+      console.log(`Watching for file changes on ${script}`)
+      await ctx.watch()
       return
     }
 
     console.log(`Unexpected url: ${url}`)
-  })
-
-  console.log(`Watching for file changes on ${script}`)
-
-  let md5Previous = ''
-  let fsWait = false
-  fs.watch(script, (event, filename) => {
-    if (!filename || fsWait) {
-      return
-    }
-
-    fsWait = true
-    setTimeout(() => {
-      fsWait = false
-    }, 100)
-
-    const fileContent = fs.readFileSync(script).toString()
-    const md5Current = md5(fileContent)
-    if (md5Current === md5Previous) {
-      return
-    }
-
-    md5Previous = md5Current
-    console.log(`${filename} changed`)
-
-    win.webContents.executeJavaScript(`
-      document.querySelector("#stop-code").click();
-      document.querySelector("textarea#code-editor").value = ${JSON.stringify(fileContent)};
-      document.querySelector("#start-code").click();
-    `)
   })
 }
 
