@@ -1,50 +1,5 @@
 declare global {
-  const ARMOR_MULT: {
-    chest: number
-    helmet: number
-    gloves: number
-    boots: number
-  }
-
-  const BASE_ARMOR: {
-    chest: number
-    helmet: number
-    gloves: number
-    boots: number
-  }
-
-  const BASE_DMG: number
-
-  const BASE_MELEE_RANGE: number
-  const BASE_RANGED_RANGE: number
-
-  const DOWN: number
-  const LEFT: number
-  const RIGHT: number
-  const UP: number
-
-  const TERRAIN_WATER: number
-  const TERRAIN_EMPTY: number
-  const TERRAIN_GRASS: number
-  const TERRAIN_DIRT: number
-  const TERRAIN_DESERT: number
-  const TERRAIN_UNDERWATER: number
-  const TERRAIN_UNDERGROUND: number
-  const TERRAIN_WINTER: number
-  const TERRAIN_WOODWALL1: number
-  const TERRAIN_STONEROOF1: number
-  const TERRAIN_UGFOREST: number
-
-  const TIER_MODS: Array<number>
-
-  const TREE_MAPLE: number
-  const TREE_PINE: number
-  const TREE_2: number
-  const TREE_3: number
-
-  const mods: {
-    mission: Array<string>
-  }
+  const top: typeof window
 
   const dw: {
     abandonMission(): void
@@ -79,14 +34,60 @@ declare global {
      */
     distance(from: Coordinates, to: Coordinates): number
 
-    // TODO: add more types to events
+    /**
+     * Chops down a tree
+     * @param eventName
+     * @param data
+     */
     emit(eventName: "chop", data: Target)
+
+    /**
+     * Places a station into the world (can only be done at your spawn area)
+     * @param eventName
+     * @param data
+     */
     emit(eventName: "placeItem", data: {
       bagIndex: number
       x: number
       y: number
     })
-    emit(eventName: "setSpawn", data: {})
+
+    /**
+     * Merges stackable crafting items together and stores them in the bag
+     * @param eventName
+     */
+    emit(eventName: "merge")
+
+    /**
+     * Mines ores, like rock, iron, gems...
+     * @param eventName
+     */
+    emit(eventName: "mine")
+
+    /**
+     * Set the new character spawn location to current location
+     * @param eventName
+     */
+    emit(eventName: "setSpawn")
+
+    /**
+     * Sorts your inventory aka the bag
+     * @param eventName
+     */
+    emit(eventName: "sortInv")
+
+    /**
+     * Returns you to your spawn
+     * @param eventName
+     */
+    emit(eventName: "unstuck")
+
+    // TODO: add more types to events
+    /**
+     * Emits a currently undocumented event
+     * @param eventName
+     * @param data
+     */
     emit(eventName: string, data: unknown)
 
     /**
@@ -103,8 +104,8 @@ declare global {
 
     /**
      * Returns the terrain at the given position
-     * 0 = Air / Walkable
-     * 1 = Wall?
+     * 0 = Walkable
+     * 1 = There is a voxel here, limiting movement
      * @param pos
      */
     getTerrainAt(pos: Position): number
@@ -115,7 +116,7 @@ declare global {
 
     getZoneLevel(l?: number, x?: number, y?: number): number
 
-    get(key: string): any
+    get(key: string): any | null
 
     isSkillReady(name: string): boolean
 
@@ -124,7 +125,7 @@ declare global {
     md: {
       items: Record<string, {
         collision?: number
-        hitbox: Record<string, { w: number, h: number }>
+        hitbox: { w: number, h: number }
       }>
     }
 
@@ -146,6 +147,18 @@ declare global {
      * @param idTo can be omitted if transferring to your character
      */
     moveItem(bagFrom: string, indexFrom: number, bagTo: string, indexTo: number, idFrom?: number, idTo?: number): void
+
+    on(eventName: 'drawEnd', listener: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void): void
+
+    on(eventName: 'hit', listener: (data: Array<{
+      projId?: number
+      md?: number
+      actor: number
+      target: number
+      amount?: number
+      val?: number
+      rip?: number
+    }>) => void): void
 
     // TODO: type more events
     on(eventName: string, listener: (data: any) => void): void
@@ -280,7 +293,10 @@ export interface YourCharacter extends Character {
 export interface Monster extends LivingBaseEntity {
   /** Means that this is a monster. Value is always 1. */
   ai: 1
-  r: number // 1 is a normal monster. 2+ are bosses.
+  /** Indicated whether the monster will attack you on sight */
+  hostile?: number
+  /** 1 is a normal monster. 2+ are bosses. */
+  r: number
 }
 
 export interface Tree extends BaseEntity {
