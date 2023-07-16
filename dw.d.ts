@@ -228,7 +228,7 @@ export interface Character extends LivingBaseEntity {
 
 export interface YourCharacter extends Character {
   /** Item inventory */
-  bag: Array<Item>
+  bag: Array<Item | null>
 
   /** Skill specific timestamps of their cooldowns */
   cds: Record<string, number>,
@@ -274,10 +274,27 @@ export interface YourCharacter extends Character {
     timeoutAt: number;
   }
 
+  professions: {
+    axesmith: Profession
+    bowsmith: Profession
+    daggersmith: Profession
+    gemcutting: Profession
+    macesmith: Profession
+    metalworking: Profession
+    mining: Profession
+    pickaxesmith: Profession
+    platesmith: Profession
+    spearsmith: Profession
+    staffsmith: Profession
+    stoneworking: Profession
+    swordsmith: Profession
+    wandsmith: Profession
+    woodcutting: Profession
+    woodworking: Profession
+  }
+
   /** Skills in skill bar */
-  skillBag: Array<{
-    md: string
-  } | null>
+  skillBag: Array<Item | null>
 
   /** Skill info for skills in skill bar */
   skills: Array<{
@@ -348,7 +365,13 @@ export type DefaultSkill = {
   critMult: number;
   range: number;
   cost: null;
-};
+}
+
+export interface Profession {
+  md: string
+  xp: number
+  level: number
+}
 
 export type Item = {
   /** Metadata ID */
