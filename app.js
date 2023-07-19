@@ -1,6 +1,5 @@
-const esbuild = require('esbuild')
-
 require('dotenv').config()
+const esbuild = require('esbuild')
 const { app, BrowserWindow } = require('electron')
 
 /** @var {string | undefined} */
