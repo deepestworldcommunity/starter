@@ -7,8 +7,13 @@ setInterval(function () {
 
   let target = dw.findEntities((entity) => entity.id === dw.targetId).shift()
 
+  // Target it on a different layer
+  if (target && target.l !== dw.c.l) {
+    target = undefined
+  }
+
   if (!target) {
-    target = dw.findClosestMonster((monster) => monster.md === 'greenGoo' && monster.r === 0)
+    target = dw.findClosestMonster((monster) => monster.md === 'goo' && monster.r === 0)
     if (target && target.id !== dw.targetId) {
       dw.setTarget({id: target.id})
     }
@@ -19,7 +24,7 @@ setInterval(function () {
     return
   }
 
-  const skillName = 'attack'
+  const skillName = 'attackRune'
   const skill = dw.character.skills.find((s) => s && s.md === skillName)
   if (!skill) {
     console.error(`No skill named "${skillName}" found in skill bag`)
