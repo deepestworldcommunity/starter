@@ -300,11 +300,11 @@ declare global {
 
     on(eventName: 'levelUp', listener: (data: { id: number }) => void): void
 
-    on(eventName: 'loot', listener: (data: {
+    on(eventName: 'loot', listener: (data: Array<{
       i: number,
       item: Item,
       log: number,
-    }) => void): void
+    }>) => void): void
 
     on(eventName: 'magicShrub', listener: (data: { error: string }) => void): void
 
@@ -576,7 +576,7 @@ export interface Station extends BaseEntity {
 
 export type Entity = YourCharacter | Character | Monster | Tree | Ore | Station
 
-export type Chunk = Array<unknown>
+export type Chunk = Array<Array<Array<number>>>
 
 /**
  * Each property is a chunk of 1x16x16 voxels containing data about the terrain.
