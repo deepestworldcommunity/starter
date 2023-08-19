@@ -41,7 +41,7 @@ async function run() {
 
   await win.webContents.executeJavaScript(`
     [...document.querySelectorAll('a.nav-link')]
-      .filter((a) => a.innerHTML === 'Login')
+      .filter((a) => a.innerHTML === 'Log In')
       .shift()
       ?.click();
   `)
