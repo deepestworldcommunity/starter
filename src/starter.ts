@@ -5,45 +5,33 @@ setInterval(function () {
     return
   }
 
-  let target = dw.findEntities((entity) => entity.id === dw.targetId).shift()
-
-  // Target it on a different layer
-  if (target && target.l !== dw.c.l) {
-    target = undefined
-  }
-
+  const target = dw.findClosestMonster()
   if (!target) {
-    target = dw.findClosestMonster((monster) => monster.md === 'goo' && monster.r === 0)
-    if (target && target.id !== dw.targetId) {
-      dw.setTarget({id: target.id})
-    }
-  }
-
-  if (!target) {
-    console.log('No monsters nearby')
+    // No target found
     return
   }
 
-  const skillName = 'attackRune'
-  const skill = dw.character.skills.find((s) => s && s.md === skillName)
-  if (!skill) {
-    console.error(`No skill named "${skillName}" found in skill bag`)
+  // Show target in game UI
+  dw.setTarget(target.id)
+
+  const skillIndex = dw.character.skills.findIndex(
+    (skill) => skill && skill.md === 'attackRune'
+  )
+  if (skillIndex === -1) {
+    // No attackRune found
     return
   }
 
-  const distance = dw.distance(dw.character, target)
-  if (distance > skill.range) {
-    // Walk half the distance
-    dw.move(
-      (dw.character.x + target.x) / 2,
-      (dw.character.y + target.y) / 2,
-    )
+  if (!dw.isSkillInRange(skillIndex, target.x, target.y)) {
+    // Too far away
+    dw.move(target.x, target.y)
     return
   }
 
-  if (!dw.isSkillReady(skillName)) {
+  if (!dw.isSkillReady(skillIndex)) {
+    // Skill is on cooldown
     return
   }
 
-  dw.useSkill(skillName, {id: target.id})
-}, 1000 / 4)
+  dw.useSkill(skillIndex, target.id)
+}, 250)
