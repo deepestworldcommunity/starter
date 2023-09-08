@@ -1,647 +1,809 @@
-declare global {
-  const top: typeof window
+declare module 'dw' {
+  declare global {
+    const dw: DeepestWorld.API
 
-  const dw: {
-    abandonMission(): void
+    namespace DeepestWorld {
+      interface API {
+        abandonMission(): void
 
-    /**
-     * Accept a mission from mission board
-     * @param id id of mission board
-     * @param index slot of mission in board to accept
-     */
-    acceptMission(id: number, index: number): void
+        acceptMission(missionTableId: number): void
 
-    /** Reference to your character */
-    c: YourCharacter
-    /** Another reference to your character */
-    char: YourCharacter
-    /** Another reference to your character **/
-    character: YourCharacter
+        /** Reference to your character */
+        c: DeepestWorld.YourCharacter
 
-    chunks: Chunks
+        /** Another reference to your character */
+        char: DeepestWorld.YourCharacter
 
-    /**
-     * Output debug information in the console
-     * * 0 = disabled
-     * * 1 = enabled
-     */
-    debug: number
+        /** Another reference to your character **/
+        character: DeepestWorld.YourCharacter
 
-    /**
-     * Returns the distance between from and to
-     * @param from
-     * @param to
-     */
-    distance(from: Coordinates, to: Coordinates): number
+        /**
+         * Chop a tree.
+         * @param targetId tree entity id
+         */
+        chop(targetId: number)
 
-    emit(eventName: "auth", data: { token: string, name: string })
+        chunks: Record<string, DeepestWorld.Chunk>
 
-    /**
-     * Chops down a tree
-     * @param eventName
-     * @param data
-     */
-    emit(eventName: "chop", data: { id: number })
+        /**
+         * x and y are the top left tile coords of your land plot
+         * @param x
+         * @param y
+         */
+        claimLand(x: number, y: number)
 
-    emit(eventName: "declinePartyInvite", data: { id: number })
+        connected: boolean
 
-    emit(eventName: "deleteItem", data: { i: number, name: string })
+        /**
+         * Combines all stackable items in the combine section of your inventory.
+         */
+        combine()
 
-    emit(eventName: "equip", data: {
-      i: number,
-      slot?: string
-      bag?: string
-    })
+        /**
+         * Indicates that debug information will appear in console
+         */
+        debug?: boolean
 
-    emit(eventName: "magicShrub", data: { id: number })
+        /**
+         * @param itemIndex index of the item in dw.character.bag
+         */
+        deleteItem(itemIndex: number)
 
-    emit(eventName: "marketSell", data: { id: number, md: string })
+        /**
+         * Disenchants item in bag with index `indexItem,
+         * uses an enchanting device provided by `enchantingDeviceId`.
+         * @param enchantingDeviceId
+         * @param itemIndex
+         */
+        disenchant(enchantingDeviceId: number, itemIndex: number)
 
-    /**
-     * Merges stackable crafting items together and stores them in the bag
-     * @param eventName
-     */
-    emit(eventName: "merge")
+        /**
+         * Returns the distance between from and to
+         * @param from
+         * @param to
+         * @deprecated use the same function, but with 4 parameters now
+         */
+        distance(from: { x: number, y: number }, to: { x: number, y: number }): number
 
-    /**
-     * Mines ores, like rock, iron, gems...
-     * @param eventName
-     * @param data
-     */
-    emit(eventName: "mine", data: { id: number })
+        /**
+         * Returns the distance between two points
+         * @param x1
+         * @param y1
+         * @param x2
+         * @param y2
+         */
+        distance(x1: number, y1: number, x2: number, y2: number): number
 
-    emit(eventName: "move", data: { x: number, y: number })
+        /** Your surroundings: monsters, characters, trees, etc */
+        e: Array<DeepestWorld.Entity>
 
-    emit(eventName: "moveItem", data: {
-      a:
-        | { name: "bag", i: number }
-        | { name: "cardBag", i: number }
-        | { name: "craftIn", i: number }
-        | { name: "storage", id: number, i: number }
-        | { name: "skillBag", i: number },
-      b:
-        | { name: "bag", i?: number }
-        | { name: "cardBag", i?: number }
-        | { name: "craftIn", i?: number }
-        | { name: "storage", id: number, i?: number }
-        | { name: "skillBag", i?: number },
-      fId?: number,
-    })
+        emit(eventName: "auth", data: { token: string, name: string })
 
-    emit(eventName: "partyKick", data: { dbId: number })
+        /**
+         * Chops down a tree
+         * @param eventName
+         * @param data
+         */
+        emit(eventName: "chop", data: { id: number })
 
-    emit(eventName: "partyPromote", data: { dbId: number })
+        /**
+         * Combines stackable crafting items together
+         * @param eventName
+         */
+        emit(eventName: "combine")
 
-    /**
-     * Places a station into the world (can only be done at your spawn area)
-     * @param eventName
-     * @param data
-     */
-    emit(eventName: "placeItem", data: {
-      bagIndex: number
-      x: number
-      y: number
-    })
+        emit(eventName: "declinePartyInvite", data: { id: number })
 
-    emit(eventName: "sacItem", data: { id: number, i: number })
+        emit(eventName: "deleteItem", data: { i: number, name: string })
 
-    emit(eventName: "saveCode", data: { code: string })
+        emit(eventName: "equip", data: {
+          i: number,
+          slot?: string
+          bag?: string
+        })
 
-    emit(eventName: "sendPartyInvite", data: { name: string })
+        emit(eventName: "magicShrub", data: { id: number })
 
-    /**
-     * Set the new character spawn location to current location rounded down
-     * @param eventName
-     * @param data
-     */
-    emit(eventName: "setSpawn", data: { x: number, y: number })
+        emit(eventName: "marketSell", data: { id: number, md: string })
 
-    /**
-     * Set the new character respawn location inside the spawn area
-     * @param eventName
-     * @param data
-     */
-    emit(eventName: "setRespawn", data: { x: number, y: number })
+        /**
+         * Mines ores, like rock, iron, gems...
+         * @param eventName
+         * @param data
+         */
+        emit(eventName: "mine", data: { id: number })
 
-    emit(eventName: "skill", data: {
-      md?: string,
-      i: number,
-      id?: number,
-      x?: number,
-      y?: number,
-      ax?: number,
-      ay?: number,
-    })
+        emit(eventName: "move", data: { x: number, y: number })
 
-    /**
-     * Sorts your inventory aka the bag
-     * @param eventName
-     */
-    emit(eventName: "sortInv")
+        emit(eventName: "moveItem", data: {
+          a:
+            | { name: "bag", i: number }
+            | { name: "cardBag", i: number }
+            | { name: "craftIn", i: number }
+            | { name: "storage", id: number, i: number }
+            | { name: "skillBag", i: number },
+          b:
+            | { name: "bag", i?: number }
+            | { name: "cardBag", i?: number }
+            | { name: "craftIn", i?: number }
+            | { name: "storage", id: number, i?: number }
+            | { name: "skillBag", i?: number },
+          fId?: number,
+        })
 
-    emit(eventName: "stopCode")
+        emit(eventName: "partyKick", data: { dbId: number })
 
-    emit(eventName: "startCode")
+        emit(eventName: "partyPromote", data: { dbId: number })
 
-    /**
-     * Returns you to your spawn
-     * @param eventName
-     */
-    emit(eventName: "unstuck")
+        /**
+         * Places a station into the world (can only be done at your spawn area)
+         * @param eventName
+         * @param data
+         */
+        emit(eventName: "placeItem", data: {
+          bagIndex: number
+          x: number
+          y: number
+        })
 
-    /**
-     * Emits a currently undocumented event
-     * @param eventName
-     * @param data
-     */
-    emit(eventName: string, data: unknown)
+        emit(eventName: "sacItem", data: { id: number, i: number })
 
-    /**
-     * Enters the accepted mission
-     */
-    enterMission(): void
+        emit(eventName: "saveCode", data: { code: string })
 
-    /** Your surroundings: monsters, characters, trees, etc */
-    entities: Entity[]
+        emit(eventName: "sendPartyInvite", data: { name: string })
 
-    findClosestMonster(filter?: (entity: Monster) => boolean): Monster | undefined
+        /**
+         * Set the new character spawn location to current location rounded down
+         * @param eventName
+         * @param data
+         */
+        emit(eventName: "setSpawn", data: undefined)
 
-    findEntities(filter?: (entity: Entity) => boolean): Entity[]
+        /**
+         * Set the new character respawn location inside the spawn area
+         * @param eventName
+         * @param data
+         */
+        emit(eventName: "setRespawn", data: { x: number, y: number })
 
-    get(key: string): any | null
+        emit(eventName: "skill", data: {
+          md?: string,
+          i: number,
+          id?: number,
+          x?: number,
+          y?: number,
+          ax?: number,
+          ay?: number,
+        })
 
-    /**
-     * Returns the terrain at the given position
-     * 0 = Walkable
-     * 1 = There is a voxel here, limiting movement
-     * @param pos
-     */
-    getTerrainAt(pos: Position): number
+        /**
+         * Sorts your inventory aka the bag
+         * @param eventName
+         */
+        emit(eventName: "sortInv")
 
-    getTerrainOver(pos: Position): number
+        emit(eventName: "stopCode")
 
-    getTerrainUnder(pos: Position): number
+        emit(eventName: "startCode")
 
-    getZoneLevel(l?: number, x?: number, y?: number): number
+        /**
+         * Returns you to your spawn
+         * @param eventName
+         */
+        emit(eventName: "unstuck")
 
-    isSkillReady(name: string): boolean
+        /**
+         * Emits a currently undocumented event
+         * @param eventName
+         * @param data
+         */
+        emit(eventName: string, data: unknown)
 
-    log(message: any): void
+        /**
+         * @param portalId
+         */
+        enterPortal(portalId: number)
 
-    md: {
-      items: Record<string, {
-        collision?: number
-        hitbox: { w: number, h: number }
-      }>
+        /**
+         * @param magicShrubId
+         */
+        enterMagicShrub(magicShrubId: number)
+
+        /** Your surroundings: monsters, characters, trees, etc */
+        entities: Array<DeepestWorld.Entity>
+
+        /**
+         * Equip an item.
+         * @param itemIndex
+         * @param slotName
+         */
+        equip(itemIndex: number, slotName: string)
+
+        eventDispatcher: {
+          listeners: Record<string, Array<(...args: unknown[]) => void>>
+          onceListeners: Record<string, Array<(...args: unknown[]) => void>>
+        }
+
+        findClosestMonster(filter?: (entity: Monster) => boolean): Monster | undefined
+
+        findEntities(filter?: (entity: Entity) => boolean): Entity[]
+
+        get(key: string): any | null
+
+        /**
+         * Returns the terrain at the given position
+         * 0 = Walkable
+         * any other value = There is a voxel here, limiting movement
+         * @param x
+         * @param y
+         * @param z
+         * @param zo Layer offset. 1 to check the terrain above, -1 to check the terrain under.
+         */
+        getTerrain(x: number, y: number, z: number, zo: number): number
+
+        /**
+         * Returns the terrain at the given position
+         * 0 = Walkable
+         * any other value = There is a voxel here, limiting movement
+         * @param pos
+         * @deprecated use dw.getTerrain instead
+         */
+        getTerrainAt(pos: WorldPosition): number
+
+        /**
+         * Returns the terrain at the given position
+         * 0 = Walkable
+         * any other value = There is a voxel here, limiting movement
+         * @param pos
+         * @deprecated use dw.getTerrain instead
+         */
+        getTerrainOver(pos: WorldPosition): number
+
+        /**
+         * Returns the terrain at the given position.
+         * 0 = Walkable
+         * any other value = There is a voxel here, limiting movement
+         * @param pos
+         * @deprecated use dw.getTerrain instead
+         */
+        getTerrainUnder(pos: WorldPosition): number
+
+        /**
+         * Get either the zone level of location or of player location
+         * when no other parameters were specified.
+         * @param number
+         * @param x
+         * @param y
+         * @param z
+         */
+        getZoneLevel(number, x?: number, y?: number, z?: number): number
+
+        /**
+         * Checks whether the target would be in range for spell.
+         * @param skillIndex
+         * @param x
+         * @param y
+         * @deprecated use dw.isSkillInRange instead
+         */
+        inSkillRange(skillIndex, x: number, y: number)
+
+        /**
+         * Checks whether the target would be in range for spell.
+         * @param skillIndex
+         * @param x
+         * @param y
+         */
+        isSkillInRange(skillIndex, x: number, y: number)
+
+        /**
+         * Checks whether the skill is on cooldown,
+         * can be used without `skillIndex` to check for GCD.
+         * @param skillIndex
+         */
+        isSkillReady(skillIndex?: number): boolean
+
+        lastLog: number
+
+        log(message: any): void
+
+        marketSell(tradingPostId: number, itemMd: string)
+
+        /**
+         * Mine an ore.
+         * @param targetId the id of the ore
+         */
+        mine(targetId: number)
+
+        md: {
+          items: Record<string, {
+            collision?: number
+            hitbox: { w: number, h: number }
+          }>
+        }
+
+        /**
+         * Moves towards x,y in a straight line
+         * @param x
+         * @param y
+         */
+        move(x: number, y: number): void
+
+        /**
+         * Your character bag names are: 'bag', 'craftIn', 'abilities', 'abilityBag'.
+         * Other objects bag names are: 'storage'.
+         * @param bagNameFrom Name of the bag
+         * @param bagIndexFrom Index of the item in the bag
+         * @param bagNameTo
+         * @param bagIndexTo
+         * @param itemIdFrom can be omitted if transferring from your character
+         * @param itemIdTo can be omitted if transferring to your character
+         * @param finderId
+         */
+        moveItem(bagNameFrom: string, bagIndexFrom: number, bagNameTo?: string, bagIndexTo: number, itemIdFrom?: number, itemIdTo?: number, finderId?: number): void
+
+        /**
+         * This is not a socket event, but a client event to draw stuff on canvas.
+         * @param eventName
+         * @param listener
+         */
+        on(eventName: 'drawEnd', listener: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void): void
+
+        on(eventName: 'afx', listener: (data: {
+          id: umber,
+          md: string,
+          v?: number,
+          d: number,
+          s?: number
+        }) => void): void
+
+        on(eventName: 'attack', listener: (data: {
+          error: string,
+        }) => void): void
+
+        on(eventName: 'auth', listener: (data: number) => void): void
+
+        on(eventName: 'combat', listener: (data: number) => void): void
+
+        on(eventName: 'cd', listener: (data: string) => void): void
+
+        on(eventName: 'diff', listener: (data: Array<{
+          id: number
+          l?: number
+          x?: number
+          y?: number
+          md?: string
+          rarity?: number
+          level?: number
+          hp?: number
+          hpMax?: number
+          hps?: number
+          hpRegen?: number
+          mp?: number
+          mpMax?: number
+          mpRegen?: number
+          xp?: number
+          targetId?: number
+          moveSpeed?: number
+          armor?: number
+          force?: number
+          died?: number
+          pname?: string,
+          pxp?: number,
+          xpGain?: number,
+          powers?: {},
+          skills?: Array<0 | Skill>,
+          i?: number,
+          bagItem?: null | Item,
+          bagItems?: Array<null | Item>,
+          craftInItems?: Array<null | Item>,
+          gcd?: number,
+        }>) => void): void
+
+        on(eventName: 'equip', listener: (data: { error: string } | {
+          id: number,
+          slot: string,
+          i: number,
+          bag: string,
+        }) => void): void
+
+        on(eventName: 'events', listener: (data: Record<string, {
+          ilvl: number
+          l: number
+          md: string
+          terrain: number
+          x: number
+          y: number
+        }>) => void): void
+
+        on(eventName: 'frenzy', listener: (data: { error: string }) => void): void
+
+        on(eventName: 'gcd', listener: (data: {}) => void): void
+
+        on(eventName: 'hit', listener: (data: Array<{
+          projId?: number
+          md?: string
+          actor: number
+          target: number
+          heal?: number
+          amount?: number
+          val?: number
+          rip?: number
+        }>) => void): void
+
+        on(eventName: 'levelUp', listener: (data: { id: number }) => void): void
+
+        on(eventName: 'loot', listener: (data: Array<{
+          i: number,
+          item: Item,
+          log: number,
+        }>) => void): void
+
+        on(eventName: 'magicShrub', listener: (data: { error: string }) => void): void
+
+        on(eventName: 'market', listener: (data: Record<string, number>) => void): void
+
+        on(eventName: 'missionBonus', listener: (data: Record<string, number>) => void): void
+
+        on(eventName: 'move', listener: (data: { error: string }) => void): void
+
+        on(eventName: 'moveItem', listener: (data: { error: string } | {
+          name: string,
+          id?: number
+          i: number
+          item?: null | Item
+        }) => void): void
+
+        on(eventName: 'proj', listener: (data: {
+          md: string,
+          mwd: string,
+          id: number,
+          aid: number,
+          tid: number,
+        }) => void): void
+
+        on(eventName: 'partyDiff', listener: (data: {
+          dbId: number,
+          name?: string,
+          level?: number,
+          id?: number,
+          leader?: number
+        }) => void): void
+
+        on(eventName: 'partyInvite', listener: (data: {
+          from: string
+          id: number
+        }) => void): void
+
+        on(eventName: 'partyKick', listener: (data: {
+          dbId: number
+        }) => void): void
+
+        on(eventName: 'rfx', listener: (data: {
+          id: number
+          md: string
+        }) => void): void
+
+        on(eventName: 'sendPartyInvite', listener: (data: {
+          error: string
+        }) => void): void
+
+        on(eventName: 'seenChunks', listener: (data: Record<string, {
+          terrain: Array<Array<Array<number>>>
+        }>) => void): void
+
+        on(eventName: 'seenObjects', listener: (data: any) => void): void
+
+        on(eventName: 'setRespawn', listener: (data: {
+          l: number
+          x: number
+          y: number
+        }) => void): void
+
+        on(eventName: 'setSpawn', listener: (data: {
+          l: number
+          x: number
+          y: number
+        }) => void): void
+
+        on(eventName: 'share', listener: (data: number) => void): void
+
+        on(eventName: 'talk', listener: (data: {
+          name: string
+          text: string
+        }) => void): void
+
+        on(eventName: 'unseenChunks', listener: (data: string) => void): void
+
+        on(eventName: 'unseenObjects', listener: (data: Array<number>) => void): void
+
+        on(eventName: string, listener: (data: any) => void): void
+
+        /**
+         * Opens a portal to your respawn location ot a player with `targetName`.
+         * @param portalScrollIndex
+         * @param targetName
+         */
+        openPortal(portalScrollIndex: number, targetName?: string)
+
+        partyInvite(targetName: string)
+
+        partyKick(targetName: string)
+
+        partyPromote(targetName: string)
+
+        /**
+         * @param itemIndex index of the item in dw.character.bag
+         * @param x
+         * @param y
+         */
+        placeItem(itemIndex, x, y)
+
+        /**
+         *
+         * @param receiver Either the ID or the name of the receiving player
+         * @param itemIndex index of the item in your dw.character.bag
+         */
+        sendItem(receiver: number | string, itemIndex: number): void
+
+        set(key: string, value: any): void
+
+        setSpawn()
+
+        /**
+         * Set the UI to show this target
+         * @param id
+         */
+        setTarget(id: number): void
+
+        sortInv()
+
+        /**
+         * Cancels the craft in progress.
+         */
+        stopCraft()
+
+        talk(message: string): void
+
+        takeItem(itemId)
+
+        targetId: number | null
+
+        /**
+         * Uneqip an item and put it in bag slow with index `itemIndex`
+         * @param slotName which slot to unequip the item from. Possible values can be found in dw.c.gear
+         * @param itemIndex index in dw.character.bag to unequip the item to
+         */
+        unequip(slotName: string, itemIndex?: number)
+
+        /**
+         * In case your character is stuck, and you have no way of unstucking yourself,
+         * you can use this to return to "1.0.0". This will reset your spawn to "1.0.0".
+         */
+        unstuck()
+
+        /**
+         * Use skill on a target.
+         * @param skillIndex
+         * @param targetId
+         */
+        useSkill(skillIndex: number, targetId: number): void
+
+        /**
+         * Use a movement skill on a position.
+         * @param skillIndex
+         * @param x
+         * @param y
+         */
+        useSkill(skillIndex: number, x: number, y: number): void
+      }
+
+      interface BaseEntity {
+        id: number
+        /** Metadata ID */
+        md: string
+
+        l: number
+        x: number
+        y: number
+      }
+
+      export interface Character extends LivingEntity {
+        /** Means that this is a player. Value is always 1. */
+        player: 1
+        /** Character's name */
+        name: string
+        /** Equipped items */
+        gear: Record<string, unknown>
+        /** Character's appearance */
+        mtx: Record<string, unknown>
+
+        charDbId: number
+      }
+
+      export type Chunk = Array<Array<Array<number>>>
+
+      export type Entity = YourCharacter | Character | Monster | Tree | Ore | Station
+
+      export interface Item {
+        /** Metadata ID */
+        md: string;
+
+        /** Count, or 1 if undefined */
+        n?: number;
+
+        /**
+         * The rarity
+         * 0 = white
+         * 1 = green
+         * 2 = blue
+         * 3 = purple
+         */
+        r: number;
+
+        /** The item level / quality*/
+        qual: number
+
+        /** The modifiers on the item */
+        mods: Record<string, number>
+      }
+
+      export interface LivingEntity extends BaseEntity {
+        level: number
+        /** Life */
+        hp: number
+        hpMax: number
+        /** Mana */
+        mp: number
+        mpMax: number
+        /** Movement speed. World units per second. Multiply by 96 to get pixels per second. */
+        moveSpeed: number
+        dx?: number
+        dy?: number
+        /** Current, if any*/
+        targetId?: number
+      }
+
+      export interface Monster extends LivingEntity {
+        /** Means that this is a monster. Value is always 1. */
+        ai: 1
+        /** Indicated whether the monster will attack you on sight */
+        bad?: number
+        /** 1 is a normal monster. 2+ are bosses. */
+        r: number
+      }
+
+      export interface Ore extends BaseEntity {
+        /** Means that this is an ore. Value is always 1. */
+        ore: 1
+        /** Quality */
+        qual: number
+      }
+
+      export interface Tree extends BaseEntity {
+        /** Means that this is a tree. Value is always 1. */
+        tree: 1
+        /** Quality */
+        qual: number
+      }
+
+      export interface Skill {
+        cost: number
+        md: string
+        range: number
+        val?: number
+        phys?: number
+        cold?: number
+        elec?: number
+        fire?: number
+        acid?: number
+        crit?: number
+        critMult?: number
+        speed?: number
+      }
+
+      export interface Station extends BaseEntity {
+        /** Means that this is a station. Value is always 1. */
+        station: 1
+        /** Indicating whether you are the owner. */
+        owner: number
+        /** Owner Database ID */
+        ownerDbId: number
+        /** Storage of items and possible other stuff */
+        storage: Array<Item | unknown | null>
+      }
+
+      export interface YourCharacter extends Character {
+        /** Item inventory */
+        bag: Array<Item | null>
+
+        /** Skill specific timestamps of their cooldowns */
+        cds: Record<string, number>,
+
+        /** Indicator whether the character is currently in combat */
+        combat?: number,
+
+        /** Crafting inventory */
+        craftIn: Array<unknown>
+
+        /**
+         * Active effects on your character
+         */
+        fx: Record<string, unknown>
+
+        /** Timestamp of the global cooldown */
+        gcd?: number,
+
+        mission: {
+          l: number
+          x: number
+          y: number
+
+          item: {
+            md: string
+            r: number
+            qual: number
+            level: number
+            ownerDbId: number
+            runners: Array<string>
+            missionId: number
+          }
+
+          /**
+           * Percentage progress e.g. 6.0990909%
+           */
+          progress: number;
+
+          /**
+           * When the timeout happens
+           */
+          timeoutAt: number;
+        }
+
+        professions: Record<
+          | "axesmith"
+          | "boomerangsmith"
+          | "bowsmith"
+          | "crossbowsmith"
+          | "daggersmith"
+          | "gemcutting"
+          | "macesmith"
+          | "metalworking"
+          | "mining"
+          | "pickaxesmith"
+          | "platesmith"
+          | "sceptersmith"
+          | "spearsmith"
+          | "staffsmith"
+          | "stoneworking"
+          | "swordsmith"
+          | "wandsmith"
+          | "woodcutting"
+          | "woodworking", {
+          md: string
+          level: number
+          xp: number
+        }>
+
+        /** Skills in skill bar */
+        skillBag: Array<Item | null>
+
+        /** Skill info for skills in skill bar */
+        skills: Array<Skill | 0>
+
+        spawn: Position & { w: number }
+
+        respawn: Position
+
+        xp: number
+      }
+
+      export interface WorldPosition {
+        l: number
+        x: number
+        y: number
+      }
     }
-
-    /**
-     * Moves towards x,y in a straight line
-     * @param x
-     * @param y
-     */
-    move(x: number, y: number): void
-
-    /**
-     * Your character bag names are: 'bag', 'craftIn', 'abilities', 'abilityBag'.
-     * Other objects bag names are: 'storage'.
-     * @param bagFrom
-     * @param indexFrom
-     * @param bagTo
-     * @param indexTo
-     * @param idFrom can be omitted if transferring from your character
-     * @param idTo can be omitted if transferring to your character
-     */
-    moveItem(bagFrom: string, indexFrom: number, bagTo: string, indexTo: number, idFrom?: number, idTo?: number): void
-
-    /**
-     * This is not a socket event, but a client event to draw stuff on canvas.
-     * @param eventName
-     * @param listener
-     */
-    on(eventName: 'drawEnd', listener: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void): void
-
-    on(eventName: 'afx', listener: (data: {
-      id: umber,
-      md: string,
-      v?: number,
-      d: number,
-      s?: number
-    }) => void): void
-
-    on(eventName: 'attack', listener: (data: {
-      error: string,
-    }) => void): void
-
-    on(eventName: 'auth', listener: (data: number) => void): void
-
-    on(eventName: 'combat', listener: (data: number) => void): void
-
-    on(eventName: 'cd', listener: (data: string) => void): void
-
-    on(eventName: 'diff', listener: (data: Array<{
-      id: number
-      l?: number
-      x?: number
-      y?: number
-      md?: string
-      rarity?: number
-      level?: number
-      hp?: number
-      hpMax?: number
-      hps?: number
-      hpRegen?: number
-      mp?: number
-      mpMax?: number
-      mpRegen?: number
-      xp?: number
-      targetId?: number
-      moveSpeed?: number
-      armor?: number
-      force?: number
-      died?: number
-      defaultSkills?: {
-        woodcutting: DefaultSkill,
-        mining: DefaultSkill,
-      },
-      pname?: string,
-      pxp?: number,
-      xpGain?: number,
-      powers?: {},
-      skills?: Array<0 | Skill>,
-      i?: number,
-      bagItem?: null | Item,
-      bagItems?: Array<null | Item>,
-      craftInItems?: Array<null | Item>,
-      gcd?: number,
-    }>) => void): void
-
-    on(eventName: 'equip', listener: (data: { error: string } | {
-      id: number,
-      slot: string,
-      i: number,
-      bag: string,
-    }) => void): void
-
-    on(eventName: 'frenzy', listener: (data: { error: string }) => void): void
-
-    on(eventName: 'gcd', listener: (data: {}) => void): void
-
-    on(eventName: 'hit', listener: (data: Array<{
-      projId?: number
-      md?: number
-      actor: number
-      target: number
-      heal?: number
-      amount?: number
-      val?: number
-      rip?: number
-    }>) => void): void
-
-    on(eventName: 'levelUp', listener: (data: { id: number }) => void): void
-
-    on(eventName: 'loot', listener: (data: Array<{
-      i: number,
-      item: Item,
-      log: number,
-    }>) => void): void
-
-    on(eventName: 'magicShrub', listener: (data: { error: string }) => void): void
-
-    on(eventName: 'market', listener: (data: Record<string, number>) => void): void
-
-    on(eventName: 'missionBonus', listener: (data: Record<string, number>) => void): void
-
-    on(eventName: 'move', listener: (data: { error: string }) => void): void
-
-    on(eventName: 'moveItem', listener: (data: { error: string } | {
-      name: string,
-      id?: number
-      i: number
-      item?: null | Item
-    }) => void): void
-
-    on(eventName: 'proj', listener: (data: {
-      md: string,
-      mwd: string,
-      id: number,
-      aid: number,
-      tid: number,
-    }) => void): void
-
-    on(eventName: 'partyDiff', listener: (data: {
-      dbId: number,
-      name?: string,
-      level?: number,
-      id?: number,
-      leader?: number
-    }) => void): void
-
-    on(eventName: 'partyInvite', listener: (data: {
-      from: string
-      id: number
-    }) => void): void
-
-    on(eventName: 'partyKick', listener: (data: {
-      dbId: number
-    }) => void): void
-
-    on(eventName: 'rfx', listener: (data: {
-      id: number
-      md: string
-    }) => void): void
-
-    on(eventName: 'sendPartyInvite', listener: (data: {
-      error: string
-    }) => void): void
-
-    on(eventName: 'seenChunks', listener: (data: Record<string, {
-      terrain: Array<Array<Array<number>>>
-    }>) => void): void
-
-    on(eventName: 'seenObjects', listener: (data: any) => void): void
-
-    on(eventName: 'setRespawn', listener: (data: {
-      l: number
-      x: number
-      y: number
-    }) => void): void
-
-    on(eventName: 'setSpawn', listener: (data: {
-      l: number
-      x: number
-      y: number
-      w: number
-    }) => void): void
-
-    on(eventName: 'share', listener: (data: number) => void): void
-
-    on(eventName: 'talk', listener: (data: {
-      name: string
-      text: string
-    }) => void): void
-
-    on(eventName: 'unseenChunks', listener: (data: string) => void): void
-
-    on(eventName: 'unseenObjects', listener: (data: Array<number>) => void): void
-
-    on(eventName: string, listener: (data: any) => void): void
-
-    sendItem(receiver: number | string, itemIndex: number): void
-
-    set(key: string, value: any): void
-
-    /**
-     * Set the UI to show this target
-     * @param target
-     */
-    setTarget(target: Target): void
-
-    targetId: number | null
-
-    useSkill(skill: string | number, target: { id: number }): void
-  }
-}
-
-export interface Coordinates {
-  /** World x pos */
-  x: number
-  /** World y pos */
-  y: number
-}
-
-export interface Position extends Coordinates {
-  /** World layer pos */
-  l: number
-}
-
-export interface Target {
-  id: number
-}
-
-interface BaseEntity extends Position {
-  id: number
-  /** Metadata ID */
-  md: string
-}
-
-interface LivingBaseEntity extends BaseEntity {
-  level: number
-  /** Life */
-  hp: number
-  hpMax: number
-  /** Mana */
-  mp: number
-  mpMax: number
-  /** Movement speed. World units per second. Multiply by 96 to get pixels per second. */
-  moveSpeed: number
-  /** Current, if any*/
-  targetId?: number
-}
-
-export interface Character extends LivingBaseEntity {
-  /** Means that this is a player. Value is always 1. */
-  player: 1
-  /** Character's name */
-  name: string
-  /** Equipped items */
-  gear: Record<string, unknown>
-  /** Character's appearance */
-  mtx: Record<string, unknown>
-}
-
-export interface YourCharacter extends Character {
-  /** Item inventory */
-  bag: Array<Item | null>
-
-  /** Skill specific timestamps of their cooldowns */
-  cds: Record<string, number>,
-
-  /** Indicator whether the character is currently in combat */
-  combat?: number,
-
-  /** Crafting inventory */
-  craftIn: Array<unknown>
-
-  defaultSkills: {
-    woodcutting: DefaultSkill
-    mining: DefaultSkill
   }
 
-  /**
-   * Active effects on your character
-   */
-  fx: Record<string, unknown>
-
-  /** Timestamp of the global cooldown */
-  gcd?: number,
-
-  mission: {
-    item: {
-      md: string
-      r: number
-      qual: number
-      level: number
-      ownerDbId: number
-      runners: Array<string>
-      missionId: number
-    }
-
-    /**
-     * Percentage progress e.g. 6.0990909%
-     */
-    progress: number;
-
-    /**
-     * When the timeout happens
-     */
-    timeoutAt: number;
-  }
-
-  professions: {
-    axesmith: Profession
-    bowsmith: Profession
-    daggersmith: Profession
-    gemcutting: Profession
-    macesmith: Profession
-    metalworking: Profession
-    mining: Profession
-    pickaxesmith: Profession
-    platesmith: Profession
-    spearsmith: Profession
-    staffsmith: Profession
-    stoneworking: Profession
-    swordsmith: Profession
-    wandsmith: Profession
-    woodcutting: Profession
-    woodworking: Profession
-  }
-
-  /** Skills in skill bar */
-  skillBag: Array<Item | null>
-
-  /** Skill info for skills in skill bar */
-  skills: Array<{
-    cost: number
-    md: string
-    range: number
-    val?: number
-    physDmg?: number;
-    coldDmg?: number;
-    elecDmg?: number;
-    fireDmg?: number;
-    acidDmg?: number;
-    crit?: number;
-    critMult?: number;
-    speed?: number;
-  } | 0>
-
-  spawn: Position & { w: number }
-  respawn: Position
-}
-
-export interface Monster extends LivingBaseEntity {
-  /** Means that this is a monster. Value is always 1. */
-  ai: 1
-  /** Indicated whether the monster will attack you on sight */
-  hostile?: number
-  /** 1 is a normal monster. 2+ are bosses. */
-  r: number
-}
-
-export interface Tree extends BaseEntity {
-  /** Means that this is a tree. Value is always 1. */
-  tree: 1
-  /** Quality */
-  qual: number
-}
-
-export interface Ore extends BaseEntity {
-  /** Means that this is an ore. Value is always 1. */
-  ore: 1
-  /** Quality */
-  qual: number
-}
-
-export interface Station extends BaseEntity {
-  /** Means that this is a station. Value is always 1. */
-  station: 1
-  /** Indicating whether you are the owner. */
-  owner: number
-  /** Owner Database Id */
-  ownerDbId: number
-  /** Storage of items and possible other stuff */
-  storage: Array<Item | unknown | null>
-}
-
-export type Entity = YourCharacter | Character | Monster | Tree | Ore | Station
-
-export type Chunk = Array<Array<Array<number>>>
-
-/**
- * Each property is a chunk of 1x16x16 voxels containing data about the terrain.
- *
- * - Keys are the chunks world positions in the format "layer.row.col". Example: "0.0.0", "5.1.0", "-1.3.-2".
- * - Values are 3D arrays of integers.
- *
- * Example: dw.chunks['0.0.0'][0][10][15] would return the terrain in chunk "0.0.0" at row 10 and col 15.
- */
-export type Chunks = Record<string, Chunk>
-
-export type DefaultSkill = {
-  physDmg: number;
-  coldDmg: number;
-  elecDmg: number;
-  fireDmg: number;
-  acidDmg: number;
-  crit: number;
-  critMult: number;
-  range: number;
-  cost: null;
-}
-
-export type Skill = {
-  md: string
-  physDmg?: number
-  coldDmg?: number
-  elecDmg?: number
-  fireDmg?: number
-  acidDmg?: number
-  crit?: number
-  critMult?: number
-  range: number
-  cost: number
-  val?: number
-  stack?: number
-  duration?: number
-  speed?: number
-}
-
-export interface Profession {
-  md: string
-  xp: number
-  level: number
-}
-
-export type Item = {
-  /** Metadata ID */
-  md: string;
-
-  /** Count, or 1 if undefined */
-  n?: number;
-
-  /**
-   * The rarity
-   * 0 = white
-   * 1 = green
-   * 2 = blue
-   * 3 = purple
-   */
-  r: number;
-
-  /** The item level / quality*/
-  qual: number
-
-  /** The modifiers on the item */
-  mods: Record<string, number>
+  export = dw
 }
