@@ -239,7 +239,7 @@ declare module 'dw' {
          * @param z
          * @param zo Layer offset. 1 to check the terrain above, -1 to check the terrain under.
          */
-        getTerrain(x: number, y: number, z: number, zo: number): number
+        getTerrain(x: number, y: number, z: number, zo?: number): number
 
         /**
          * Returns the terrain at the given position
@@ -271,12 +271,11 @@ declare module 'dw' {
         /**
          * Get either the zone level of location or of player location
          * when no other parameters were specified.
-         * @param number
          * @param x
          * @param y
          * @param z
          */
-        getZoneLevel(number, x?: number, y?: number, z?: number): number
+        getZoneLevel(x?: number, y?: number, z?: number): number
 
         /**
          * Checks whether the target would be in range for spell.
