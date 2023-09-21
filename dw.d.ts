@@ -656,6 +656,7 @@ declare module 'dw' {
         mpMax: number
         /** Movement speed. World units per second. Multiply by 96 to get pixels per second. */
         moveSpeed: number
+        fx: object
         dx?: number
         dy?: number
         /** Current, if any*/
