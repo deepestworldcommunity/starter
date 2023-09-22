@@ -762,7 +762,7 @@ declare module 'dw' {
         /**
          * Party information
          */
-        party: Array<{
+        party?: Array<{
           dbId: number
           name: string
           level: number
