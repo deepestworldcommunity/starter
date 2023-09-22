@@ -749,17 +749,6 @@ declare module 'dw' {
           }
 
           /**
-           * Party information
-           */
-          party: Array<{
-            dbId: number
-            name: string
-            level: number
-            id: number
-            leader?: number
-          }>
-
-          /**
            * Percentage progress e.g. 6.0990909%
            */
           progress: number;
@@ -769,6 +758,17 @@ declare module 'dw' {
            */
           timeoutAt: number;
         }
+
+        /**
+         * Party information
+         */
+        party: Array<{
+          dbId: number
+          name: string
+          level: number
+          id: number
+          leader?: number
+        }>
 
         professions: Record<
           | "axesmith"
