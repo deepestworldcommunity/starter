@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noImplicitAny": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2017"
+    "target": "ESNext",
+    "types": [
+      "./dw.d.ts"
+    ]
   }
 }

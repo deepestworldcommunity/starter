@@ -19,16 +19,15 @@ if (typeof password !== 'string') {
   process.exit(2)
 }
 
-if (process.argv.length < 3) {
-  console.error('Missing character name')
-  console.error('  npm start <charactername> [<script>]')
+if (!process.env.DW_CHARACTER) {
+  console.error('set DW_CHARACTER in .env file')
   process.exit(3)
 }
 
 const disableTracking = process.env.DW_DISABLE_TRACKING === "true"
 
-const characterName = process.argv[2]
-const script = process.argv[3] ?? './src/starter.js'
+const characterName = process.env.DW_CHARACTER
+const script = process.argv[2] ?? process.env.DW_SCRIPT ?? 'src/starter.js'
 
 function log(...args) {
   console.log(new Date().toLocaleTimeString('en-GB'), ...args)
@@ -55,6 +54,10 @@ async function run() {
     }
 
     if (!disableTracking) {
+      if (json[0] === '' && json[1] === 'seenObjects') {
+        tracking.onSeenObjects(json[2])
+      }
+
       if (json[0] === '' && json[1] === 'seenChunks') {
         tracking.onSeenChunks(json[2])
       }
@@ -115,6 +118,7 @@ async function run() {
       ctx = await esbuild.context({
         entryPoints: [script],
         bundle: true,
+        target: 'chrome116',
         plugins: [{
           name: 'watch-plugin',
           setup: (build) => {
