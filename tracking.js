@@ -5,7 +5,10 @@ const seenChunks = new Map()
 const seenObjects = new Set()
 
 function hashChunk(chunk) {
-  return crypto.createHash('sha1').update(JSON.stringify(chunk)).digest('hex')
+  return crypto
+    .createHash('sha1')
+    .update(JSON.stringify(chunk))
+    .digest('hex')
 }
 
 async function onSeenChunks(chunks) {
@@ -43,28 +46,28 @@ async function onSeenObjects(entities) {
     }
 
     const key = `${entity.level}+${entity.r ?? 0} ${entity.md}`
-    if (!seenObjects.has(key)) {
-      console.log(`[Tracking] ${key}`)
-
-      seenObjects.add(key)
-
-      requests.push(fetch(
-        `${BASE_URL}/log/mob`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            level: entity.level,
-            r: entity.r ?? 0,
-            md: entity.md,
-            terrain: entity.terrain,
-            hp: entity.hpMax,
-          })
-        }
-      ))
+    if (seenObjects.has(key)) {
+      continue
     }
+
+    seenObjects.add(key)
+
+    requests.push(fetch(
+      `${BASE_URL}/log/mob`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          level: entity.level,
+          r: entity.r ?? 0,
+          md: entity.md,
+          terrain: entity.terrain,
+          hp: entity.hpMax,
+        })
+      }
+    ))
   }
 
   await Promise.allSettled(requests)
@@ -78,7 +81,7 @@ async function onLoot(entries){
       continue
     }
 
-    const item = {...entry.item}
+    const item = { ...entry.item }
     delete item.n
 
     requests.push(fetch(
