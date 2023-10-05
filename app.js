@@ -19,18 +19,45 @@ if (typeof password !== 'string') {
   process.exit(2)
 }
 
-if (!process.env.DW_CHARACTER) {
+/** @var {string | undefined} */
+const characterName = process.env.DW_CHARACTER
+if (typeof characterName !== 'string') {
   console.error('set DW_CHARACTER in .env file')
   process.exit(3)
 }
 
 const disableTracking = process.env.DW_DISABLE_TRACKING === "true"
 
-const characterName = process.env.DW_CHARACTER
+/** @var {string} */
 const script = process.argv[2] ?? process.env.DW_SCRIPT ?? 'src/starter.js'
 
 function log(...args) {
   console.log(new Date().toLocaleTimeString('en-GB'), ...args)
+}
+
+let characterId
+let character
+
+function getCharacterBattleScore() {
+  if (!character) {
+    return 0
+  }
+
+  let maxDmg = 0
+  character.skills.forEach((skill) => {
+    if (!skill || /heal|shield/.test(skill.md)) {
+      return
+    }
+
+    let dmg = (skill?.phys ?? 0) + (skill?.fire ?? 0) + (skill.acid ?? 0) + (skill.cold ?? 0) + (skill.elec ?? 0)
+    dmg *= 1 + (skill.crit ?? 0) * ((skill.critMult ?? 1) - 1)
+
+    if (dmg > maxDmg) {
+      maxDmg = dmg
+    }
+  })
+
+  return Math.sqrt(maxDmg * character.hpMax)
 }
 
 async function run() {
@@ -64,6 +91,39 @@ async function run() {
 
       if (json[0] === '' && json[1] === 'loot') {
         tracking.onLoot(json[2])
+      }
+    }
+
+    if (json[0] === '' && json[1] === "auth") {
+      characterId = json[2]
+      log(`Got character id`, characterId)
+    }
+
+    if (json[0] === '' && json[1] === "dc") {
+      log(`Disconnect`, json[2])
+    }
+
+    if (json[0] === '' && json[1] === 'seenObjects') {
+      for (let i = 0; i < json[2].length; i++) {
+        if (json[2][i].id === characterId) {
+          character = json[2][i]
+        }
+      }
+    }
+
+    if (json[0] === '' && json[1] === 'diff') {
+      for (let i = 0; i < json[2].length; i++) {
+        if (json[2][i].id !== characterId) {
+          continue
+        }
+
+        const beforeBattleScore = getCharacterBattleScore()
+        character = {...character, ...json[2][i]}
+        const afterBattleScore = getCharacterBattleScore()
+
+        if (beforeBattleScore !== afterBattleScore) {
+          log(`[BattleScore] ${beforeBattleScore.toLocaleString()} -> ${afterBattleScore.toLocaleString()}`)
+        }
       }
     }
   })
