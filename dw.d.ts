@@ -582,7 +582,7 @@ declare global {
 
       magicShrub: (data: { error: string }) => void
 
-      market: (data: Record<string, number>) => void
+      market: (data: Record<string, Record<number, number>>) => void
 
       missionBonus: (data: Record<string, number>) => void
 
@@ -699,6 +699,9 @@ declare global {
       mpMax: number
       /** Movement speed. World units per second. Multiply by 96 to get pixels per second. */
       moveSpeed: number
+      /**
+       * Buffs & debuffs will be accessible here.
+       */
       fx: Record<string, unknown>
       dx?: number
       dy?: number
@@ -711,6 +714,8 @@ declare global {
       ai: 1
       /** Indicated whether the monster will attack you on sight */
       bad?: number
+      /** time of activation */
+      badCd?: number
       /** 1 is a normal monster. 2+ are bosses. */
       r: number
       /** Coop shield. */
@@ -828,6 +833,7 @@ declare global {
 
       professions: Record<
         | "axesmith"
+        | "armorsmith"
         | "boomerangsmith"
         | "bowsmith"
         | "crossbowsmith"
@@ -836,7 +842,6 @@ declare global {
         | "macesmith"
         | "metalworking"
         | "mining"
-        | "pickaxesmith"
         | "platesmith"
         | "sceptersmith"
         | "spearsmith"

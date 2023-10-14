@@ -24,6 +24,7 @@ npm install
 ```
 DW_USERNAME=myUserName
 DW_PASSWORD=secretPassword
+DW_CHARACTER=Charactername
 ```
 You might wonder how you would create a `.env` file under Windows, you can use this to create an empty one:
 ```shell
@@ -31,7 +32,7 @@ echo. > .env
 ```
 5. start Election via:
 ```shell
-npm start <characterName>
+npm start
 ```
 6. go to src/starter.js and change the first line to:
 ```js
@@ -64,8 +65,8 @@ foo()
 ### Run & Enjoy
 
 ```sh
-npm start [character] bar.js # for JavaScript
-npm start [character] bar.ts # fot TypeScript
+npm start bar.js # for JavaScript
+npm start bar.ts # for TypeScript
 ```
 ## Electron - What Is It and Why Is It Used
 
@@ -76,7 +77,7 @@ But slowing down you AI code will probably most likely result in poor performanc
 
 ## FAQ
 
-### "Help, my code get's updated, but nothing is happening."
+### "Help, my code gets updated, but nothing is happening."
 
 Have you checked out the developer tools of Electron? You can do so
 via `Ctrl + Shift + I` under Windows/Unix or `Option + Command + I`, there might be an error.
