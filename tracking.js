@@ -41,7 +41,7 @@ async function onSeenObjects(entities) {
   const requests = []
 
   for (const entity of entities) {
-    if (!('ai' in entity) || entity.hp !== entity.hpMax) {
+    if (!('ai' in entity) || entity.hp !== entity.hpMax || !!entity.fx?.hpMore) {
       continue
     }
 
