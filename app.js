@@ -122,7 +122,7 @@ async function run() {
         const afterBattleScore = getCharacterBattleScore()
 
         if (beforeBattleScore !== afterBattleScore) {
-          log(`[BattleScore] ${beforeBattleScore.toLocaleString()} -> ${afterBattleScore.toLocaleString()}`)
+          log(`[BattleScore] ${beforeBattleScore.toLocaleString([], { maximumFractionDigits: 0 })} -> ${afterBattleScore.toLocaleString([], { maximumFractionDigits: 0 })}`)
         }
       }
     }
