@@ -78,7 +78,11 @@ async function run() {
     }
 
     if (json[0] === '' && json[1] === "callLimitDc") {
-      log(`[Disconnect] You've got disconnected due to the call limit`)
+      log(`[Disconnect] You've got disconnected due to sending too many requests (call limit)`)
+    }
+
+    if (json[0] === '' && json[1] === "byteLimitDc") {
+      log(`[Disconnect] You've got disconnected due to sending too big requests (byte limit)`)
     }
 
     if (json[0] === '' && json[1] === 'seenObjects') {
