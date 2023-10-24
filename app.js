@@ -1,35 +1,9 @@
-require('dotenv').config()
 const esbuild = require('esbuild')
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("node:path");
 
+const config = require('./config')
 const tracking = require('./tracking')
-
-/** @var {string | undefined} */
-const username = process.env.DW_USERNAME
-if (typeof username !== 'string') {
-  console.error('set DW_USERNAME in .env file')
-  process.exit(1)
-}
-
-/** @var {string | undefined} */
-const password = process.env.DW_PASSWORD
-if (typeof password !== 'string') {
-  console.error('set DW_PASSWORD in .env file')
-  process.exit(2)
-}
-
-/** @var {string | undefined} */
-const characterName = process.env.DW_CHARACTER
-if (typeof characterName !== 'string') {
-  console.error('set DW_CHARACTER in .env file')
-  process.exit(3)
-}
-
-const disableTracking = process.env.DW_DISABLE_TRACKING === "true"
-
-/** @var {string} */
-const script = process.argv[2] ?? process.env.DW_SCRIPT ?? 'src/starter.js'
 
 function log(...args) {
   console.log(new Date().toLocaleTimeString('en-GB'), ...args)
@@ -80,7 +54,7 @@ async function run() {
       return
     }
 
-    if (!disableTracking) {
+    if (!config.disableTracking) {
       if (json[0] === '' && json[1] === 'seenObjects') {
         tracking.onSeenObjects(json[2])
       }
@@ -100,7 +74,11 @@ async function run() {
     }
 
     if (json[0] === '' && json[1] === "dc") {
-      log(`Disconnect`, json[2])
+      log(`[Disconnect] You've got disconnected due to another login`, json[2])
+    }
+
+    if (json[0] === '' && json[1] === "callLimitDc") {
+      log(`[Disconnect] You've got disconnected due to the call limit`)
     }
 
     if (json[0] === '' && json[1] === 'seenObjects') {
@@ -157,8 +135,8 @@ async function run() {
 
     if (url === 'https://deepestworld.com/login') {
       await win.webContents.executeJavaScript(`
-        document.querySelector("input#username").value = ${JSON.stringify(username)};
-        document.querySelector("input#password").value = ${JSON.stringify(password)};
+        document.querySelector("input#username").value = ${JSON.stringify(config.username)};
+        document.querySelector("input#password").value = ${JSON.stringify(config.password)};
         document.querySelector("button[type=submit]").click();
       `)
       return
@@ -167,7 +145,7 @@ async function run() {
     if (url.startsWith('https://deepestworld.com/perso/list')) {
       await win.webContents.executeJavaScript(`
         [...document.querySelectorAll("a")]
-          .filter((a) => a.href.startsWith("https://deepestworld.com/game/") && a.innerHTML === ${JSON.stringify(characterName)})
+          .filter((a) => a.href.startsWith("https://deepestworld.com/game/") && a.innerHTML === ${JSON.stringify(config.characterName)})
           .shift()
           ?.click();
       `)
@@ -176,7 +154,7 @@ async function run() {
 
     if (url.startsWith('https://deepestworld.com/game/')) {
       ctx = await esbuild.context({
-        entryPoints: [script],
+        entryPoints: [config.script],
         bundle: true,
         target: 'chrome116',
         plugins: [{
@@ -219,7 +197,7 @@ async function run() {
         write: false,
       })
 
-      log(`Watching for file changes on ${script}`)
+      log(`Watching for file changes on ${config.script}`)
       await ctx.watch()
       return
     }
