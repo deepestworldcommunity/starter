@@ -51,6 +51,8 @@ declare namespace DeepestWorld {
      */
     deleteItem(itemIndex: number): void
 
+    destroyBuilding(buildingId: number): void
+
     /**
      * Disenchants item in bag with index `indexItem,
      * uses an enchanting device provided by `enchantingDeviceId`.
@@ -112,6 +114,8 @@ declare namespace DeepestWorld {
     emit(eventName: 'declinePartyInvite', data: { id: number }): void
 
     emit(eventName: 'deleteItem', data: { i: number }): void
+
+    emit(eventName: 'destroyBuilding', data: { id: number }): void
 
     emit(eventName: 'elevator', data: {
       id: number,
