@@ -67,7 +67,10 @@ declare namespace DeepestWorld {
      * @param to
      * @deprecated use the same function, but with 4 parameters now
      */
-    distance(from: { x: number, y: number }, to: { x: number, y: number }): number
+    distance(
+      from: { x: number; y: number },
+      to: { x: number; y: number },
+    ): number
 
     /**
      * Returns the distance between two points
@@ -81,7 +84,7 @@ declare namespace DeepestWorld {
     /** Your surroundings: monsters, characters, trees, etc */
     e: Array<Entity>
 
-    emit(eventName: 'auth', data: { token: string, name: string }): void
+    emit(eventName: 'auth', data: { token: string; name: string }): void
 
     emit(eventName: 'abandonMission'): void
 
@@ -96,7 +99,7 @@ declare namespace DeepestWorld {
      */
     emit(eventName: 'chop', data: { id: number }): void
 
-    emit(eventName: 'claimLand', data: { x: number, y: number }): void
+    emit(eventName: 'claimLand', data: { x: number; y: number }): void
 
     /**
      * Combines stackable crafting items together
@@ -104,12 +107,15 @@ declare namespace DeepestWorld {
      */
     emit(eventName: 'combine'): void
 
-    emit(eventName: 'craft', data: {
-      id: number
-      md: string
-      r: 0
-      max?: number
-    }): void
+    emit(
+      eventName: 'craft',
+      data: {
+        id: number
+        md: string
+        r: 0
+        max?: number
+      },
+    ): void
 
     emit(eventName: 'declinePartyInvite', data: { id: number }): void
 
@@ -117,31 +123,40 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'destroyBuilding', data: { id: number }): void
 
-    emit(eventName: 'elevator', data: {
-      id: number,
-      z: number
-    }): void
+    emit(
+      eventName: 'elevator',
+      data: {
+        id: number
+        z: number
+      },
+    ): void
 
-    emit(eventName: 'enchant', data: {
-      id: number,
-      md: string
-    }): void
+    emit(
+      eventName: 'enchant',
+      data: {
+        id: number
+        md: string
+      },
+    ): void
 
     emit(eventName: 'enterCar', data: { id: number }): void
 
     emit(eventName: 'enterPortal', data: { id: number }): void
 
-    emit(eventName: 'equip', data: {
-      i: number,
-      slot?: string
-      bag?: string
-    }): void
+    emit(
+      eventName: 'equip',
+      data: {
+        i: number
+        slot?: string
+        bag?: string
+      },
+    ): void
 
     emit(eventName: 'exitCar'): void
 
     emit(eventName: 'magicShrub', data: { id: number }): void
 
-    emit(eventName: 'marketSell', data: { id: number, md: string }): void
+    emit(eventName: 'marketSell', data: { id: number; md: string }): void
 
     /**
      * Mines ores, like rock, iron, gems...
@@ -150,34 +165,43 @@ declare namespace DeepestWorld {
      */
     emit(eventName: 'mine', data: { id: number }): void
 
-    emit(eventName: 'move', data: { x: number, y: number }): void
+    emit(eventName: 'move', data: { x: number; y: number }): void
 
-    emit(eventName: 'moveCar', data: {
-      id: number
-      dx: number
-      dy: number
-    })
-
-    emit(eventName: 'moveItem', data: {
-      a: {
-        i: number
-        id?: number
-        name: string
+    emit(
+      eventName: 'moveCar',
+      data: {
+        id: number
+        dx: number
+        dy: number
       },
-      b: {
-        i: number
-        id?: number
-        name?: string
-      }
-      fId?: number,
-    }): void
+    )
+
+    emit(
+      eventName: 'moveItem',
+      data: {
+        a: {
+          i: number
+          id?: number
+          name: string
+        }
+        b: {
+          i: number
+          id?: number
+          name?: string
+        }
+        fId?: number
+      },
+    ): void
 
     emit(eventName: 'openItem', data: { i: number }): void
 
-    emit(eventName: 'openPortal', data: {
-      i: number
-      name?: string
-    }): void
+    emit(
+      eventName: 'openPortal',
+      data: {
+        i: number
+        name?: string
+      },
+    ): void
 
     emit(eventName: 'partyKick', data: { name: string }): void
 
@@ -188,37 +212,49 @@ declare namespace DeepestWorld {
      * @param eventName
      * @param data
      */
-    emit(eventName: 'placeItem', data: {
-      i: number
-      x: number
-      y: number
-    }): void
+    emit(
+      eventName: 'placeItem',
+      data: {
+        i: number
+        x: number
+        y: number
+      },
+    ): void
 
-    emit(eventName: 'portal2event', data: {
-      id: number
-      eventId: number
-      i: number
-    }): void
+    emit(
+      eventName: 'portal2event',
+      data: {
+        id: number
+        eventId: number
+        i: number
+      },
+    ): void
 
     emit(eventName: 'repair', data: { id: number }): void
 
-    emit(eventName: 'sacItem', data: { id: number, i: number }): void
+    emit(eventName: 'sacItem', data: { id: number; i: number }): void
 
     emit(eventName: 'saveCode', data: { code: string }): void
 
     emit(eventName: 'sendPartyInvite', data: { name: string }): void
 
-    emit(eventName: 'sendItem', data: {
-      id: number
-      i: number
-    }): void
+    emit(
+      eventName: 'sendItem',
+      data: {
+        id: number
+        i: number
+      },
+    ): void
 
-    emit(eventName: 'sendMail', data: {
-      id: number
-      name: string
-      i: Array<number>
-      fee: Array<number>
-    }): void
+    emit(
+      eventName: 'sendMail',
+      data: {
+        id: number
+        name: string
+        i: Array<number>
+        fee: Array<number>
+      },
+    ): void
 
     /**
      * Set the new character spawn location to current location rounded down
@@ -226,15 +262,18 @@ declare namespace DeepestWorld {
      */
     emit(eventName: 'setSpawn'): void
 
-    emit(eventName: 'skill', data: {
-      md?: string,
-      i: number,
-      id?: number,
-      x?: number,
-      y?: number,
-      ax?: number,
-      ay?: number,
-    }): void
+    emit(
+      eventName: 'skill',
+      data: {
+        md?: string
+        i: number
+        id?: number
+        x?: number
+        y?: number
+        ax?: number
+        ay?: number
+      },
+    ): void
 
     /**
      * Sorts your inventory aka the bag
@@ -258,12 +297,15 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'talkTrade', data: { m: string }): void
 
-    emit(eventName: 'talkWhisper', data: { name: string, m: string }): void
+    emit(eventName: 'talkWhisper', data: { name: string; m: string }): void
 
-    emit(eventName: 'unequip', data: {
-      i?: number,
-      slot: string
-    }): void
+    emit(
+      eventName: 'unequip',
+      data: {
+        i?: number
+        slot: string
+      },
+    ): void
 
     /**
      * Returns you to your spawn
@@ -298,15 +340,25 @@ declare namespace DeepestWorld {
     eventDispatcher: {
       listeners: Record<string, Array<(...args: unknown[]) => void>>
       onceListeners: Record<string, Array<(...args: unknown[]) => void>>
-      on<E extends keyof Events>(eventName: E, listener: Events[E], timeout?: number)
-      once<E extends keyof Events>(eventName: E, listener: Events[E], timeout?: number)
+      on<E extends keyof Events>(
+        eventName: E,
+        listener: Events[E],
+        timeout?: number,
+      )
+      once<E extends keyof Events>(
+        eventName: E,
+        listener: Events[E],
+        timeout?: number,
+      )
       remove<E extends keyof Events>(eventName: E, listener: Events[E])
       clear(): void
     }
 
     exitCar(): void
 
-    findClosestMonster(filter?: (entity: Monster) => boolean): Monster | undefined
+    findClosestMonster(
+      filter?: (entity: Monster) => boolean,
+    ): Monster | undefined
 
     findEntities(filter?: (entity: Entity) => boolean): Entity[]
 
@@ -390,14 +442,20 @@ declare namespace DeepestWorld {
     marketSell(tradingPostId: number, itemMd: string)
 
     md: {
-      items: Record<string, {
-        collision?: number
-        hitbox: { w: number, h: number }
-      }>
-      skills: Record<string, {
-        cd: number
-        movement?: boolean
-      }>
+      items: Record<
+        string,
+        {
+          collision?: number
+          hitbox: { w: number; h: number }
+        }
+      >
+      skills: Record<
+        string,
+        {
+          cd: number
+          movement?: boolean
+        }
+      >
       chunkSizeX: number
       chunkSizeY: number
       chunkSizeZ: number
@@ -429,11 +487,27 @@ declare namespace DeepestWorld {
      * @param itemIdTo can be omitted if transferring to your character
      * @param finderId
      */
-    moveItem(bagNameFrom: string, bagIndexFrom: number, bagNameTo: string | undefined, bagIndexTo: number, itemIdFrom?: number, itemIdTo?: number, finderId?: number): void
+    moveItem(
+      bagNameFrom: string,
+      bagIndexFrom: number,
+      bagNameTo: string | undefined,
+      bagIndexTo: number,
+      itemIdFrom?: number,
+      itemIdTo?: number,
+      finderId?: number,
+    ): void
 
-    on<E extends keyof Events>(eventName: E, listener: Events[E], timeout?: number): void
+    on<E extends keyof Events>(
+      eventName: E,
+      listener: Events[E],
+      timeout?: number,
+    ): void
 
-    once<E extends keyof Events>(eventName: E, listener: Events[E], timeout?: number): void
+    once<E extends keyof Events>(
+      eventName: E,
+      listener: Events[E],
+      timeout?: number,
+    ): void
 
     openItem(bagIndex: number): void
 
@@ -444,7 +518,11 @@ declare namespace DeepestWorld {
      */
     openPortal(portalScrollIndex: number, targetName?: string): void
 
-    openPortalToEvent(eventBoardId: number, eventId: number, portalScrollBagIndex: number): void
+    openPortalToEvent(
+      eventBoardId: number,
+      eventId: number,
+      portalScrollBagIndex: number,
+    ): void
 
     partyAccept(partyInviteId: number): void
 
@@ -467,7 +545,10 @@ declare namespace DeepestWorld {
 
     removeAllListeners(): void
 
-    removeListener<E extends keyof Events>(eventName: E, listener: Events[E]): void
+    removeListener<E extends keyof Events>(
+      eventName: E,
+      listener: Events[E],
+    ): void
 
     repair(objectId: number): void
 
@@ -478,7 +559,12 @@ declare namespace DeepestWorld {
      */
     sendItem(receiver: number | string, itemIndex: number): void
 
-    sendMail(mailboxId: number, recipientName: string, itemsBagIndexes: Array<number>, portalScrollsBagIndexes: Array<number>): void
+    sendMail(
+      mailboxId: number,
+      recipientName: string,
+      itemsBagIndexes: Array<number>,
+      portalScrollsBagIndexes: Array<number>,
+    ): void
 
     set(key: string, value: unknown): void
 
@@ -570,7 +656,13 @@ declare namespace DeepestWorld {
 
   export type Chunk = Array<Array<Array<number>>>
 
-  export type Entity = YourCharacter | Character | Monster | Tree | Ore | Station
+  export type Entity =
+    | YourCharacter
+    | Character
+    | Monster
+    | Tree
+    | Ore
+    | Station
 
   type Events = {
     /**
@@ -583,16 +675,14 @@ declare namespace DeepestWorld {
     // Socket Events
 
     afx: (data: {
-      id: number,
-      md: string,
-      v?: number,
-      d: number,
+      id: number
+      md: string
+      v?: number
+      d: number
       s?: number
     }) => void
 
-    attack: (data: {
-      error: string,
-    }) => void
+    attack: (data: { error: string }) => void
 
     auth: (data: number) => void
 
@@ -600,83 +690,98 @@ declare namespace DeepestWorld {
 
     cd: (data: string) => void
 
-    diff: (data: Array<{
-      id: number
-      l?: number
-      x?: number
-      y?: number
-      md?: string
-      rarity?: number
-      level?: number
-      hp?: number
-      hpMax?: number
-      hps?: number
-      hpRegen?: number
-      mp?: number
-      mpMax?: number
-      mpRegen?: number
-      xp?: number
-      targetId?: number
-      moveSpeed?: number
-      armor?: number
-      force?: number
-      died?: number
-      pname?: string,
-      pxp?: number,
-      xpGain?: number,
-      powers?: object,
-      skills?: Array<0 | Skill>,
-      i?: number,
-      bagItem?: null | Item,
-      bagItems?: Array<null | Item>,
-      craftInItems?: Array<null | Item>,
-      gcd?: number,
-    }>) => void
+    diff: (
+      data: Array<{
+        id: number
+        l?: number
+        x?: number
+        y?: number
+        md?: string
+        rarity?: number
+        level?: number
+        hp?: number
+        hpMax?: number
+        hps?: number
+        hpRegen?: number
+        mp?: number
+        mpMax?: number
+        mpRegen?: number
+        xp?: number
+        targetId?: number
+        moveSpeed?: number
+        armor?: number
+        force?: number
+        died?: number
+        pname?: string
+        pxp?: number
+        xpGain?: number
+        powers?: object
+        skills?: Array<0 | Skill>
+        i?: number
+        bagItem?: null | Item
+        bagItems?: Array<null | Item>
+        craftInItems?: Array<null | Item>
+        gcd?: number
+      }>,
+    ) => void
 
-    equip: (data: { error: string } | {
-      id: number,
-      slot: string,
-      i: number,
-      bag: string,
-    }) => void
+    equip: (
+      data:
+        | { error: string }
+        | {
+        id: number
+        slot: string
+        i: number
+        bag: string
+      },
+    ) => void
 
-    events: (data: Record<string, {
-      ilvl: number
-      l: number
-      md: string
-      terrain: number
-      x: number
-      y: number
-    }>) => void
+    events: (
+      data: Record<
+        string,
+        {
+          ilvl: number
+          l: number
+          md: string
+          terrain: number
+          x: number
+          y: number
+        }
+      >,
+    ) => void
 
     frenzy: (data: { error: string }) => void
 
     gcd: (data: object) => void
 
-    hit: (data: Array<{
-      projId?: number
-      md?: string
-      actor: number
-      target: number
-      heal?: number
-      /** @deprecated */
-      amount?: number
-      phys?: number
-      fire?: number
-      cold?: number
-      elec?: number
-      acid?: number
-      val?: number
-      rip?: number
-    }>) => void
+    hit: (
+      data: Array<{
+        projId?: number
+        md?: string
+        actor: number
+        target: number
+        heal?: number
+        /** @deprecated */
+        amount?: number
+        phys?: number
+        fire?: number
+        cold?: number
+        elec?: number
+        acid?: number
+        val?: number
+        rip?: number
+      }>,
+    ) => void
 
     levelUp: (data: { id: number }) => void
 
-    loot: (data: Array<{
-      i: number,
-      item: Item,
-      log: number,
-    }>) => void
+    loot: (
+      data: Array<{
+        i: number
+        item: Item
+        log: number
+      }>,
+    ) => void
 
     magicShrub: (data: { error: string }) => void
 
@@ -686,71 +791,59 @@ declare namespace DeepestWorld {
 
     move: (data: { error: string }) => void
 
-    moveItem: (data: { error: string } | {
-      name: string,
-      id?: number
-      i: number
-      item?: null | Item
-    }) => void
+    moveItem: (
+      data:
+        | { error: string }
+        | {
+        name: string
+        id?: number
+        i: number
+        item?: null | Item
+      },
+    ) => void
 
     proj: (data: {
-      md: string,
-      mwd: string,
-      id: number,
-      aid: number,
-      tid: number,
+      md: string
+      mwd: string
+      id: number
+      aid: number
+      tid: number
     }) => void
 
     partyDiff: (data: {
-      dbId: number,
-      name?: string,
-      level?: number,
-      id?: number,
+      dbId: number
+      name?: string
+      level?: number
+      id?: number
       leader?: number
     }) => void
 
-    partyInvite: (data: {
-      from: string
-      id: number
-    }) => void
+    partyInvite: (data: { from: string; id: number }) => void
 
-    partyKick: (data: {
-      dbId: number
-    }) => void
+    partyKick: (data: { dbId: number }) => void
 
-    rfx: (data: {
-      id: number
-      md: string
-    }) => void
+    rfx: (data: { id: number; md: string }) => void
 
-    sendPartyInvite: (data: {
-      error: string
-    }) => void
+    sendPartyInvite: (data: { error: string }) => void
 
-    seenChunks: (data: Record<string, {
-      terrain: Array<Array<Array<number>>>
-    }>) => void
+    seenChunks: (
+      data: Record<
+        string,
+        {
+          terrain: Array<Array<Array<number>>>
+        }
+      >,
+    ) => void
 
     seenObjects: (data: unknown) => void
 
-    setRespawn: (data: {
-      l: number
-      x: number
-      y: number
-    }) => void
+    setRespawn: (data: { l: number; x: number; y: number }) => void
 
-    setSpawn: (data: {
-      l: number
-      x: number
-      y: number
-    }) => void
+    setSpawn: (data: { l: number; x: number; y: number }) => void
 
     share: (data: number) => void
 
-    talk: (data: {
-      name: string
-      text: string
-    }) => void
+    talk: (data: { name: string; text: string }) => void
 
     unseenChunks: (data: string) => void
 
@@ -759,10 +852,10 @@ declare namespace DeepestWorld {
 
   export interface Item {
     /** Metadata ID */
-    md: string;
+    md: string
 
     /** Count, or 1 if undefined */
-    n?: number;
+    n?: number
 
     /**
      * The rarity
@@ -772,7 +865,7 @@ declare namespace DeepestWorld {
      * 3 = purple
      * 4 = orange
      */
-    r?: number;
+    r?: number
 
     /** The item level / quality*/
     qual: number
@@ -882,19 +975,19 @@ declare namespace DeepestWorld {
     cardBag: Array<Item | null>
 
     /** Skill specific timestamps of their cooldowns */
-    cds: Record<string, number>,
+    cds: Record<string, number>
 
     coldArmor: number
 
     /** Indicator whether the character is currently in combat */
-    combat?: number,
+    combat?: number
 
     elecArmor: number
 
     fireArmor: number
 
     /** Timestamp of the global cooldown */
-    gcd?: number,
+    gcd?: number
 
     /** the amount of mana points you restore every 1.5s */
     hpRegen: number
@@ -909,16 +1002,16 @@ declare namespace DeepestWorld {
       /**
        * Percentage progress e.g. 6.0990909%
        */
-      progress: number;
+      progress: number
 
       /**
        * When the timeout happens
        */
-      timeoutAt: number;
+      timeoutAt: number
     }
 
     /** the amount of mana points you restore every 1.5s */
-    mpRegen: number;
+    mpRegen: number
 
     /**
      * Party information
@@ -932,29 +1025,31 @@ declare namespace DeepestWorld {
     }>
 
     professions: Record<
-      | "axesmith"
-      | "armorsmith"
-      | "boomerangsmith"
-      | "bowsmith"
-      | "crossbowsmith"
-      | "daggersmith"
-      | "gemcutting"
-      | "macesmith"
-      | "metalworking"
-      | "mining"
-      | "platesmith"
-      | "sceptersmith"
-      | "spearsmith"
-      | "staffsmith"
-      | "stoneworking"
-      | "swordsmith"
-      | "wandsmith"
-      | "woodcutting"
-      | "woodworking", {
-      md: string
-      level: number
-      xp: number
-    }>
+      | 'axesmith'
+      | 'armorsmith'
+      | 'boomerangsmith'
+      | 'bowsmith'
+      | 'crossbowsmith'
+      | 'daggersmith'
+      | 'gemcutting'
+      | 'macesmith'
+      | 'metalworking'
+      | 'mining'
+      | 'platesmith'
+      | 'sceptersmith'
+      | 'spearsmith'
+      | 'staffsmith'
+      | 'stoneworking'
+      | 'swordsmith'
+      | 'wandsmith'
+      | 'woodcutting'
+      | 'woodworking',
+      {
+        md: string
+        level: number
+        xp: number
+      }
+    >
 
     physArmor: number
 
