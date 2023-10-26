@@ -1,6 +1,6 @@
 declare const dw: DeepestWorld.API
 
-namespace DeepestWorld {
+declare namespace DeepestWorld {
   interface API {
     /** Abandons the current mission */
     abandonMission(): void
@@ -306,7 +306,7 @@ namespace DeepestWorld {
 
     findEntities(filter?: (entity: Entity) => boolean): Entity[]
 
-    get(key: string): any | null
+    get(key: string): unknown | null
 
     /**
      * Returns the terrain at the given position
@@ -381,7 +381,7 @@ namespace DeepestWorld {
 
     lastLog: number
 
-    log(message: any)
+    log(message: unknown)
 
     marketSell(tradingPostId: number, itemMd: string)
 
@@ -476,7 +476,7 @@ namespace DeepestWorld {
 
     sendMail(mailboxId: number, recipientName: string, itemsBagIndexes: Array<number>, portalScrollsBagIndexes: Array<number>): void
 
-    set(key: string, value: any): void
+    set(key: string, value: unknown): void
 
     setSpawn(): void
 
@@ -497,7 +497,7 @@ namespace DeepestWorld {
 
     talkWhisper(name: string, message: string, isJson: false | undefined): void
 
-    talkWhisper(name: string, message: any, isJson: true): void
+    talkWhisper(name: string, message: unknown, isJson: true): void
 
     takeItem(itemId): void
 
@@ -620,7 +620,7 @@ namespace DeepestWorld {
       pname?: string,
       pxp?: number,
       xpGain?: number,
-      powers?: {},
+      powers?: object,
       skills?: Array<0 | Skill>,
       i?: number,
       bagItem?: null | Item,
@@ -647,7 +647,7 @@ namespace DeepestWorld {
 
     frenzy: (data: { error: string }) => void
 
-    gcd: (data: {}) => void
+    gcd: (data: object) => void
 
     hit: (data: Array<{
       projId?: number
@@ -727,7 +727,7 @@ namespace DeepestWorld {
       terrain: Array<Array<Array<number>>>
     }>) => void
 
-    seenObjects: (data: any) => void
+    seenObjects: (data: unknown) => void
 
     setRespawn: (data: {
       l: number
