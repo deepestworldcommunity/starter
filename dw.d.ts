@@ -1,5 +1,3 @@
-declare const dw: DeepestWorld.API
-
 declare namespace DeepestWorld {
   interface API {
     /** Abandons the current mission */
@@ -7,6 +5,12 @@ declare namespace DeepestWorld {
 
     /** Accept the first mission in the mission table storage */
     acceptMission(missionTableId: number): void
+
+    buyPlot(
+      realEstateTableId: number,
+      location: [number, number, number],
+      size: [number, number, number],
+    ): void
 
     /** Reference to your character */
     c: YourCharacter
@@ -26,18 +30,19 @@ declare namespace DeepestWorld {
     chunks: Record<string, Chunk>
 
     /**
-     * x and y are the top left tile coords of your land plot
-     * @param x
-     * @param y
-     */
-    claimLand(x: number, y: number): void
-
-    connected: boolean
-
-    /**
      * Combines all stackable items in the combine section of your inventory.
      */
     combine(): void
+
+    connected: boolean
+
+    constants: {
+      CHUNK_DIM: [number, number, number]
+      INTERACT_RANGE: number
+      MELEE_RANGE: number
+      ZONE_LEVEL_RADIUS: number
+      ZONE_TIER_ZONE_LEVEL_RADIUS: number
+    }
 
     craft(benchId: number, itemMd: string, max?: number): void
 
@@ -92,6 +97,15 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'acceptPartyInvite', data: { id: number }): void
 
+    emit(
+      eventName: 'buyLand',
+      data: {
+        benchId: number
+        pos: [number, number, number]
+        dim: [number, number, number]
+      },
+    )
+
     /**
      * Chops down a tree
      * @param eventName
@@ -112,7 +126,7 @@ declare namespace DeepestWorld {
       data: {
         id: number
         md: string
-        r: 0
+        r: number
         max?: number
       },
     ): void
@@ -122,6 +136,8 @@ declare namespace DeepestWorld {
     emit(eventName: 'deleteItem', data: { i: number }): void
 
     emit(eventName: 'destroyBuilding', data: { id: number }): void
+
+    emit(eventName: 'dungeonBoard', data: { id: number }): void
 
     emit(
       eventName: 'elevator',
@@ -152,7 +168,14 @@ declare namespace DeepestWorld {
       },
     ): void
 
+    emit(eventName: 'eventBoard', data: { id: number }): void
+
     emit(eventName: 'exitCar'): void
+
+    emit(
+      eventName: 'fill',
+      data: { i: number; x: number; y: number; z: number },
+    ): void
 
     emit(eventName: 'magicShrub', data: { id: number }): void
 
@@ -164,6 +187,8 @@ declare namespace DeepestWorld {
      * @param data
      */
     emit(eventName: 'mine', data: { id: number }): void
+
+    emit(eventName: 'missionTable', data: { id: number }): void
 
     emit(eventName: 'move', data: { x: number; y: number }): void
 
@@ -207,6 +232,11 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'partyPromote', data: { name: string }): void
 
+    emit(
+      eventName: 'placeBlock',
+      data: { i: number; x: number; y: number; z: number },
+    )
+
     /**
      * Places a station into the world (can only be done at your spawn area)
      * @param eventName
@@ -230,11 +260,17 @@ declare namespace DeepestWorld {
       },
     ): void
 
+    emit(eventName: 'pour', data: { i: number; id: number })
+
+    emit(eventName: 'realEstateTable', data: { id: number }): void
+
     emit(eventName: 'repair', data: { id: number }): void
 
     emit(eventName: 'sacItem', data: { id: number; i: number }): void
 
     emit(eventName: 'saveCode', data: { code: string }): void
+
+    emit(eventName: 'sellLand', data: { benchId: number; id: number })
 
     emit(eventName: 'sendPartyInvite', data: { name: string }): void
 
@@ -265,11 +301,11 @@ declare namespace DeepestWorld {
     emit(
       eventName: 'skill',
       data: {
-        md?: string
         i: number
         id?: number
         x?: number
         y?: number
+        z?: number
         ax?: number
         ay?: number
       },
@@ -287,6 +323,8 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'startCode'): void
 
+    emit(eventName: 'takeBlock', data: { x: number; y: number; z: number })
+
     emit(eventName: 'takeItem', data: { id: number })
 
     emit(eventName: 'talkGlobal', data: { m: string }): void
@@ -298,6 +336,8 @@ declare namespace DeepestWorld {
     emit(eventName: 'talkTrade', data: { m: string }): void
 
     emit(eventName: 'talkWhisper', data: { name: string; m: string }): void
+
+    emit(eventName: 'tradingPost', data: { id: number }): void
 
     emit(
       eventName: 'unequip',
@@ -318,14 +358,14 @@ declare namespace DeepestWorld {
     enterCar(carId: number): void
 
     /**
-     * @param portalId
-     */
-    enterPortal(portalId: number): void
-
-    /**
      * @param magicShrubId
      */
     enterMagicShrub(magicShrubId: number): void
+
+    /**
+     * @param portalId
+     */
+    enterPortal(portalId: number): void
 
     /** Your surroundings: monsters, characters, trees, etc */
     entities: Array<Entity>
@@ -356,6 +396,33 @@ declare namespace DeepestWorld {
 
     exitCar(): void
 
+    fetchDungeons(
+      dungeonBoardId: number,
+      callback: (data?: DungeonBoard, error?: string) => void,
+    ): void
+
+    fetchEvents(
+      eventBoardId: number,
+      callback: (data?: EventBoard, error?: string) => void,
+    ): void
+
+    fetchMarket(
+      tradingPostId: number,
+      callback: (data?: TradingPost, error?: string) => void,
+    ): void
+
+    fetchMissions(
+      missionTableId: number,
+      callback: (data?: MissionTable, error?: string) => void,
+    ): void
+
+    fetchPlots(
+      realEstateTableId: number,
+      callback: (data?: RealEstateTable, error?: string) => void,
+    ): void
+
+    fillItem(toolBagIndex: number, x: number, y: number, z: number): void
+
     findClosestMonster(
       filter?: (entity: Monster) => boolean,
     ): Monster | undefined
@@ -376,33 +443,6 @@ declare namespace DeepestWorld {
     getTerrain(x: number, y: number, z: number, zo?: number): number
 
     /**
-     * Returns the terrain at the given position
-     * 0 = Walkable
-     * any other value = There is a voxel here, limiting movement
-     * @param pos
-     * @deprecated use dw.getTerrain instead
-     */
-    getTerrainAt(pos: WorldPosition): number
-
-    /**
-     * Returns the terrain at the given position
-     * 0 = Walkable
-     * any other value = There is a voxel here, limiting movement
-     * @param pos
-     * @deprecated use dw.getTerrain instead
-     */
-    getTerrainOver(pos: WorldPosition): number
-
-    /**
-     * Returns the terrain at the given position.
-     * 0 = Walkable
-     * any other value = There is a voxel here, limiting movement
-     * @param pos
-     * @deprecated use dw.getTerrain instead
-     */
-    getTerrainUnder(pos: WorldPosition): number
-
-    /**
      * Get either the zone level of location or of player location
      * when no other parameters were specified.
      * @param x
@@ -410,6 +450,8 @@ declare namespace DeepestWorld {
      * @param z
      */
     getZoneLevel(x?: number, y?: number, z?: number): number
+
+    getZoneTier(x: number, y: number, z: number)
 
     /**
      * Checks whether the target would be in range for spell.
@@ -536,12 +578,16 @@ declare namespace DeepestWorld {
 
     partyPromote(targetName: string): void
 
+    placeBlock(bagIndex: number, x: number, y: number, z: number): void
+
     /**
      * @param itemIndex index of the item in dw.character.bag
      * @param x
      * @param y
      */
     placeItem(itemIndex: number, x: number, y: number): void
+
+    pourItem(toolBagIndex: number, targetId: number): void
 
     removeAllListeners(): void
 
@@ -551,6 +597,8 @@ declare namespace DeepestWorld {
     ): void
 
     repair(objectId: number): void
+
+    sellPlot(realEstateTableId: number, plotId: number): void
 
     /**
      *
@@ -583,13 +631,13 @@ declare namespace DeepestWorld {
      */
     stopCraft(): void
 
-    talk(message: string): void
+    takeBlock(x: number, y: number, z: number): void
+
+    takeItem(itemId): void
 
     talkWhisper(name: string, message: string, isJson: false | undefined): void
 
     talkWhisper(name: string, message: unknown, isJson: true): void
-
-    takeItem(itemId): void
 
     targetId: number | null
 
@@ -620,8 +668,9 @@ declare namespace DeepestWorld {
      * @param skillIndex
      * @param x
      * @param y
+     * @param z
      */
-    useSkill(skillIndex: number, x: number, y: number): void
+    useSkill(skillIndex: number, x: number, y: number, z?: number): void
   }
 
   interface BaseEntity {
@@ -725,6 +774,10 @@ declare namespace DeepestWorld {
       }>,
     ) => void
 
+    dungeonBoard: (
+      data: ['dungeonBoard', DungeonBoard] | { error: string },
+    ) => void
+
     equip: (
       data:
         | { error: string }
@@ -736,23 +789,11 @@ declare namespace DeepestWorld {
       },
     ) => void
 
-    events: (
-      data: Record<
-        string,
-        {
-          ilvl: number
-          l: number
-          md: string
-          terrain: number
-          x: number
-          y: number
-        }
-      >,
-    ) => void
+    eventBoard: (data: ['eventBoard', EventBoard] | { error: string }) => void
 
     frenzy: (data: { error: string }) => void
 
-    gcd: (data: object) => void
+    gcd: (data: number) => void
 
     hit: (
       data: Array<{
@@ -785,9 +826,17 @@ declare namespace DeepestWorld {
 
     magicShrub: (data: { error: string }) => void
 
-    market: (data: Record<string, Record<number, number>>) => void
+    realEstateTable: (
+      data: ['realEstateTable', RealEstateTable] | { error: string },
+    ) => void
 
-    missionBonus: (data: Record<string, number>) => void
+    tradingPost: (
+      data: ['tradingPost', TradingPost] | { error: string },
+    ) => void
+
+    missionTable: (
+      data: ['missionTable', MissionTable] | { error: string },
+    ) => void
 
     move: (data: { error: string }) => void
 
@@ -1081,4 +1130,34 @@ declare namespace DeepestWorld {
     x: number
     y: number
   }
+
+  type DungeonBoard = Array<{
+    md: string
+    pos: [number, number, number]
+  }>
+
+  type EventBoard = Record<
+    string,
+    {
+      ilvl: number
+      l: number
+      md: string
+      terrain: number
+      x: number
+      y: number
+    }
+  >
+
+  type RealEstateTable = Array<{
+    dim: [number, number, number]
+    id: number
+    owner: string
+    pos: [number, number, number]
+  }>
+
+  type MissionTable = Record<string, number>
+
+  type TradingPost = Record<string, Record<number, number>>
 }
+
+declare const dw: DeepestWorld.API
