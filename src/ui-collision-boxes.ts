@@ -1,6 +1,7 @@
 import { UI_SCALE } from './consts'
+import { addMenuButton } from './ui-buttons'
 
-type CollisionObject = {
+export type CollisionObject = {
   id?: number
   ref?: string
   x: number
@@ -116,7 +117,18 @@ dw.on('unseenObjects', (entityIds) => {
   collisionObjects = collisionObjects.filter((obj) => !obj?.id || !entityIds.includes(obj.id))
 })
 
+let show = dw.get('showCollisionBoxes') ?? true
+
+addMenuButton('📦', () => {
+  show = !show
+  dw.set('showCollisionBoxes', show)
+})
+
 dw.on('drawEnd', (ctx, cx, cy) => {
+  if (!show) {
+    return
+  }
+
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2

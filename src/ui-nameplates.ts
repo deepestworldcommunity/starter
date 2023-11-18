@@ -1,6 +1,7 @@
 import { getMonsterBattleScore, getCharacterBattleScore } from './battlescore'
 import getSmoothPosition from './getSmoothPosition'
 import { BOSSES, UI_SCALE } from './consts'
+import { addMenuButton } from './ui-buttons'
 
 const icons = new Image()
 icons.src = '/images/icons.png'
@@ -8,6 +9,13 @@ icons.src = '/images/icons.png'
 const COLOR_HP = '#c55050'
 const COLOR_BORDER = '#3c3c3c'
 const COLOR_BACKGROUND = '#0c0c0c'
+
+let showBattleScore = dw.get('showBattleScore') ?? true
+
+addMenuButton('💯', () => {
+  showBattleScore = !showBattleScore
+  dw.set('showBattleScore', showBattleScore)
+})
 
 dw.on('drawEnd', (ctx, cx, cy) => {
   const { width, height } = ctx.canvas
@@ -74,7 +82,10 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Name + BattleScore?
       ctx.textAlign = 'left'
       ctx.font = '14px system-ui'
-      const name = `${entity.name}${dw.c.name === entity.name ? ` · ${getCharacterBattleScore().toLocaleString([], { maximumFractionDigits: 0 })}` : ''}`
+      let name = entity.name
+      if (dw.c.name === entity.name && showBattleScore) {
+        name += ` · ${getCharacterBattleScore().toLocaleString([], { maximumFractionDigits: 0 })}`
+      }
       ctx.strokeText(name, x - UI_SCALE / 2, y - UI_SCALE - 5)
       ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - 5)
 
@@ -131,7 +142,10 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Name + BattleScore?
       ctx.textAlign = 'left'
       ctx.font = `${isBoss ? 20 : 14}px system-ui`
-      const name = `${entity.md} · ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
+      let name = entity.md
+      if (showBattleScore) {
+        name += `· ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
+      }
       ctx.strokeText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
       ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
 

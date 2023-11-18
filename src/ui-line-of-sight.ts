@@ -1,7 +1,19 @@
 import { hasLineOfSight } from './hasLineOfSight'
 import { UI_SCALE } from './consts'
+import { addMenuButton } from './ui-buttons'
+
+let show = dw.get('showLineOfSight') ?? true
+
+addMenuButton('👀', () => {
+  show = !show
+  dw.set('showLineOfSight', show)
+})
 
 dw.on('drawEnd', (ctx, cx, cy) => {
+  if (!show) {
+    return
+  }
+
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2

@@ -1,7 +1,19 @@
-import { UI_SCALE } from './consts'
 import getBreadcrumbs from './breadcrumbs'
+import { addMenuButton } from './ui-buttons'
+import { UI_SCALE } from './consts'
+
+let show = dw.get('showBreadcrumbs') ?? true
+
+addMenuButton('🍞', () => {
+  show = !show
+  dw.set('showBreadcrumbs', show)
+})
 
 dw.on('drawEnd', (ctx, cx, cy) => {
+  if (!show) {
+    return
+  }
+
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2
