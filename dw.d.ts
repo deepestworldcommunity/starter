@@ -1,10 +1,27 @@
 declare namespace DeepestWorld {
+  interface Account {
+    coins: number
+    id: number
+    plots: Array<{
+      dim: [number, number, number],
+      id: number
+      pos: [number, number, number],
+      sellCd: number
+    }>
+  }
+
   interface API {
+    a: Account
+
     /** Abandons the current mission */
     abandonMission(): void
 
     /** Accept the first mission in the mission table storage */
     acceptMission(missionTableId: number): void
+
+    account: Account
+
+    addMog(stationId: number, bagIndex: number): void
 
     buyPlot(
       realEstateTableId: number,
@@ -23,9 +40,10 @@ declare namespace DeepestWorld {
 
     /**
      * Chop a tree.
+     * @param toolBagIndex id of the tool in toolBag
      * @param targetId tree entity id
      */
-    chop(targetId: number): void
+    chop(toolBagIndex: number, targetId: number): void
 
     chunks: Record<string, Chunk>
 
@@ -37,6 +55,7 @@ declare namespace DeepestWorld {
     connected: boolean
 
     constants: {
+      CHARACTER_SPEED: number
       CHUNK_DIM: [number, number, number]
       INTERACT_RANGE: number
       MELEE_RANGE: number
@@ -86,16 +105,20 @@ declare namespace DeepestWorld {
      */
     distance(x1: number, y1: number, x2: number, y2: number): number
 
+    draw: boolean
+
     /** Your surroundings: monsters, characters, trees, etc */
     e: Array<Entity>
-
-    emit(eventName: 'auth', data: { token: string; name: string }): void
 
     emit(eventName: 'abandonMission'): void
 
     emit(eventName: 'acceptMission', data: { id: number }): void
 
     emit(eventName: 'acceptPartyInvite', data: { id: number }): void
+
+    emit(eventName: 'addMog', data: { i: number, id: number }): void
+
+    emit(eventName: 'auth', data: { token: string; name: string }): void
 
     emit(
       eventName: 'buyLand',
@@ -111,7 +134,7 @@ declare namespace DeepestWorld {
      * @param eventName
      * @param data
      */
-    emit(eventName: 'chop', data: { id: number }): void
+    emit(eventName: 'chop', data: { id: number , i: number}): void
 
     emit(eventName: 'claimLand', data: { x: number; y: number }): void
 
@@ -177,6 +200,10 @@ declare namespace DeepestWorld {
       data: { i: number; x: number; y: number; z: number },
     ): void
 
+    emit(eventName: 'loadout', data: { id: number }): void
+
+    emit(eventName: 'lockItems', data: { id: number }): void
+
     emit(eventName: 'magicShrub', data: { id: number }): void
 
     emit(eventName: 'marketSell', data: { id: number; md: string }): void
@@ -186,7 +213,7 @@ declare namespace DeepestWorld {
      * @param eventName
      * @param data
      */
-    emit(eventName: 'mine', data: { id: number }): void
+    emit(eventName: 'mine', data: { i: number, id: number }): void
 
     emit(eventName: 'missionTable', data: { id: number }): void
 
@@ -264,7 +291,11 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'realEstateTable', data: { id: number }): void
 
-    emit(eventName: 'repair', data: { id: number }): void
+    emit(eventName: 'removeMog', data: { id: number }): void
+
+    emit(eventName: 'repair', data: { i: number, id: number }): void
+
+    emit(eventName: 'repair', data: { i: number, id: number }): void
 
     emit(eventName: 'sacItem', data: { id: number; i: number }): void
 
@@ -277,7 +308,7 @@ declare namespace DeepestWorld {
     emit(
       eventName: 'sendItem',
       data: {
-        id: number
+        id: string | number
         i: number
       },
     ): void
@@ -296,7 +327,7 @@ declare namespace DeepestWorld {
      * Set the new character spawn location to current location rounded down
      * @param eventName
      */
-    emit(eventName: 'setSpawn'): void
+    emit(eventName: 'setRespawn'): void
 
     emit(
       eventName: 'skill',
@@ -323,9 +354,9 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'startCode'): void
 
-    emit(eventName: 'takeBlock', data: { x: number; y: number; z: number })
+    emit(eventName: 'takeBlock', data: { i: number, x: number; y: number; z: number })
 
-    emit(eventName: 'takeItem', data: { id: number })
+    emit(eventName: 'takeItem', data: { i: number, id: number })
 
     emit(eventName: 'talkGlobal', data: { m: string }): void
 
@@ -337,6 +368,8 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'talkWhisper', data: { name: string; m: string }): void
 
+    emit(eventName: 'toggleMog', data: { id: number, md: string }): void
+
     emit(eventName: 'tradingPost', data: { id: number }): void
 
     emit(
@@ -346,6 +379,8 @@ declare namespace DeepestWorld {
         slot: string
       },
     ): void
+
+    emit(eventName: 'unlockItems', data: { id: number }): void
 
     /**
      * Returns you to your spawn
@@ -431,6 +466,10 @@ declare namespace DeepestWorld {
 
     get(key: string): unknown | null
 
+    getItemBaseValue(item: DeepestWorld.Item): number | undefined
+
+    getItemModValue(item: DeepestWorld.Item, s: string): number | undefined
+
     /**
      * Returns the terrain at the given position
      * 0 = Walkable
@@ -479,9 +518,13 @@ declare namespace DeepestWorld {
 
     lastLog: number
 
+    loadout(stationId: number): void
+
+    lockItems(stationId: number): void
+
     log(message: unknown)
 
-    marketSell(tradingPostId: number, itemMd: string)
+    marketSell(tradingPostId: number, itemMd: string): void
 
     md: {
       items: Record<
@@ -503,11 +546,13 @@ declare namespace DeepestWorld {
       chunkSizeZ: number
     }
 
+
     /**
      * Mine an ore.
+     * @param toolBagIndex the id of the ore
      * @param targetId the id of the ore
      */
-    mine(targetId: number): void
+    mine(toolBagIndex: number, targetId: number): void
 
     /**
      * Moves towards x,y in a straight line
@@ -538,6 +583,11 @@ declare namespace DeepestWorld {
       itemIdTo?: number,
       finderId?: number,
     ): void
+
+    off<E extends keyof Events>(
+      eventName: E,
+      listener: Events[E],
+    )
 
     on<E extends keyof Events>(
       eventName: E,
@@ -596,7 +646,9 @@ declare namespace DeepestWorld {
       listener: Events[E],
     ): void
 
-    repair(objectId: number): void
+    removeMog(stationId: number, itemMd: string, bagIndex: number): void
+
+    repair(toolBagIndex: number, objectId: number): void
 
     sellPlot(realEstateTableId: number, plotId: number): void
 
@@ -631,9 +683,11 @@ declare namespace DeepestWorld {
      */
     stopCraft(): void
 
-    takeBlock(x: number, y: number, z: number): void
+    takeBlock(toolBagIndex: number, x: number, y: number, z: number): void
 
-    takeItem(itemId): void
+    takeItem(toolBagIndex: number, itemId): void
+
+    takeItemAsync(toolBagIndex: number, itemId): Promise<number>
 
     talkWhisper(name: string, message: string, isJson: false | undefined): void
 
@@ -641,12 +695,16 @@ declare namespace DeepestWorld {
 
     targetId: number | null
 
+    toggleMog(stationId: number, itemMd: string): void
+
     /**
      * Uneqip an item and put it in bag slow with index `itemIndex`
      * @param slotName which slot to unequip the item from. Possible values can be found in dw.c.gear
      * @param itemIndex index in dw.character.bag to unequip the item to
      */
     unequip(slotName: string, itemIndex?: number): void
+
+    unlockItems(stationId: number): void
 
     /**
      * In case your character is stuck, and you have no way of unstucking yourself,
@@ -826,14 +884,6 @@ declare namespace DeepestWorld {
 
     magicShrub: (data: { error: string }) => void
 
-    realEstateTable: (
-      data: ['realEstateTable', RealEstateTable] | { error: string },
-    ) => void
-
-    tradingPost: (
-      data: ['tradingPost', TradingPost] | { error: string },
-    ) => void
-
     missionTable: (
       data: ['missionTable', MissionTable] | { error: string },
     ) => void
@@ -871,6 +921,10 @@ declare namespace DeepestWorld {
 
     partyKick: (data: { dbId: number }) => void
 
+    realEstateTable: (
+      data: ['realEstateTable', RealEstateTable] | { error: string },
+    ) => void
+
     rfx: (data: { id: number; md: string }) => void
 
     sendPartyInvite: (data: { error: string }) => void
@@ -892,7 +946,13 @@ declare namespace DeepestWorld {
 
     share: (data: number) => void
 
+    takeItem: (data: { error: string }) => void
+
     talk: (data: { name: string; text: string }) => void
+
+    tradingPost: (
+      data: ['tradingPost', TradingPost] | { error: string },
+    ) => void
 
     unseenChunks: (data: string) => void
 
@@ -1114,6 +1174,8 @@ declare namespace DeepestWorld {
      * The size is based on your level and caps at 7x7.
      */
     spawn: WorldPosition
+
+    toolBag: Array<Item | null>
 
     /**
      * In-game called just spawn
