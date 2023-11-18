@@ -55,10 +55,8 @@ setInterval(() => {
   if (breadcrumb) {
     breadcrumb.value = 1
     breadcrumb.time = Date.now()
-  } else {
-    breadcrumbs.push(
-      { x, y, z, value: 1, time: Date.now() },
-    )
+    return
   }
 
+  breadcrumbs.push({ x, y, z, value: 1, time: Date.now() })
 }, 100)

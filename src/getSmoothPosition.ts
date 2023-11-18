@@ -20,10 +20,11 @@ setInterval(function() {
     if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
       smoothPosition.x += dx
       smoothPosition.y += dy
-    } else {
-      smoothPosition.x += dx / 10
-      smoothPosition.y += dy / 10
+      continue
     }
+
+    smoothPosition.x += dx / 10
+    smoothPosition.y += dy / 10
   }
 
   for (const entityId of entitiesSmoothPosition.keys()) {
