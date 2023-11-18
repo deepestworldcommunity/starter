@@ -1059,6 +1059,7 @@ declare namespace DeepestWorld {
     crit?: number
     critMult?: number
     speed?: number
+    cd?: number
   }
 
   export interface Station extends BaseEntity {
