@@ -3,9 +3,9 @@ declare namespace DeepestWorld {
     coins: number
     id: number
     plots: Array<{
-      dim: [number, number, number],
+      dim: [number, number, number]
       id: number
-      pos: [number, number, number],
+      pos: [number, number, number]
       sellCd: number
     }>
   }
@@ -55,12 +55,35 @@ declare namespace DeepestWorld {
     connected: boolean
 
     constants: {
+      CHARACTER_DMG_BASE: number
+      CHARACTER_HP_BASE: number
       CHARACTER_SPEED: number
       CHUNK_DIM: [number, number, number]
+      CHUNK_DIMENSION: [number, number, number]
+      CRIT_BASE: number
+      CRIT_MULT_BASE: number
+      GCD: number
+      GCD_BASE: number
+      GCD_MIN: number
       INTERACT_RANGE: number
       MELEE_RANGE: number
+      MOVEMENT_SPEED_BASE: number
+      MONSTER_HP_BASE: number
+      PIXELS_PER_UNIT: number
+      RANGE_MELEE_BASE: number
+      RANGE_RANGED_BASE: number
+      TERRAIN_WATER: number
+      TERRAIN_EMPTY: number
+      TERRAIN_GRASS: number
+      TERRAIN_DIRT: number
+      TERRAIN_DESERT:number
+      TERRAIN_UNDERWATER: number
+      TERRAIN_WINTER: number
+      TERRAIN_CLOUD: number
+      TERRAIN_TREE: number
       ZONE_LEVEL_RADIUS: number
       ZONE_TIER_ZONE_LEVEL_RADIUS: number
+      ZONE_LEVELS_PER_ZONE_TIER: number
     }
 
     craft(benchId: number, itemMd: string, max?: number): void
@@ -116,7 +139,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'acceptPartyInvite', data: { id: number }): void
 
-    emit(eventName: 'addMog', data: { i: number, id: number }): void
+    emit(eventName: 'addMog', data: { i: number; id: number }): void
 
     emit(eventName: 'auth', data: { token: string; name: string }): void
 
@@ -134,7 +157,7 @@ declare namespace DeepestWorld {
      * @param eventName
      * @param data
      */
-    emit(eventName: 'chop', data: { id: number , i: number}): void
+    emit(eventName: 'chop', data: { id: number; i: number }): void
 
     emit(eventName: 'claimLand', data: { x: number; y: number }): void
 
@@ -213,7 +236,7 @@ declare namespace DeepestWorld {
      * @param eventName
      * @param data
      */
-    emit(eventName: 'mine', data: { i: number, id: number }): void
+    emit(eventName: 'mine', data: { i: number; id: number }): void
 
     emit(eventName: 'missionTable', data: { id: number }): void
 
@@ -293,9 +316,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'removeMog', data: { id: number }): void
 
-    emit(eventName: 'repair', data: { i: number, id: number }): void
-
-    emit(eventName: 'repair', data: { i: number, id: number }): void
+    emit(eventName: 'repair', data: { i: number; id: number }): void
 
     emit(eventName: 'sacItem', data: { id: number; i: number }): void
 
@@ -354,9 +375,12 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'startCode'): void
 
-    emit(eventName: 'takeBlock', data: { i: number, x: number; y: number; z: number })
+    emit(
+      eventName: 'takeBlock',
+      data: { i: number; x: number; y: number; z: number },
+    )
 
-    emit(eventName: 'takeItem', data: { i: number, id: number })
+    emit(eventName: 'takeItem', data: { i: number; id: number })
 
     emit(eventName: 'talkGlobal', data: { m: string }): void
 
@@ -368,7 +392,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'talkWhisper', data: { name: string; m: string }): void
 
-    emit(eventName: 'toggleMog', data: { id: number, md: string }): void
+    emit(eventName: 'toggleMog', data: { id: number; md: string }): void
 
     emit(eventName: 'tradingPost', data: { id: number }): void
 
@@ -546,7 +570,6 @@ declare namespace DeepestWorld {
       chunkSizeZ: number
     }
 
-
     /**
      * Mine an ore.
      * @param toolBagIndex the id of the ore
@@ -584,10 +607,7 @@ declare namespace DeepestWorld {
       finderId?: number,
     ): void
 
-    off<E extends keyof Events>(
-      eventName: E,
-      listener: Events[E],
-    )
+    off<E extends keyof Events>(eventName: E, listener: Events[E])
 
     on<E extends keyof Events>(
       eventName: E,
@@ -960,6 +980,9 @@ declare namespace DeepestWorld {
   }
 
   export interface Item {
+    /** Indicated the item is locked, preventing deleteItem, disenchant, sendItem, sendMail, enchant */
+    l?: number
+
     /** Metadata ID */
     md: string
 
