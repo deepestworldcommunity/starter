@@ -1,7 +1,9 @@
 import { getMonsterBattleScore, getCharacterBattleScore } from './battlescore'
 import getSmoothPosition from './getSmoothPosition'
-import { BOSSES, UI_SCALE } from './consts'
+import { BOSSES, mobNames } from './consts'
 import { addMenuButton } from './ui-buttons'
+
+const UI_SCALE = dw.constants.PIXELS_PER_UNIT
 
 const icons = new Image()
 icons.src = '/images/icons.png'
@@ -10,7 +12,13 @@ const COLOR_HP = '#c55050'
 const COLOR_BORDER = '#3c3c3c'
 const COLOR_BACKGROUND = '#0c0c0c'
 
+let showBuffNames = dw.get('showBuffNames') ?? false
 let showBattleScore = dw.get('showBattleScore') ?? true
+
+addMenuButton('💪', () => {
+  showBuffNames = !showBuffNames
+  dw.set('showBuffNames', showBuffNames)
+})
 
 addMenuButton('💯', () => {
   showBattleScore = !showBattleScore
@@ -114,6 +122,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     }
 
     if ('ai' in entity) {
+      const fxs = Object.entries(entity.fx)
       const isBoss = BOSSES.includes(entity.md)
 
       ctx.lineWidth = 4
@@ -142,7 +151,34 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Name + BattleScore?
       ctx.textAlign = 'left'
       ctx.font = `${isBoss ? 20 : 14}px system-ui`
-      let name = entity.md
+      let name = mobNames.find(([md, terrain]) => entity.md === md && entity.terrain === terrain)?.[2] ?? entity.md
+
+      if (showBuffNames) {
+        for (let i = 0; i < fxs.length; i++) {
+          const fx = fxs[i]
+
+          switch (fx[0]) {
+            case 'dmgMore':
+              name = `Fierce ${name}`
+              break
+            case 'hpRegen':
+              name = `Regenerating ${name}`
+              break
+            case 'hpMore':
+              name = `Healthy ${name}`
+              break
+            case 'quick':
+              name = `Quick ${name}`
+              break
+            case 'skull':
+              name = `Elite ${name}`
+              break
+            default:
+              break
+          }
+        }
+      }
+
       if (showBattleScore) {
         name += `· ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
       }
@@ -180,7 +216,6 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE, isBoss ? 12 : 8)
       ctx.stroke()
 
-      const fxs = Object.entries(entity.fx)
       let fxX = x - UI_SCALE / 2 - 34
       const fxY = y - UI_SCALE - 48 - (isBoss ? 12 : 2)
       for (let i = 0; i < fxs.length; i++) {

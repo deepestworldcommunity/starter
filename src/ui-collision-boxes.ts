@@ -1,5 +1,6 @@
-import { UI_SCALE } from './consts'
 import { addMenuButton } from './ui-buttons'
+
+const UI_SCALE = dw.constants.PIXELS_PER_UNIT
 
 export type CollisionObject = {
   id?: number

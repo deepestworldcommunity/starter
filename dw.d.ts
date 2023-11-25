@@ -76,7 +76,7 @@ declare namespace DeepestWorld {
       TERRAIN_EMPTY: number
       TERRAIN_GRASS: number
       TERRAIN_DIRT: number
-      TERRAIN_DESERT:number
+      TERRAIN_DESERT: number
       TERRAIN_UNDERWATER: number
       TERRAIN_WINTER: number
       TERRAIN_CLOUD: number
@@ -556,6 +556,7 @@ declare namespace DeepestWorld {
         {
           collision?: number
           hitbox: { w: number; h: number }
+          gearSlots?: string[]
         }
       >
       skills: Record<
@@ -794,10 +795,21 @@ declare namespace DeepestWorld {
   type Events = {
     /**
      * This is not a socket event, but a client event to draw stuff on canvas.
+     * It will be called last.
+     *
      * @param eventName
      * @param listener
      */
     drawEnd: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void
+
+    /**
+     * This is not a socket event, but a client event to draw stuff on canvas.
+     * It will be called
+     *
+     * @param eventName
+     * @param listener
+     */
+    drawUnder: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void
 
     // Socket Events
 
@@ -1093,7 +1105,7 @@ declare namespace DeepestWorld {
     /** Owner Database ID */
     ownerDbId: number
     /** Storage of items */
-    storage: Array<Item | null>
+    storage: Array<Item | null> | Record<string, Item>
   }
 
   export interface YourCharacter extends Character {
