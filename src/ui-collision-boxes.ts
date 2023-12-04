@@ -120,7 +120,7 @@ dw.on('unseenObjects', (entityIds) => {
 
 let show = dw.get('showCollisionBoxes') ?? true
 
-addMenuButton('📦', () => {
+addMenuButton('📦', 'Toggle Collision Boxes', () => {
   show = !show
   dw.set('showCollisionBoxes', show)
 })

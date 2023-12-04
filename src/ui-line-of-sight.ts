@@ -3,7 +3,7 @@ import { addMenuButton } from './ui-buttons'
 
 let show = dw.get('showLineOfSight') ?? true
 
-addMenuButton('👀', () => {
+addMenuButton('👀', 'Toggle Line of Sight', () => {
   show = !show
   dw.set('showLineOfSight', show)
 })

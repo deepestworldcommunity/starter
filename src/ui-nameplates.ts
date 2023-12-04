@@ -13,14 +13,14 @@ const COLOR_BORDER = '#3c3c3c'
 const COLOR_BACKGROUND = '#0c0c0c'
 
 let showBuffNames = dw.get('showBuffNames') ?? false
-let showBattleScore = dw.get('showBattleScore') ?? true
+let showBattleScore = dw.get('showBattleScore') ?? false
 
-addMenuButton('💪', () => {
+addMenuButton('💪', 'Toggle Buff Names', () => {
   showBuffNames = !showBuffNames
   dw.set('showBuffNames', showBuffNames)
 })
 
-addMenuButton('💯', () => {
+addMenuButton('💯', 'Toggle BattleScore', () => {
   showBattleScore = !showBattleScore
   dw.set('showBattleScore', showBattleScore)
 })
@@ -256,10 +256,12 @@ dw.on('drawEnd', (ctx, cx, cy) => {
         const fxData = fx[1]
         if (fxData && typeof fxData === 'object' && 's' in fxData && typeof fxData.s === 'number') {
           const s = `${fxData.s}`
+          ctx.font = '14px system-ui'
+          ctx.textAlign = 'right'
           ctx.fillStyle = 'white'
           ctx.strokeStyle = 'black'
-          ctx.strokeText(s, fxX + 24, fxY + 28)
-          ctx.fillText(s, fxX + 24, fxY + 28)
+          ctx.strokeText(s, fxX + 32, fxY + 28)
+          ctx.fillText(s, fxX + 32, fxY + 28)
         }
       }
     }

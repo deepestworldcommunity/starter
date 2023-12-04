@@ -9,7 +9,7 @@ window.addEventListener('unload', () => {
   }
 })
 
-export function addMenuButton(title: string, handler: () => void) {
+export function addMenuButton(icon: string, title: string, handler: () => void) {
   if (!window.top) {
     return
   }
@@ -22,8 +22,9 @@ export function addMenuButton(title: string, handler: () => void) {
 
   const button = window.top.document.createElement('div')
   button.className = 'ui-btn p-0 me-1 custom-btn'
+  button.innerText = icon
   button.style.width = '32px'
-  button.innerText = title
+  button.title = title
   button.addEventListener('click', (e) => {
     e.preventDefault()
     handler()
@@ -33,7 +34,7 @@ export function addMenuButton(title: string, handler: () => void) {
 
 let inventoryButtonCount = 1
 
-export function addInventoryButton(title: string, handler: () => void) {
+export function addInventoryButton(icon: string, title: string, handler: () => void) {
   if (!window.top) {
     return
   }
@@ -47,12 +48,13 @@ export function addInventoryButton(title: string, handler: () => void) {
 
   const button = window.top.document.createElement('div')
   button.className = 'ui-btn p-1 custom-btn'
+  button.innerText = icon
   button.style.width = '34px'
   button.style.height = '34px'
   button.style.position = 'absolute'
   button.style.top = '4px'
   button.style.right = `${inventoryButtonCount * 38 + 4}px`
-  button.innerText = title
+  button.title = title
   button.addEventListener('click', (e) => {
     e.preventDefault()
     handler()

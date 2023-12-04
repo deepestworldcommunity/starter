@@ -57,15 +57,19 @@ declare namespace DeepestWorld {
     constants: {
       CHARACTER_DMG_BASE: number
       CHARACTER_HP_BASE: number
+      /** @deprecated */
       CHARACTER_SPEED: number
+      /** @deprecated */
       CHUNK_DIM: [number, number, number]
       CHUNK_DIMENSION: [number, number, number]
       CRIT_BASE: number
       CRIT_MULT_BASE: number
+      /** @deprecated */
       GCD: number
       GCD_BASE: number
       GCD_MIN: number
       INTERACT_RANGE: number
+      /** @deprecated */
       MELEE_RANGE: number
       MOVEMENT_SPEED_BASE: number
       MONSTER_HP_BASE: number
@@ -82,6 +86,7 @@ declare namespace DeepestWorld {
       TERRAIN_CLOUD: number
       TERRAIN_TREE: number
       ZONE_LEVEL_RADIUS: number
+      /** @deprecated */
       ZONE_TIER_ZONE_LEVEL_RADIUS: number
       ZONE_LEVELS_PER_ZONE_TIER: number
     }

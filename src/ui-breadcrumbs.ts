@@ -3,7 +3,7 @@ import { addMenuButton } from './ui-buttons'
 
 let show = dw.get('showBreadcrumbs') ?? true
 
-addMenuButton('🍞', () => {
+addMenuButton('🍞', 'Toggle Breadcrumbs', () => {
   show = !show
   dw.set('showBreadcrumbs', show)
 })
