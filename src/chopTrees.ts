@@ -1,4 +1,4 @@
-setInterval(function () {
+function chopTrees() {
   // Find the closest tree
   const target = dw.findEntities(
       (e) => 'tree' in e,
@@ -32,4 +32,6 @@ setInterval(function () {
   }
 
   dw.chop(toolIndex, target.id)
-}, 250)
+}
+
+setInterval(chopTrees, 250)

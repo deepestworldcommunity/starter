@@ -33,7 +33,19 @@ addMenuButton('🎨', 'Toggle Drawing',() => {
   ctx.clearRect(0, 0, width, height)
 })
 
-setInterval(() => {
+window.addEventListener('unload', function onUnload() {
+  if (!window.top) {
+    return
+  }
+
+  let statsPanel: HTMLDivElement | null = window.top.document.querySelector('#statsPanel')
+
+  if (statsPanel) {
+    statsPanel.remove()
+  }
+})
+
+function updateStats() {
   if (!window.top) {
     return
   }
@@ -207,4 +219,6 @@ setInterval(() => {
   if (stat) {
     stat.innerHTML = `${(lootTracker.orange * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`
   }
-}, 1000)
+}
+
+setInterval(updateStats, 1000)

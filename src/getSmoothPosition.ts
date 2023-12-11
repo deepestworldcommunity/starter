@@ -1,6 +1,6 @@
 const entitiesSmoothPosition = new Map<number, { x: number, y: number }>
 
-setInterval(function() {
+function updateSmootPosition() {
   const currentEntities = new Set()
 
   for (const entity of dw.findEntities((e) => 'ai' in e || 'player' in e)) {
@@ -32,7 +32,9 @@ setInterval(function() {
       entitiesSmoothPosition.delete(entityId)
     }
   }
-}, 16)
+}
+
+setInterval(updateSmootPosition, 16)
 
 export default function getSmoothPosition(entity: DeepestWorld.Entity) {
   const smoothPosition = entitiesSmoothPosition.get(entity.id)

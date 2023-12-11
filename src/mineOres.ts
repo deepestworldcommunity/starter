@@ -1,4 +1,4 @@
-setInterval(function () {
+function mineOres() {
   // Find the closest ore
   const target = dw.findEntities(
       (e) => 'ore' in e,
@@ -32,4 +32,6 @@ setInterval(function () {
   }
 
   dw.mine(toolIndex, target.id)
-}, 250)
+}
+
+setInterval(mineOres, 250)

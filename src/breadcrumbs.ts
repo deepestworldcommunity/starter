@@ -41,7 +41,7 @@ export default function getBreadcrumbs() {
   return result
 }
 
-setInterval(() => {
+function dropBreadcrumb() {
   const x = Math.floor(dw.c.x)
   const y = Math.floor(dw.c.y)
   const z = Math.floor(dw.c.z)
@@ -59,4 +59,6 @@ setInterval(() => {
   }
 
   breadcrumbs.push({ x, y, z, value: 1, time: Date.now() })
-}, 100)
+}
+
+setInterval(dropBreadcrumb, 100)

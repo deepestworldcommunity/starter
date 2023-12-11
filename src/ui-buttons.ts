@@ -1,4 +1,4 @@
-window.addEventListener('unload', () => {
+window.addEventListener('unload', function onUnload() {
   if (!window.top) {
     return
   }

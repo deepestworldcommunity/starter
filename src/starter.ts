@@ -1,6 +1,6 @@
 const attackMode = false
 
-setInterval(function () {
+function basicAttack() {
   if (!attackMode) {
     return
   }
@@ -34,4 +34,6 @@ setInterval(function () {
   }
 
   dw.useSkill(skillIndex, target.id)
-}, 250)
+}
+
+setInterval(basicAttack, 250)
