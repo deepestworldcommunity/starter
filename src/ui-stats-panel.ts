@@ -67,8 +67,6 @@ const stats = [
         (runtime: number) => `${(lootTracker.green * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
       ],
     },
-  ],
-  [
     {
       label: 'Blue drops',
       stats: [
@@ -76,8 +74,6 @@ const stats = [
         (runtime: number) => `${(lootTracker.blue * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
       ],
     },
-  ],
-  [
     {
       label: 'Purple drops',
       stats: [
@@ -85,13 +81,34 @@ const stats = [
         (runtime: number) => `${(lootTracker.purple * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
       ],
     },
-  ],
-  [
     {
       label: 'Orange drops',
       stats: [
         () => `${lootTracker.orange}`,
         (runtime: number) => `${(lootTracker.orange * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
+      ],
+    },
+  ],
+  [
+    {
+      label: 'Rune drops',
+      stats: [
+        () => `${lootTracker.rune}`,
+        (runtime: number) => `${(lootTracker.rune * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
+      ],
+    },
+    {
+      label: 'Wood drops',
+      stats: [
+        () => `${lootTracker.wood}`,
+        (runtime: number) => `${(lootTracker.wood * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
+      ],
+    },
+    {
+      label: 'Prism drops',
+      stats: [
+        () => `${lootTracker.prism}`,
+        (runtime: number) => `${(lootTracker.prism * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
       ],
     },
   ],
@@ -114,14 +131,16 @@ function addStatsPanel() {
 
   ui.appendChild(statsPanel)
 
+  const maxStatsPerRow = Math.max(...stats.flatMap((group) => group.map((row) => row.stats.length)))
+
   statsPanel.innerHTML = `<div class="ui-content2">
     <table class="table mb-0">
       <tbody>
         ${stats.map((group, groupIdx) => group.map((row, rowIdx) => `
           <tr>
             <td class="text-alt border-0 p-0 pb-1${rowIdx === 0 && groupIdx !== 0 ? ' pt-2' : ''}">${row.label}</td>
-            ${row.stats.map((_, statIdx) => `
-              <td class="text-end border-0 p-0 pb-1${rowIdx === 0 && groupIdx !== 0 ? ' pt-2' : ''}" data-content="stat-${groupIdx}-${rowIdx}-${statIdx}"></td>
+            ${row.stats.map((_, statIdx, rowStats) => `
+              <td class="text-end border-0 p-0 pb-1${rowIdx === 0 && groupIdx !== 0 ? ' pt-2' : ''}" colspan="${statIdx === rowStats.length - 1 ? maxStatsPerRow - statIdx : 1}" data-content="stat-${groupIdx}-${rowIdx}-${statIdx}"></td>
             `).join('')}
           </tr>
         `).join('')).join('')}

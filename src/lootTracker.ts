@@ -1,35 +1,43 @@
-let green = 0
-let blue = 0
-let purple = 0
-let orange = 0
-let prism = 0
-let wood = 0
+const tracker = {
+  green: 0,
+  blue: 0,
+  purple: 0,
+  orange: 0,
+  prism: 0,
+  wood: 0,
+  rune: 0,
+}
 
 dw.on('loot', (lootList) => {
   for (const loot of lootList) {
     if (!loot.item.mods) {
+      if (['rune1', 'rune2', 'rune3'].includes(loot.item.md)) {
+        tracker.rune++
+      }
+
       if (loot.item.md === 'prism') {
-        prism++
+        tracker.prism++
       }
 
       if (loot.item.md === 'wood') {
-        wood++
+        tracker.wood++
       }
+
       continue
     }
 
     switch (loot.item.r) {
       case 4:
-        orange++
+        tracker.orange++
         break
       case 3:
-        purple++
+        tracker.purple++
         break
       case 2:
-        blue++
+        tracker.blue++
         break
       case 1:
-        green++
+        tracker.green++
         break
       default:
         break
@@ -37,11 +45,4 @@ dw.on('loot', (lootList) => {
   }
 })
 
-export default {
-  green,
-  blue,
-  purple,
-  orange,
-  prism,
-  wood,
-}
+export default tracker
