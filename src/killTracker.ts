@@ -2,8 +2,12 @@ import { BOSSES } from "./consts"
 
 const tracker = {
   levels: 0,
-  kills: 0,
-  skullKills: 0,
+  total: 0,
+  normal: 0,
+  skullKills: {
+    total: 0,
+    bySkulls: new Array<number>(10).fill(0),
+  },
   bossKills: 0,
 }
 
@@ -16,18 +20,22 @@ dw.on('hit', (hits) => {
         return
       }
 
+      tracker.levels += entity.level
+      tracker.total++
+
       if (BOSSES.includes(entity.md)) {
         tracker.bossKills++
         return
       }
 
+      // TODO: adjust to new fx annotation
       if (entity.r > 0) {
-        tracker.skullKills++
+        tracker.skullKills.total++
+        tracker.skullKills.bySkulls[entity.r - 1]++
         return
       }
 
-      tracker.levels += entity.level
-      tracker.kills++
+      tracker.normal++
     })
 })
 

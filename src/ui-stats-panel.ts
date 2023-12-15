@@ -26,7 +26,17 @@ const stats = [
     {
       label: 'Idle',
       stats: [
-        (runtime: number) => dw.character.combat ? '-' : formatDuration(Math.max(0, Math.floor((Date.now() - combatTracker.idle) / 1000)), true),
+        () => dw.character.combat ? '-' : formatDuration(Math.max(0, Math.floor((Date.now() - combatTracker.idle) / 1000)), true),
+        () => formatDuration(Math.max(0, Math.floor((combatTracker.totalIdleTime + (dw.character.combat ? 0 : Date.now() - combatTracker.idle)) / 1000)), true),
+      ],
+    },
+  ],
+  [
+    {
+      label: 'Deaths',
+      stats: [
+        () => `${combatTracker.deaths}`,
+        (runtime: number) => `${(combatTracker.deaths * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
       ],
     },
   ],
@@ -34,28 +44,42 @@ const stats = [
     {
       label: 'Average Level',
       stats: [
-        () => killTracker.kills > 0 ? `${(killTracker.levels / killTracker.kills).toLocaleString([], { maximumFractionDigits: 1 })}` : '-',
+        () => killTracker.total > 0 ? `${(killTracker.levels / killTracker.total).toLocaleString([], { maximumFractionDigits: 1 })}` : '-',
       ],
     },
     {
-      label: 'Kills',
+      label: 'All Kills',
       stats: [
-        () => `${killTracker.kills}`,
-        (runtime: number) => `${(killTracker.kills * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
+        () => `${killTracker.total}`,
+        (runtime: number) => `${(killTracker.total * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
       ],
     },
     {
-      label: 'Skull Kills',
+      label: 'Normal Kills',
       stats: [
-        () => `${killTracker.skullKills}`,
-        (runtime: number) => `${(killTracker.skullKills * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
+        () => `${killTracker.normal}`,
+        (runtime: number) => `${(killTracker.normal * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`,
       ],
     },
+    {
+      label: 'All Skull Kills',
+      stats: [
+        () => `${killTracker.skullKills.total}`,
+        (runtime: number) => `${(killTracker.skullKills.total * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
+      ],
+    },
+    ...new Array(10).fill(0).map((_, skull) => ({
+      label: `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${skull + 1} Skull Kills`,
+      stats: [
+        () => `${killTracker.skullKills.bySkulls[skull]}`,
+        (runtime: number) => `${(killTracker.skullKills.bySkulls[skull] * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
+      ],
+    })),
     {
       label: 'Boss Kills',
       stats: [
         () => `${killTracker.bossKills}`,
-        (runtime: number) => `${(killTracker.bossKills * 60 * 60 * 24 * 7 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/w`,
+        (runtime: number) => `${(killTracker.bossKills * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
       ],
     },
   ],
@@ -71,21 +95,21 @@ const stats = [
       label: 'Blue drops',
       stats: [
         () => `${lootTracker.blue}`,
-        (runtime: number) => `${(lootTracker.blue * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
+        (runtime: number) => `${(lootTracker.blue * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
       ],
     },
     {
       label: 'Purple drops',
       stats: [
         () => `${lootTracker.purple}`,
-        (runtime: number) => `${(lootTracker.purple * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
+        (runtime: number) => `${(lootTracker.purple * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
       ],
     },
     {
       label: 'Orange drops',
       stats: [
         () => `${lootTracker.orange}`,
-        (runtime: number) => `${(lootTracker.orange * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/d`,
+        (runtime: number) => `${(lootTracker.orange * 60 * 60 * 24 / runtime).toLocaleString([], { maximumFractionDigits: 1 })}/d`,
       ],
     },
   ],
