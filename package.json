@@ -8,16 +8,16 @@
     "test": "tsc --noEmit"
   },
   "engines": {
-    "node": "^18",
-    "npm": "^9"
+    "node": "^20.9.0",
+    "npm": "^10.2.3"
   },
   "author": "Kevin Sandow",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "18.15.3",
+    "@types/node": "^20.10.4",
     "dotenv": "^16.3.1",
     "electron": "^26.2.4",
-    "esbuild": "^0.19.4",
-    "typescript": "^5.1.6"
+    "esbuild": "^0.19.9",
+    "typescript": "^5.3.3"
   }
 }
