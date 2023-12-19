@@ -32,6 +32,19 @@ declare namespace DeepestWorld {
     /** Reference to your character */
     c: YourCharacter
 
+    canUseSkill(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
+
+    /**
+     * Checks whether the skill is on cooldown,
+     * can be used without `skillIndex` to check for GCD.
+     * @param skillIndex
+     */
+    canUseSkillCd(skillIndex?: number): boolean
+
+    canUseSkillCost(skillIndex?: number): boolean
+
+    canUseSkillRange(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
+
     /** Another reference to your character */
     char: YourCharacter
 
@@ -41,9 +54,9 @@ declare namespace DeepestWorld {
     /**
      * Chop a tree.
      * @param toolBagIndex id of the tool in toolBag
-     * @param targetId tree entity id
+     * @param target tree entity id or entity
      */
-    chop(toolBagIndex: number, targetId: number): void
+    chop(toolBagIndex: number, target: number | { id: number }): void
 
     chunks: Record<string, Chunk>
 
@@ -55,27 +68,25 @@ declare namespace DeepestWorld {
     connected: boolean
 
     constants: {
-      CHARACTER_DMG_BASE: number
-      CHARACTER_HP_BASE: number
-      /** @deprecated */
-      CHARACTER_SPEED: number
-      /** @deprecated */
-      CHUNK_DIM: [number, number, number]
-      CHUNK_DIMENSION: [number, number, number]
-      CRIT_BASE: number
-      CRIT_MULT_BASE: number
-      /** @deprecated */
-      GCD: number
-      GCD_BASE: number
-      GCD_MIN: number
+      VERSION: number
       INTERACT_RANGE: number
-      /** @deprecated */
-      MELEE_RANGE: number
-      MOVEMENT_SPEED_BASE: number
-      MONSTER_HP_BASE: number
-      PIXELS_PER_UNIT: number
+      CHUNK_DIMENSION: [number, number, number]
+      ZONE_LEVEL_RADIUS: number
+      ZONE_LEVELS_PER_ZONE_TIER: number
       RANGE_MELEE_BASE: number
       RANGE_RANGED_BASE: number
+      MOVEMENT_SPEED_BASE: number
+      PIXELS_PER_UNIT: number
+      GCD_BASE: number
+      GCD_MIN: number
+      CRIT_BASE: number
+      CRIT_MULT_BASE: number
+      CHARACTER_HP_BASE: number
+      MONSTER_HP_BASE: number
+      CHARACTER_DMG_BASE: number
+      DMG_TYPE_FX_CHANCE_BASE: number
+      DMG_TYPE_FX_MAX: number
+      LEVEL_BUFFER: number
       TERRAIN_WATER: number
       TERRAIN_EMPTY: number
       TERRAIN_GRASS: number
@@ -85,10 +96,28 @@ declare namespace DeepestWorld {
       TERRAIN_WINTER: number
       TERRAIN_CLOUD: number
       TERRAIN_TREE: number
-      ZONE_LEVEL_RADIUS: number
+      DMG_TYPES: Array<string>
+      ATTR_TYPES: Array<string>
+      BASE_MOD_MULTS: Array<number>
+      MAX_BASE_MOD_TIER: number
+      MAX_MOD_TIER: number
+      MAX_RES: number
+      MAX_DMG_TYPE_EFFECT: number
+      WHITE: number
+      GREEN: number
+      BLUE: number
+      PURPLE: number
+      ORANGE: number
+      /** @deprecated */
+      CHUNK_DIM: [number, number, number]
       /** @deprecated */
       ZONE_TIER_ZONE_LEVEL_RADIUS: number
-      ZONE_LEVELS_PER_ZONE_TIER: number
+      /** @deprecated */
+      MELEE_RANGE: number
+      /** @deprecated */
+      CHARACTER_SPEED: number
+      /** @deprecated */
+      GCD: number
     }
 
     craft(benchId: number, itemMd: string, max?: number): void
@@ -111,7 +140,7 @@ declare namespace DeepestWorld {
      * @param enchantingDeviceId
      * @param itemIndex
      */
-    disenchant(enchantingDeviceId: number, itemIndex: number): void
+    disenchant(enchantingDeviceId: number, itemIndex: number): Promise<void>
 
     /**
      * Returns the distance between from and to
@@ -209,6 +238,8 @@ declare namespace DeepestWorld {
     emit(eventName: 'enterCar', data: { id: number }): void
 
     emit(eventName: 'enterPortal', data: { id: number }): void
+
+    emit(eventName: 'enterMission', data: { id: number, i: number }): void
 
     emit(
       eventName: 'equip',
@@ -454,8 +485,9 @@ declare namespace DeepestWorld {
         listener: Events[E],
         timeout?: number,
       )
-      remove<E extends keyof Events>(eventName: E, listener: Events[E])
-      clear(): void
+      off<E extends keyof Events>(eventName: E, listener: Events[E])
+      removeListener<E extends keyof Events>(eventName: E, listener: Events[E])
+      clear<E extends keyof Events>(eventName: E): void
     }
 
     exitCar(): void
@@ -491,9 +523,13 @@ declare namespace DeepestWorld {
       filter?: (entity: Monster) => boolean,
     ): Monster | undefined
 
-    findEntities(filter?: (entity: Entity) => boolean): Entity[]
+    findEntities(filter: (entity: Entity) => boolean): Entity[]
+
+    findEntity(filter: (entity: Entity) => boolean): Entity | undefined
 
     get(key: string): unknown | null
+
+    getChunkHash(x: number, y: number, z: number): string
 
     getItemBaseValue(item: DeepestWorld.Item): number | undefined
 
@@ -506,9 +542,8 @@ declare namespace DeepestWorld {
      * @param x
      * @param y
      * @param z
-     * @param zo Layer offset. 1 to check the terrain above, -1 to check the terrain under.
      */
-    getTerrain(x: number, y: number, z: number, zo?: number): number
+    getTerrain(x: number, y: number, z: number): number | undefined
 
     /**
      * Get either the zone level of location or of player location
@@ -524,26 +559,26 @@ declare namespace DeepestWorld {
     /**
      * Checks whether the target would be in range for spell.
      * @param skillIndex
-     * @param x
-     * @param y
-     * @deprecated use dw.isSkillInRange instead
+     * @param args
+     * @deprecated use dw.canUseSkillRange instead
      */
-    inSkillRange(skillIndex, x: number, y: number)
+    inSkillRange(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
 
     /**
      * Checks whether the target would be in range for spell.
      * @param skillIndex
-     * @param x
-     * @param y
+     * @param args
+     * @deprecated use dw.canUseSkillRange instead
      */
-    isSkillInRange(skillIndex, x: number, y: number)
+    isSkillInRange(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
 
     /**
      * Checks whether the skill is on cooldown,
      * can be used without `skillIndex` to check for GCD.
      * @param skillIndex
+     * @deprecated use dw.canUseSkillCd instead
      */
-    isSkillReady(skillIndex?: number): undefined | true
+    isSkillReady(skillIndex?: number): boolean
 
     lastLog: number
 
@@ -556,32 +591,23 @@ declare namespace DeepestWorld {
     marketSell(tradingPostId: number, itemMd: string): void
 
     md: {
-      items: Record<
-        string,
-        {
-          collision?: number
-          hitbox: { w: number; h: number }
-          gearSlots?: string[]
-        }
-      >
-      skills: Record<
-        string,
-        {
-          cd: number
-          movement?: boolean
-        }
-      >
+      chunkSize: number
       chunkSizeX: number
       chunkSizeY: number
       chunkSizeZ: number
+      e: Record<string, MetaDataEntity>
+      entities: Record<string, MetaDataEntity>
+      items: Record<string, MetaDataItem>
+      recipes: Record<string, MetaDataRecipe>
+      skills: Record<string, MetaDataSkill>
     }
 
     /**
      * Mine an ore.
      * @param toolBagIndex the id of the ore
-     * @param targetId the id of the ore
+     * @param target the id of the ore
      */
-    mine(toolBagIndex: number, targetId: number): void
+    mine(toolBagIndex: number, target: number | { id: number }): void
 
     /**
      * Moves towards x,y in a straight line
@@ -627,7 +653,9 @@ declare namespace DeepestWorld {
       timeout?: number,
     ): void
 
-    openItem(bagIndex: number): void
+    openItem(bagIndex: number): Promise<void>
+
+    openMission(missionTableId: number): Promise<number>
 
     /**
      * Opens a portal to your respawn location ot a player with `targetName`.
@@ -665,7 +693,7 @@ declare namespace DeepestWorld {
 
     pourItem(toolBagIndex: number, targetId: number): void
 
-    removeAllListeners(): void
+    removeAllListeners<E extends keyof Events>(eventName: E): void
 
     removeListener<E extends keyof Events>(
       eventName: E,
@@ -673,6 +701,8 @@ declare namespace DeepestWorld {
     ): void
 
     removeMog(stationId: number, itemMd: string, bagIndex: number): void
+
+    reopenMission(missionTableId: number, portalBagIndex: number): Promise<number>
 
     repair(toolBagIndex: number, objectId: number): void
 
@@ -711,7 +741,7 @@ declare namespace DeepestWorld {
 
     takeBlock(toolBagIndex: number, x: number, y: number, z: number): void
 
-    takeItem(toolBagIndex: number, itemId): void
+    takeItem(toolBagIndex: number, itemId): Promise<void>
 
     takeItemAsync(toolBagIndex: number, itemId): Promise<number>
 
@@ -740,21 +770,27 @@ declare namespace DeepestWorld {
 
     useElevator(elevatorId: number, z: number): void
 
-    /**
-     * Use skill on a target.
-     * @param skillIndex
-     * @param targetId
-     */
-    useSkill(skillIndex: number, targetId: number): void
+    // /**
+    //  * Use skill on a target.
+    //  * @param skillIndex
+    //  * @param targetId
+    //  */
+    // useSkill(skillIndex: number, targetId: number): void
+    //
+    // /**
+    //  * Use a movement skill on a position.
+    //  * @param skillIndex
+    //  * @param x
+    //  * @param y
+    //  * @param z
+    //  */
+    // useSkill(skillIndex: number, x: number, y: number, z?: number): void
 
-    /**
-     * Use a movement skill on a position.
-     * @param skillIndex
-     * @param x
-     * @param y
-     * @param z
-     */
-    useSkill(skillIndex: number, x: number, y: number, z?: number): void
+    useSkill(skillIndex: number, ...args: [number] | [number, number] | [number, number, number] | [{
+      x: number,
+      y: number,
+      z?: number
+    }])
   }
 
   interface BaseEntity {
@@ -818,6 +854,8 @@ declare namespace DeepestWorld {
 
     // Socket Events
 
+    acceptMission: (data: { error: string }) => void
+
     afx: (data: {
       id: number
       md: string
@@ -873,6 +911,10 @@ declare namespace DeepestWorld {
       data: ['dungeonBoard', DungeonBoard] | { error: string },
     ) => void
 
+    enterPortal: (data: { error: string }) => void
+
+    enterMission: (data: { error: string }) => void
+
     equip: (
       data:
         | { error: string }
@@ -908,6 +950,8 @@ declare namespace DeepestWorld {
         rip?: number
       }>,
     ) => void
+
+    l: (data: Array<[number, number, number, number] | [number, number, number, number, number]>) => void
 
     levelUp: (data: { id: number }) => void
 
@@ -958,11 +1002,15 @@ declare namespace DeepestWorld {
 
     partyKick: (data: { dbId: number }) => void
 
+    openPortal: (data: { error: string }) => void
+
     realEstateTable: (
       data: ['realEstateTable', RealEstateTable] | { error: string },
     ) => void
 
     rfx: (data: { id: number; md: string }) => void
+
+    sacItem: (data: { error: string }) => void
 
     sendPartyInvite: (data: { error: string }) => void
 
@@ -1257,6 +1305,46 @@ declare namespace DeepestWorld {
     owner: string
     pos: [number, number, number]
   }>
+
+  type MetaDataEntity = {
+    collidable?: true
+    hitbox?: [number, number]
+    monster?: true
+    ore?: true
+    player?: true
+    portal?: true
+    resource?: true
+    tree?: true
+  }
+
+  type MetaDataItem = {
+    armor?: true
+    collision?: 1
+    dmgTypes?: string[]
+    gearSlots?: string[]
+    gem?: true
+    hitbox: { w: number; h: number }
+    jewelry?: true
+    mat?: true
+    placeable?: true
+    s?: number
+    skill?: true
+    tool?: true
+    weapon?: true
+  }
+
+  type MetaDataRecipe = Record<string, {
+    mats: Record<string, {
+      n?: number
+      r?: number
+    }>
+    minLevel?: number
+  }>
+
+  type MetaDataSkill = {
+    cd: number
+    movement?: boolean
+  }
 
   type MissionTable = Record<string, number>
 

@@ -22,14 +22,14 @@ function basicAttack() {
     return
   }
 
-  if (!dw.isSkillInRange(skillIndex, target.x, target.y)) {
+  if (!dw.canUseSkillRange(skillIndex, target.x, target.y)) {
     // Too far away
     dw.move(target.x, target.y)
     return
   }
 
-  if (!dw.isSkillReady(skillIndex)) {
-    // Skill is on cooldown
+  if (!dw.canUseSkillCd(skillIndex) || !dw.canUseSkillCost(skillIndex)) {
+    // Skill is either on cooldown or not enough resources
     return
   }
 
