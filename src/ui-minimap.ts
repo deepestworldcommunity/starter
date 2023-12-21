@@ -25,7 +25,7 @@ dw.on('drawEnd', (ctx) => {
     for (let dx = -RANGE; dx < RANGE; dx++) {
       const terrain = dw.getTerrain(ex+dx, ey+dy, ez)
       const terrainBelow = dw.getTerrain(ex+dx, ey+dy, ez - 1)
-      if (!PASSABLE_TERRAIN.includes(terrain)) {
+      if (terrain === undefined || !PASSABLE_TERRAIN.includes(terrain)) {
         ctx.fillStyle = '#000000'
       } else {
         switch (terrainBelow) {

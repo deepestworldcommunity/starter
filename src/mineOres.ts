@@ -26,7 +26,7 @@ function mineOres() {
     return
   }
 
-  if (!dw.isSkillReady()) {
+  if (!dw.canUseSkillCd()) {
     // We have to wait for GCD
     return
   }

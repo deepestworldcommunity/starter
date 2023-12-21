@@ -37,9 +37,16 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
 
   for (let y = Math.floor(minY); y <= maxY; y++) {
     for (let x = Math.floor(minX); x <= maxX; x++) {
+      const wall = dw.getTerrain(x, y, z)
+      const floor = dw.getTerrain(x, y, z - 1)
+
+      if (wall === undefined || floor === undefined) {
+        return false
+      }
+
       if (
-        PASSABLE_TERRAIN.includes(dw.getTerrain(x, y, z))
-        && !PASSABLE_TERRAIN.includes(dw.getTerrain(x, y, z - 1))
+        PASSABLE_TERRAIN.includes(wall)
+        && !PASSABLE_TERRAIN.includes(floor)
       ) {
         continue
       }

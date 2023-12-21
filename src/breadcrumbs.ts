@@ -27,9 +27,14 @@ export default function getBreadcrumbs() {
 
   for (let wy = Math.floor(dw.c.y - 10); wy <= dw.c.y + 10; wy++) {
     for (let wx = Math.floor(dw.c.x - 10); wx <= dw.c.x + 10; wx++) {
+      const wall = dw.getTerrain(wx, wy, dw.c.z)
+      const floor = dw.getTerrain(wx, wy, dw.c.z - 1)
+
       if (
-        !PASSABLE_TERRAIN.includes(dw.getTerrain(wx, wy, dw.c.z))
-        || PASSABLE_TERRAIN.includes(dw.getTerrain(wx, wy, dw.c.z - 1))
+        wall === undefined
+        || floor === undefined
+        || !PASSABLE_TERRAIN.includes(wall)
+        || PASSABLE_TERRAIN.includes(floor)
       ) {
         continue
       }
