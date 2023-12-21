@@ -87,6 +87,7 @@ declare namespace DeepestWorld {
       DMG_TYPE_FX_CHANCE_BASE: number
       DMG_TYPE_FX_MAX: number
       LEVEL_BUFFER: number
+      MISSION_RANGE: number
       TERRAIN_WATER: number
       TERRAIN_EMPTY: number
       TERRAIN_GRASS: number
@@ -1191,9 +1192,11 @@ declare namespace DeepestWorld {
     hpRegen: number
 
     mission?: {
+      /** @deprecated use z instead */
       l: number
       x: number
       y: number
+      z: number
 
       item: Item
 
