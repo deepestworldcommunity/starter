@@ -32,7 +32,10 @@ declare namespace DeepestWorld {
     /** Reference to your character */
     c: YourCharacter
 
-    canUseSkill(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
+    canUseSkill(
+      skillIndex,
+      ...args: [number] | [number, number] | [{ x: number; y: number }]
+    ): boolean
 
     /**
      * Checks whether the skill is on cooldown,
@@ -43,7 +46,10 @@ declare namespace DeepestWorld {
 
     canUseSkillCost(skillIndex?: number): boolean
 
-    canUseSkillRange(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
+    canUseSkillRange(
+      skillIndex,
+      ...args: [number] | [number, number] | [{ x: number; y: number }]
+    ): boolean
 
     /** Another reference to your character */
     char: YourCharacter
@@ -100,6 +106,7 @@ declare namespace DeepestWorld {
       DMG_TYPES: Array<string>
       ATTR_TYPES: Array<string>
       BASE_MOD_MULTS: Array<number>
+      MOD_MULTS: Array<number>
       MAX_BASE_MOD_TIER: number
       MAX_MOD_TIER: number
       MAX_RES: number
@@ -240,7 +247,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'enterPortal', data: { id: number }): void
 
-    emit(eventName: 'enterMission', data: { id: number, i: number }): void
+    emit(eventName: 'enterMission', data: { id: number; i: number }): void
 
     emit(
       eventName: 'equip',
@@ -528,6 +535,8 @@ declare namespace DeepestWorld {
 
     findEntity(filter: (entity: Entity) => boolean): Entity | undefined
 
+    gather(target: number | { id: number }): void
+
     get(key: string): unknown | null
 
     getChunkHash(x: number, y: number, z: number): string
@@ -563,7 +572,10 @@ declare namespace DeepestWorld {
      * @param args
      * @deprecated use dw.canUseSkillRange instead
      */
-    inSkillRange(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
+    inSkillRange(
+      skillIndex: number,
+      ...args: [number] | [number, number] | [{ x: number; y: number }]
+    ): boolean
 
     /**
      * Checks whether the target would be in range for spell.
@@ -571,7 +583,10 @@ declare namespace DeepestWorld {
      * @param args
      * @deprecated use dw.canUseSkillRange instead
      */
-    isSkillInRange(skillIndex, ...args: [number] | [number, number] | [{ x: number, y: number }]): boolean
+    isSkillInRange(
+      skillIndex: number,
+      ...args: [number] | [number, number] | [{ x: number; y: number }]
+    ): boolean
 
     /**
      * Checks whether the skill is on cooldown,
@@ -633,8 +648,8 @@ declare namespace DeepestWorld {
     moveItem(
       bagNameFrom: string,
       bagIndexFrom: number,
-      bagNameTo: string | undefined,
-      bagIndexTo: number,
+      bagNameTo: string,
+      bagIndexTo: number | undefined,
       itemIdFrom?: number,
       itemIdTo?: number,
       finderId?: number,
@@ -703,7 +718,10 @@ declare namespace DeepestWorld {
 
     removeMog(stationId: number, itemMd: string, bagIndex: number): void
 
-    reopenMission(missionTableId: number, portalBagIndex: number): Promise<number>
+    reopenMission(
+      missionTableId: number,
+      portalBagIndex: number,
+    ): Promise<number>
 
     repair(toolBagIndex: number, objectId: number): void
 
@@ -754,6 +772,8 @@ declare namespace DeepestWorld {
 
     toggleMog(stationId: number, itemMd: string): void
 
+    toggleStation(stationId: number): void
+
     /**
      * Uneqip an item and put it in bag slow with index `itemIndex`
      * @param slotName which slot to unequip the item from. Possible values can be found in dw.c.gear
@@ -787,11 +807,20 @@ declare namespace DeepestWorld {
     //  */
     // useSkill(skillIndex: number, x: number, y: number, z?: number): void
 
-    useSkill(skillIndex: number, ...args: [number] | [number, number] | [number, number, number] | [{
-      x: number,
-      y: number,
-      z?: number
-    }])
+    useSkill(
+      skillIndex: number,
+      ...args:
+        | [number]
+        | [number, number]
+        | [number, number, number]
+        | [
+        {
+          x: number
+          y: number
+          z?: number
+        },
+      ]
+    )
   }
 
   interface BaseEntity {
@@ -952,7 +981,12 @@ declare namespace DeepestWorld {
       }>,
     ) => void
 
-    l: (data: Array<[number, number, number, number] | [number, number, number, number, number]>) => void
+    l: (
+      data: Array<
+        | [number, number, number, number]
+        | [number, number, number, number, number]
+      >,
+    ) => void
 
     levelUp: (data: { id: number }) => void
 
@@ -1068,6 +1102,9 @@ declare namespace DeepestWorld {
     /** The item level / quality*/
     qual: number
 
+    /** The base multipliers for the specific item */
+    base?: Record<string, number>
+
     /** The modifiers on the item */
     mods?: Record<string, number>
 
@@ -1160,6 +1197,9 @@ declare namespace DeepestWorld {
     ownerDbId: number
     /** Storage of items */
     storage: Array<Item | null> | Record<string, Item>
+    /** Storage of items */
+    output?: Array<Item | null> | Record<string, Item>
+    powerOn?: boolean
   }
 
   export interface YourCharacter extends Character {
@@ -1169,6 +1209,8 @@ declare namespace DeepestWorld {
 
     /** Item inventory */
     bag: Array<Item | null>
+
+    crafting?: number
 
     /** Gem pyramid in skill bar */
     cardBag: Array<Item | null>
@@ -1205,10 +1247,9 @@ declare namespace DeepestWorld {
        */
       progress: number
 
-      /**
-       * When the timeout happens
-       */
-      timeoutAt: number
+      reward: number
+
+      deaths: number
     }
 
     /** the amount of mana points you restore every 1.5s */
@@ -1260,29 +1301,20 @@ declare namespace DeepestWorld {
     /** Skill info for skills in skill bar */
     skills: Array<Skill | 0>
 
-    /**
-     * In-game called claimed land.
-     * The top-left location of your main base.
-     * The size is based on your level and caps at 7x7.
-     */
-    spawn: WorldPosition
+    spawn: [number, number, number]
 
     toolBag: Array<Item | null>
 
     /**
-     * In-game called just spawn
-     * The location where you respawn after death.
-     * The location where your portals lead to by default.
+     * @deprecated use spawn instead
      */
-    respawn: WorldPosition
+    respawn: {
+      l: number
+      x: number
+      y: number
+    }
 
     xp: number
-  }
-
-  export interface WorldPosition {
-    l: number
-    x: number
-    y: number
   }
 
   type DungeonBoard = Array<{
@@ -1310,6 +1342,10 @@ declare namespace DeepestWorld {
   }>
 
   type MetaDataEntity = {
+    canChop?: true
+    canGather?: true
+    canHunt?: true
+    canMine?: true
     collidable?: true
     hitbox?: [number, number]
     monster?: true
@@ -1322,8 +1358,10 @@ declare namespace DeepestWorld {
 
   type MetaDataItem = {
     armor?: true
+    box?: true
     collision?: 1
     dmgTypes?: string[]
+    essence?: true
     gearSlots?: string[]
     gem?: true
     hitbox: { w: number; h: number }
@@ -1333,19 +1371,26 @@ declare namespace DeepestWorld {
     s?: number
     skill?: true
     tool?: true
+    vessel?: true
     weapon?: true
   }
 
-  type MetaDataRecipe = Record<string, {
-    mats: Record<string, {
-      n?: number
-      r?: number
-    }>
-    minLevel?: number
-  }>
+  type MetaDataRecipe = Record<
+    string,
+    {
+      mats: Record<
+        string,
+        {
+          n?: number
+          r?: number
+        }
+      >
+      minLevel?: number
+    }
+  >
 
   type MetaDataSkill = {
-    cd: number
+    cd?: number
     movement?: boolean
   }
 

@@ -58,7 +58,7 @@ function removeMinimapPanels() {
 }
 
 function updateMinimapPanels() {
-  if (!dw.c.mission || !window.top) {
+  if (!window.top) {
     return
   }
 

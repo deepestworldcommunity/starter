@@ -1,6 +1,3 @@
-// The max distance (to x,y) to receive mission contribution
-export const RANGE_MISSION = 100
-
 export const MATERIALS = ['wood', 'bronze', 'iron', 'steel']
 
 export const ELEMENTS = ['acid', 'cold', 'elec', 'fire', 'phys']
@@ -68,6 +65,10 @@ export const mobNames: Array<[string, number, string]> = [
   ['mob2', 4, 'Wolf'],
   ['mob2', 7, 'Wolf'],
   ['mob2', 16, 'Squirrel'],
+  ['cub1', 1, 'Deer'],
+  ['cub1', 7, 'Deer'],
+  ['animal1', 1, 'Deer'],
+  ['animal1', 7, 'Deer'],
   ['meleeDps', 1, 'Deer'],
   ['meleeDps', 2, 'Myconid'],
   ['meleeDps', 4, 'Spider'],
@@ -109,6 +110,11 @@ export const mobNames: Array<[string, number, string]> = [
   ['elemental', 4, 'Fire Elemental'],
   ['elemental', 7, 'Ice Elemental'],
   ['elemental', 15, 'Lightning Elemental'],
+  ['eleoak', 1, 'Tree'],
+  ['eleoak', 2, 'Tree'],
+  ['eleoak', 4, 'Tree'],
+  ['eleoak', 7, 'Tree'],
+  ['eleoak', 15, 'Tree'],
   ['magicShrubGrass1', 1, 'Magic Shrub'],
   ['magicShrubGrass1', 2, 'Magic Shrub'],
   ['magicShrubGrass1', 4, 'Magic Shrub'],

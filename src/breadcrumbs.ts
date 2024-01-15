@@ -53,17 +53,23 @@ function dropBreadcrumb() {
 
   breadcrumbs.forEach((b) => b.value *= 0.999)
 
-  const breadcrumb = breadcrumbs.find(
-    (b) => b.x === x && b.y === y && b.z === z,
-  )
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const breadcrumb = breadcrumbs.find(
+        (b) => b.x === x + dx && b.y === y + dy && b.z === z,
+      )
 
-  if (breadcrumb) {
-    breadcrumb.value = 1
-    breadcrumb.time = Date.now()
-    return
+      const value = 1 / (1 + Math.abs(dx) + Math.abs(dy))
+
+      if (breadcrumb) {
+        breadcrumb.value = Math.max(breadcrumb.value, value)
+        breadcrumb.time = Date.now()
+        continue
+      }
+
+      breadcrumbs.push({ x: x + dx, y: y + dy, z, value, time: Date.now() })
+    }
   }
-
-  breadcrumbs.push({ x, y, z, value: 1, time: Date.now() })
 }
 
 setInterval(dropBreadcrumb, 100)

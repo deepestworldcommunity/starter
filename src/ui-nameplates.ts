@@ -166,6 +166,9 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (entity.md.includes('alarm')) {
         level = '🔔' + level
       }
+      if (dw.md.entities[entity.md]?.canHunt) {
+        level = '🎯' + level
+      }
       ctx.strokeText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
       ctx.fillText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
 
@@ -228,7 +231,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current shield
       ctx.fillStyle = 'white'
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hps / entity.hpMax, 8)
+      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hps / entity.hpMax, isBoss ? 12 : 8)
       ctx.fill()
 
       // Current HP
