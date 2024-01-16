@@ -267,6 +267,8 @@ declare namespace DeepestWorld {
       data: { i: number; x: number; y: number; z: number },
     ): void
 
+    emit(eventName: 'gather', data: { id: number }): void
+
     emit(eventName: 'loadout', data: { id: number }): void
 
     emit(eventName: 'lockItems', data: { id: number }): void
@@ -321,6 +323,8 @@ declare namespace DeepestWorld {
         name?: string
       },
     ): void
+
+    emit(eventName: 'renameStation', data: { id: number, name: string }): void
 
     emit(eventName: 'partyKick', data: { name: string }): void
 
@@ -438,6 +442,8 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'toggleMog', data: { id: number; md: string }): void
 
+    emit(eventName: 'toggleStation', data: { id: number }): void
+
     emit(eventName: 'tradingPost', data: { id: number }): void
 
     emit(
@@ -526,6 +532,10 @@ declare namespace DeepestWorld {
     ): void
 
     fillItem(toolBagIndex: number, x: number, y: number, z: number): void
+
+    findClosestEntity(
+      filter?: (entity: Entity) => boolean,
+    ): Entity | undefined
 
     findClosestMonster(
       filter?: (entity: Monster) => boolean,
@@ -649,7 +659,7 @@ declare namespace DeepestWorld {
       bagNameFrom: string,
       bagIndexFrom: number,
       bagNameTo: string,
-      bagIndexTo: number | undefined,
+      bagIndexTo?: number,
       itemIdFrom?: number,
       itemIdTo?: number,
       finderId?: number,
@@ -717,6 +727,8 @@ declare namespace DeepestWorld {
     ): void
 
     removeMog(stationId: number, itemMd: string, bagIndex: number): void
+
+    renameStation(stationId: number, name: string): void
 
     reopenMission(
       missionTableId: number,
@@ -829,7 +841,7 @@ declare namespace DeepestWorld {
     md: string
 
     // Portals or stations have an owner
-    charDbId?: number
+    cid?: number
 
     /** @deprecated */
     l: number
@@ -850,7 +862,7 @@ declare namespace DeepestWorld {
     /** Character's appearance */
     mtx: Record<string, number>
 
-    charDbId: number
+    cid: number
   }
 
   export type Chunk = Array<Array<Array<number>>>
@@ -1037,6 +1049,8 @@ declare namespace DeepestWorld {
 
     partyKick: (data: { dbId: number }) => void
 
+    openItem: (data: { error?: string }) => void
+
     openPortal: (data: { error: string }) => void
 
     realEstateTable: (
@@ -1194,7 +1208,7 @@ declare namespace DeepestWorld {
     /** Indicating whether you are the owner. */
     owner: number
     /** Owner Database ID */
-    ownerDbId: number
+    aid: number
     /** Storage of items */
     storage: Array<Item | null> | Record<string, Item>
     /** Storage of items */
@@ -1301,7 +1315,11 @@ declare namespace DeepestWorld {
     /** Skill info for skills in skill bar */
     skills: Array<Skill | 0>
 
-    spawn: [number, number, number]
+    spawn: {
+      x: number
+      y: number
+      z: number
+    }
 
     toolBag: Array<Item | null>
 
