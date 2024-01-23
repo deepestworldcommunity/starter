@@ -910,6 +910,9 @@ declare namespace DeepestWorld {
 
     auth: (data: number) => void
 
+    //dw.on('callLimitDc', () => alert('got limit dced')) can be used to see if you made to many calls and got booted
+    callLimitDc: (data: unknown) => void
+    
     combat: (data: number) => void
 
     cd: (data: string) => void
