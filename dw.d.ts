@@ -924,11 +924,11 @@ declare namespace DeepestWorld {
         rarity?: number
         level?: number
         hp?: number
-        hpMax?: number
+        maxHp?: number
         hps?: number
         hpRegen?: number
         mp?: number
-        mpMax?: number
+        maxMp?: number
         mpRegen?: number
         xp?: number
         targetId?: number
@@ -1133,10 +1133,10 @@ declare namespace DeepestWorld {
     level: number
     /** Life */
     hp: number
-    hpMax: number
+    maxHp: number
     /** Mana */
     mp: number
-    mpMax: number
+    maxMp: number
     /** Movement speed. World units per second. Multiply by 96 to get pixels per second. */
     moveSpeed: number
     /**
@@ -1171,7 +1171,7 @@ declare namespace DeepestWorld {
     qual: number
 
     hp: number
-    hpMax: number
+    maxHp: number
     hps: number
   }
 
@@ -1182,7 +1182,7 @@ declare namespace DeepestWorld {
     qual: number
 
     hp: number
-    hpMax: number
+    maxHp: number
     hps: number
   }
 
