@@ -117,7 +117,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current HP
       ctx.fillStyle = COLOR_HP
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hp / entity.hpMax, 8)
+      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hp / entity.maxHp, 8)
       ctx.fill()
 
       // Border
@@ -129,7 +129,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current MP
       ctx.fillStyle = 'blue'
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE + 8, UI_SCALE * entity.mp / entity.mpMax, 2)
+      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE + 8, UI_SCALE * entity.mp / entity.maxMp, 2)
       ctx.fill()
 
       // Border
@@ -210,7 +210,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
 
       // Cooldown before entity starts moving/attacking
-      if (entity.badCd && entity.hp === entity.hpMax && !entity.targetId) {
+      if (entity.badCd && entity.hp === entity.maxHp && !entity.targetId) {
         const activation = Math.floor((entity.badCd - Date.now()) / 1000)
         if (activation > 0) {
           ctx.font = '32px system-ui'
@@ -231,13 +231,13 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current shield
       ctx.fillStyle = 'white'
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hps / entity.hpMax, isBoss ? 12 : 8)
+      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hps / entity.maxHp, isBoss ? 12 : 8)
       ctx.fill()
 
       // Current HP
       ctx.fillStyle = COLOR_HP
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE * entity.hp / entity.hpMax, isBoss ? 12 : 8)
+      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE * entity.hp / entity.maxHp, isBoss ? 12 : 8)
       ctx.fill()
 
       // Border

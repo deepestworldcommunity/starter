@@ -13,10 +13,24 @@ declare namespace DeepestWorld {
   interface API {
     a: Account
 
-    /** Abandons the current mission */
+    /**
+     * Abandon the current mission
+     *
+     * @example
+     * dw.abandonMission()
+     */
     abandonMission(): void
 
-    /** Accept the first mission in the mission table storage */
+    /**
+     * Accept the first mission in the mission table storage
+     *
+     * @example
+     * const missionTable = dw.findClosestEntity(
+     *   (e) => e.md === 'missionTable' && e.owner
+     * )
+     *
+     * dw.acceptMission(missionTable.id)
+     */
     acceptMission(missionTableId: number): void
 
     account: Account
@@ -910,9 +924,15 @@ declare namespace DeepestWorld {
 
     auth: (data: number) => void
 
-    //dw.on('callLimitDc', () => alert('got limit dced')) can be used to see if you made to many calls and got booted
-    callLimitDc: (data: unknown) => void
-    
+    /**
+     * This event is called when you make too many calls to the server.
+     * @param data
+     *
+     * @example
+     * dw.on('callLimitDc', () => alert('got disconnected due to call limit'))
+     */
+    callLimitDc: (data: {}) => void
+
     combat: (data: number) => void
 
     cd: (data: string) => void
@@ -920,9 +940,9 @@ declare namespace DeepestWorld {
     diff: (
       data: Array<{
         id: number
-        l?: number
         x?: number
         y?: number
+        z?: number
         md?: string
         rarity?: number
         level?: number
@@ -1284,22 +1304,27 @@ declare namespace DeepestWorld {
     }>
 
     professions: Record<
-      | 'axesmith'
       | 'armorsmith'
+      | 'axesmith'
       | 'boomerangsmith'
       | 'bowsmith'
       | 'crossbowsmith'
       | 'daggersmith'
       | 'gemcutting'
+      | 'hunting'
+      | 'leatherworking'
       | 'macesmith'
       | 'metalworking'
       | 'mining'
-      | 'platesmith'
+      | 'plantFarming'
+      | 'runecrafting'
       | 'sceptersmith'
+      | 'shieldsmith'
       | 'spearsmith'
       | 'staffsmith'
       | 'stoneworking'
       | 'swordsmith'
+      | 'tailoring'
       | 'wandsmith'
       | 'woodcutting'
       | 'woodworking',
@@ -1368,7 +1393,7 @@ declare namespace DeepestWorld {
     canHunt?: true
     canMine?: true
     collidable?: true
-    hitbox?: [number, number]
+    hitbox: { w: number; h: number }
     monster?: true
     ore?: true
     player?: true

@@ -31,7 +31,19 @@ function getCharacterBattleScore() {
     }
   })
 
-  return Math.sqrt(maxDmg * character.hpMax)
+  // Can we use armor somehow?
+  // const armor = Math.min(
+  //   character.physArmor,
+  //   character.fireArmor,
+  //   character.coldArmor,
+  //   character.acidArmor,
+  //   character.elecArmor,
+  // )
+  //
+  // const effectiveHp = (character.maxHp + 5 * character.hpRegen) / Math.max(0.25, 1 - (armor / (armor + character.level * 100)))
+  //
+  // return Math.sqrt(maxDmg * effectiveHp)
+  return Math.sqrt(maxDmg * character.maxHp)
 }
 
 async function run() {

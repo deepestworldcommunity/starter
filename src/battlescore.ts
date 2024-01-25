@@ -20,7 +20,7 @@ export function getCharacterBattleScore() {
     }
   })
 
-  return Math.sqrt(maxDmg * dw.character.hpMax)
+  return Math.sqrt(maxDmg * dw.character.maxHp)
 }
 
 export function getMonsterBattleScore(monster: DeepestWorld.Monster) {
@@ -55,5 +55,5 @@ export function getMonsterBattleScore(monster: DeepestWorld.Monster) {
     dmg *= 1.2
   }
 
-  return Math.sqrt(dmg * monster.hpMax)
+  return Math.sqrt(dmg * monster.maxHp)
 }

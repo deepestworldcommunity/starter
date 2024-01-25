@@ -194,10 +194,10 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   ctx.fillStyle = ctx.strokeStyle + '40'
   ctx.beginPath()
   ctx.rect(
-    mx - dw.md.items.human.hitbox.w * UI_SCALE / 2,
-    my - dw.md.items.human.hitbox.h * UI_SCALE,
-    dw.md.items.human.hitbox.w * UI_SCALE,
-    dw.md.items.human.hitbox.h * UI_SCALE,
+    mx - dw.md.entities.human.hitbox.w * UI_SCALE / 2,
+    my - dw.md.entities.human.hitbox.h * UI_SCALE,
+    dw.md.entities.human.hitbox.w * UI_SCALE,
+    dw.md.entities.human.hitbox.h * UI_SCALE,
   )
   ctx.stroke()
   ctx.fill()
