@@ -198,7 +198,7 @@ async function run() {
 
                 await win.webContents.executeJavaScript(`
                   document.querySelector("#stop-code").click();
-                  document.querySelector("textarea#code-editor").value = ${JSON.stringify(result.outputFiles[0].text)};
+                  dw.editor.session.setValue(${JSON.stringify(result.outputFiles[0].text)});
                   document.querySelector("#start-code").click();
                 `)
 
