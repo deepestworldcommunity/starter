@@ -1311,6 +1311,7 @@ declare namespace DeepestWorld {
       | 'crossbowsmith'
       | 'daggersmith'
       | 'gemcutting'
+      | 'herbalism'
       | 'hunting'
       | 'leatherworking'
       | 'macesmith'
