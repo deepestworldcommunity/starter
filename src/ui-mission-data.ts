@@ -43,7 +43,7 @@ function addMissionData() {
 const data: Record<string, () => string> = {
   'battle-score': () => `${dw.getZoneLevel(dw.c.mission?.x, dw.c.mission?.y, dw.c.mission?.z)}`,
   'distance': () => {
-    if (dw.c.z !== dw.c.mission?.l) {
+    if (dw.c.z !== dw.c.mission?.z) {
       return `wrong layer️ 🚨`
     }
 
@@ -81,7 +81,7 @@ const data: Record<string, () => string> = {
   },
   'location-x': () => `${dw.c.mission?.x?.toLocaleString([], { maximumFractionDigits: 0 })}`,
   'location-y': () => `${dw.c.mission?.y?.toLocaleString([], { maximumFractionDigits: 0 })}`,
-  'location-z': () => `${dw.c.mission?.l?.toLocaleString([], { maximumFractionDigits: 0 })}`,
+  'location-z': () => `${dw.c.mission?.z?.toLocaleString([], { maximumFractionDigits: 0 })}`,
 }
 
 function getMissionData() {

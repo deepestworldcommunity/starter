@@ -1,8 +1,13 @@
 import killTracker from './killTracker'
+import errorTracker from './errorTracker'
 
 const startedAt = Date.now()
 
 const panels: Record<string, { label: string, data: () => string}> = {
+  'errors': {
+    label: 'Errors',
+    data: () => `${errorTracker.allErrors.reduce((total, { count }) => total + count, 0)}`,
+  },
   'avg-level': {
     label: 'Average Level',
     data: () => killTracker.total > 0 ? `${(killTracker.levels / killTracker.total).toLocaleString([], { maximumFractionDigits: 1 })}` : '-',
@@ -13,7 +18,7 @@ const panels: Record<string, { label: string, data: () => string}> = {
       const runtime = Math.max(1, Math.floor((Date.now() - startedAt) / 1000))
       return `${(killTracker.total * 60 * 60 / runtime).toLocaleString([], { maximumFractionDigits: 0 })}/h`
     },
-  }
+  },
 }
 
 function addMinimapPanels() {

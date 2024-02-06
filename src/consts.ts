@@ -1,53 +1,10 @@
-export const MATERIALS = ['wood', 'bronze', 'iron', 'steel']
-
-export const ELEMENTS = ['acid', 'cold', 'elec', 'fire', 'phys']
-
-export const TIERS = ['1', '2', '3', '4']
-
-export const GEMS = ['diamond', 'emerald', 'ruby', 'sapphire', 'topaz']
-
 export const BOSSES = [
   'kingGoo',        // Event Boss: spawned by killing goo
   'kingSpikedGoo',  // Event Boss: spawned by killing goo
   'alarmBoss',      // Event Boss: spawned by killing alarmOnDeath
   'bouncyGoo',      // Event Boss: spawned by killing goo
   'sdBoss',         // Dungeon Boss: Squirrel Den
-]
-
-export const ARMOR_SLOTS = [
-  'helmet',
-  'chest',
-  'gloves',
-  'boots',
-]
-
-export const SHIELD_SLOTS = [
-  'shield',
-]
-
-export const ACCESSORY_SLOTS = [
-  'amulet',
-  'ring1',
-  'ring2',
-  'belt',
-]
-
-export const WEAPON_SLOTS = [
-  'mainHand',
-]
-
-export const WEAPON_TYPES = [
-  'sword',
-  'dagger',
-  'staff',
-  'mace',
-  'axe',
-  'spear',
-  'wand',
-  'scepter',
-  'bow',
-  'boomerang',
-  'crossbow',
+  'mazeBoss',       // new boss found in a maze?
 ]
 
 export const PASSABLE_TERRAIN = [
@@ -69,6 +26,8 @@ export const mobNames: Array<[string, number, string]> = [
   ['cub1', 7, 'Deer'],
   ['animal1', 1, 'Deer'],
   ['animal1', 7, 'Deer'],
+  ['cub2', 7, 'Seal'],
+  ['animal2', 7, 'Walrus'],
   ['meleeDps', 1, 'Deer'],
   ['meleeDps', 2, 'Myconid'],
   ['meleeDps', 4, 'Spider'],
@@ -89,22 +48,22 @@ export const mobNames: Array<[string, number, string]> = [
   ['healerRanged', 4, 'Fairy'],
   ['healerRanged', 7, 'Fairy'],
   ['healerRanged', 15, 'Harpy'],
-  ['orc', 1, 'Orc Warrior'],
-  ['orc', 2, 'Orc Warrior'],
-  ['orc', 4, 'Orc Warrior'],
-  ['orc', 7, 'Orc Warrior'],
+  ['orc', 1, 'Orc Ranger'],
+  ['orc', 2, 'Orc Ranger'],
+  ['orc', 4, 'Orc Ranger'],
+  ['orc', 7, 'Orc Ranger'],
   ['orcRanged', 1, 'Orc Ranger'],
   ['orcRanged', 2, 'Orc Ranger'],
   ['orcRanged', 4, 'Orc Ranger'],
   ['orcRanged', 7, 'Orc Ranger'],
-  ['alarmOnDeathMob', 1, 'Bee'],
+  ['alarmOnDeathMob', 1, 'Wasp'],
   ['alarmOnDeathMob', 2, 'Myconid'],
-  ['alarmOnDeathMob', 4, 'Bee'],
-  ['alarmOnDeathMob', 7, 'Bee'],
-  ['alarmBoss', 1, 'Giant Wasp'],
+  ['alarmOnDeathMob', 4, 'Wasp'],
+  ['alarmOnDeathMob', 7, 'Wasp'],
+  ['alarmBoss', 1, 'Bee'],
   ['alarmBoss', 2, 'Myconid'],
-  ['alarmBoss', 4, 'Giant Wasp'],
-  ['alarmBoss', 7, 'Giant Wasp'],
+  ['alarmBoss', 4, 'Bee'],
+  ['alarmBoss', 7, 'Bee'],
   ['elemental', 1, 'Acid Elemental'],
   ['elemental', 2, 'Earth Elemental'],
   ['elemental', 4, 'Fire Elemental'],
@@ -124,6 +83,7 @@ export const mobNames: Array<[string, number, string]> = [
   ['bouncyGoo', 4, 'Bouncy Goo'],
   ['bouncyGoo', 7, 'Bouncy Goo'],
   ['sdBoss', 2, 'Nutcracker'],
+  ['mazeBoss', 2, 'Minotaur'],
   ['goo', 1, 'Goo'],
   ['goo', 2, 'Goo'],
   ['goo', 4, 'Goo'],

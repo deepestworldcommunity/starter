@@ -74,7 +74,7 @@ dw.on('unseenChunks', (chunkName) => {
 
 for (let i = 0; i < dw.entities.length; i++) {
   const entity = dw.entities[i]
-  if (!dw.md.items[entity.md]?.collision) {
+  if (!dw.md.entities[entity.md]?.canCollide) {
     continue
   }
 
@@ -93,7 +93,7 @@ for (let i = 0; i < dw.entities.length; i++) {
 dw.on('seenObjects', () => {
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
-    if (!dw.md.items[entity.md]?.collision) {
+    if (!dw.md.entities[entity.md]?.canCollide) {
       continue
     }
 
@@ -172,7 +172,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
-    if ('player' in entity || dw.c.z !== entity.z || dw.md.items[entity.md]?.collision || !dw.md.items[entity.md]?.hitbox) {
+    if (dw.c.z !== entity.z || dw.md.entities[entity.md].isPlayer || dw.md.entities[entity.md]?.canCollide || !dw.md.entities[entity.md]?.hitbox) {
       continue
     }
 

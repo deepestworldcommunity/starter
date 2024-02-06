@@ -637,6 +637,7 @@ declare namespace DeepestWorld {
       chunkSizeZ: number
       e: Record<string, MetaDataEntity>
       entities: Record<string, MetaDataEntity>
+      i: Record<string, MetaDataItem>
       items: Record<string, MetaDataItem>
       recipes: Record<string, MetaDataRecipe>
       skills: Record<string, MetaDataSkill>
@@ -907,6 +908,13 @@ declare namespace DeepestWorld {
      * @param listener
      */
     drawUnder: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void
+
+    /**
+     * This is a "catch all" event for generic data handling.
+     *
+     * @param data
+     */
+    '*': (msg: string, data: unknown) => void
 
     // Socket Events
 
@@ -1271,8 +1279,6 @@ declare namespace DeepestWorld {
     hpRegen: number
 
     mission?: {
-      /** @deprecated use z instead */
-      l: number
       x: number
       y: number
       z: number
@@ -1304,31 +1310,7 @@ declare namespace DeepestWorld {
     }>
 
     professions: Record<
-      | 'armorsmith'
-      | 'axesmith'
-      | 'boomerangsmith'
-      | 'bowsmith'
-      | 'crossbowsmith'
-      | 'daggersmith'
-      | 'gemcutting'
-      | 'herbalism'
-      | 'hunting'
-      | 'leatherworking'
-      | 'macesmith'
-      | 'metalworking'
-      | 'mining'
-      | 'plantFarming'
-      | 'runecrafting'
-      | 'sceptersmith'
-      | 'shieldsmith'
-      | 'spearsmith'
-      | 'staffsmith'
-      | 'stoneworking'
-      | 'swordsmith'
-      | 'tailoring'
-      | 'wandsmith'
-      | 'woodcutting'
-      | 'woodworking',
+      Profession,
       {
         md: string
         level: number
@@ -1393,32 +1375,71 @@ declare namespace DeepestWorld {
     canGather?: true
     canHunt?: true
     canMine?: true
+    canCollide?: true
+    /** @deprecated use canCollide instead */
     collidable?: true
     hitbox: { w: number; h: number }
+    isMonster?: true
+    isPlayer?: true
+    isPortal?: true
+    isStation?: true
+    /** @deprecated use isMonster instead */
     monster?: true
+    /** @deprecated use canMine instead */
     ore?: true
+    /** @deprecated use isPlayer instead */
     player?: true
+    /** @deprecated use isPortal instead */
     portal?: true
+    /** @deprecated use canGather instead */
     resource?: true
+    /** @deprecated use canChop instead */
     tree?: true
   }
 
   type MetaDataItem = {
+    /** @deprecated use isArmor instead */
     armor?: true
     box?: true
-    collision?: 1
+    cd?: number
     dmgTypes?: string[]
     essence?: true
+    /** Lorem ipsum */
     gearSlots?: string[]
     gem?: true
     hitbox: { w: number; h: number }
+    isAccessory?: true
+    isArmor?: true
+    isBox?: true
+    isEssence?: true
+    isGem?: true
+    isMat?: true
+    isRune?: true
+    isSkill?: true
+    isStation?: true
+    isTool?: true
+    isVessel?: true
+    isWeapon?: true
+    /** @deprecated use isAccessory instead */
     jewelry?: true
+    /** @deprecated use isMat instead */
     mat?: true
+    movement?: true
+    /** @deprecated use isStation instead */
     placeable?: true
+    recipe?: {
+      professions?: Record<Profession, null | number>,
+      stationType: string
+    }
     s?: number
+    /** @alias gearSlots */
+    slots?: string[]
+    /** @deprecated use isSkill/isRune instead */
     skill?: true
+    /** @deprecated use isTool instead */
     tool?: true
     vessel?: true
+    /** @deprecated use isWeapon instead */
     weapon?: true
   }
 
@@ -1442,6 +1463,33 @@ declare namespace DeepestWorld {
   }
 
   type MissionTable = Record<string, number>
+
+  type Profession =
+    | 'armorsmith'
+    | 'axesmith'
+    | 'boomerangsmith'
+    | 'bowsmith'
+    | 'crossbowsmith'
+    | 'daggersmith'
+    | 'gemcutting'
+    | 'herbalism'
+    | 'hunting'
+    | 'leatherworking'
+    | 'macesmith'
+    | 'metalworking'
+    | 'mining'
+    | 'plantFarming'
+    | 'runecrafting'
+    | 'sceptersmith'
+    | 'shieldsmith'
+    | 'spearsmith'
+    | 'staffsmith'
+    | 'stoneworking'
+    | 'swordsmith'
+    | 'tailoring'
+    | 'wandsmith'
+    | 'woodcutting'
+    | 'woodworking'
 
   type TradingPost = Record<string, Record<number, number>>
 }
