@@ -15,6 +15,7 @@ const COLOR_BACKGROUND = '#0c0c0c'
 
 let showBuffNames = dw.get('showBuffNames') ?? false
 let showBattleScore = dw.get('showBattleScore') ?? false
+let showNpcQuests = dw.get('showNpcQuests') ?? false
 
 addMenuButton('💪', 'Toggle Buff Names', () => {
   showBuffNames = !showBuffNames
@@ -24,6 +25,11 @@ addMenuButton('💪', 'Toggle Buff Names', () => {
 addMenuButton('💯', 'Toggle BattleScore', () => {
   showBattleScore = !showBattleScore
   dw.set('showBattleScore', showBattleScore)
+})
+
+addMenuButton('⁉️', 'Toggle NPC Quests', () => {
+  showNpcQuests = !showNpcQuests
+  dw.set('showNpcQuests', showNpcQuests)
 })
 
 dw.on('drawEnd', (ctx, cx, cy) => {
@@ -358,6 +364,34 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
           fxX += 34
         }
+      }
+
+      if (
+        dw.md.entities[entity.md].isNpc
+        && showNpcQuests
+        && 'questIds' in entity
+        && entity.questIds.length > 0
+      ) {
+        let questStatus = '?'
+        let color = 'orange'
+        if (entity.questIds.some((questId) => !!dw.c.quests.find(
+          (q) => q.id === questId))
+        ) {
+          questStatus = '!'
+          color = 'lightgray'
+        }
+        if (entity.questIds.some((questId) => !!dw.c.quests.find(
+          (q) => q.id === questId && q.progress === q.maxProgress))
+        ) {
+          questStatus = '!'
+          color = 'orange'
+        }
+        ctx.font = '64px system-ui'
+        ctx.fillStyle = color
+        ctx.textAlign = 'center'
+        ctx.strokeStyle = 'black'
+        ctx.fillText(`${questStatus}`, x, y - 116)
+        ctx.strokeText(`${questStatus}`, x, y - 116)
       }
     }
   }

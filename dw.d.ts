@@ -1332,6 +1332,8 @@ declare namespace DeepestWorld {
 
     physArmor: number
 
+    silver: number
+
     /** Skills in skill bar */
     skillBag: Array<Item | null>
 
@@ -1345,6 +1347,23 @@ declare namespace DeepestWorld {
     }
 
     toolBag: Array<Item | null>
+
+    quests: Array<{
+      data: {
+        name: string
+        [string]: unknown
+      }
+      id: number
+      items: Array<Item>
+      maxProgress: number
+      md: string
+      progress: number
+      silver: number
+    }>
+
+    recipes: Record<string, number>
+
+    rep: number
 
     /**
      * @deprecated use spawn instead
