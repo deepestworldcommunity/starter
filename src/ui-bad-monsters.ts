@@ -45,7 +45,7 @@ dw.on('drawUnder', (ctx, cx, cy) => {
     ctx.lineTo(tx - headLength * Math.cos(tAngle + Math.PI / 6), ty - headLength * Math.sin(tAngle + Math.PI / 6))
     ctx.stroke()
 
-    if (!entity.bad) {
+    if (!entity.bad || !dw.md.entities[entity.md].isMonster) {
       continue
     }
 

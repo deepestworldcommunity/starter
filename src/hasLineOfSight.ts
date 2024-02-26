@@ -26,7 +26,7 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
   }
 
   if (target.x === cx && target.y === cy) {
-    // standing on top of it
+    // Standing on top of it
     return true
   }
 
@@ -81,10 +81,15 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
       continue
     }
 
-    const hitbox = dw.md.entities[entity.md].hitbox
-    const x1 = entity.x - hitbox.w / 2
-    const x2 = entity.x + hitbox.w / 2
-    const y1 = entity.y - hitbox.h
+    let variant = 0
+    if ('v' in entity && typeof entity.v === 'number') {
+      variant = entity.v
+    }
+
+    const [w, h] = dw.getHitbox(entity.md, variant)
+    const x1 = entity.x - w / 2
+    const x2 = entity.x + w / 2
+    const y1 = entity.y - h
     const y2 = entity.y
 
     if (doesIntersect(cx, cy, target.x, target.y, x1, y1, x2, y1)) {

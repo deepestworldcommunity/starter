@@ -1,6 +1,7 @@
 import { getMonsterBattleScore, getCharacterBattleScore } from './battlescore'
+import { BOSSES } from './consts'
+import getMobName from './getMobName'
 import getSmoothPosition from './getSmoothPosition'
-import { BOSSES, mobNames } from './consts'
 import { addMenuButton } from './ui-buttons'
 
 const UI_SCALE = dw.constants.PIXELS_PER_UNIT
@@ -71,7 +72,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.fillText(debug, x, y)
     }
 
-    if ('tree' in entity || 'ore' in entity) {
+    if ('hp' in entity && (dw.md.entities[entity.md]?.canGather || dw.md.entities[entity.md]?.canChop || dw.md.entities[entity.md]?.canMine)) {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'blue'
       ctx.fillStyle = 'lightblue'
@@ -87,7 +88,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.lineWidth = 4
 
       // Level
-      ctx.fillStyle = dw.c.name === entity.name ? 'white' : '#00ff00'
+      ctx.fillStyle = dw.c.name === entity.name ? 'white' : '#00ffff'
       ctx.strokeStyle = COLOR_BORDER
       ctx.font = '32px system-ui'
       ctx.textAlign = 'right'
@@ -153,6 +154,9 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (entity.bad) {
         ctx.fillStyle = 'orange'
       }
+      if (dw.md.entities[entity.md].isNpc) {
+        ctx.fillStyle = '#00ff00'
+      }
       if (entity.targetId === dw.c.id) {
         ctx.fillStyle = 'red'
       }
@@ -175,7 +179,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Name + BattleScore?
       ctx.textAlign = 'left'
       ctx.font = `${isBoss ? 20 : 14}px system-ui`
-      let name = mobNames.find(([md, terrain]) => entity.md === md && entity.terrain === terrain)?.[2] ?? entity.md
+      let name = getMobName(entity.md, entity.terrain)
 
       if (showBuffNames) {
         for (let i = 0; i < fxs.length; i++) {
@@ -246,112 +250,114 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE, isBoss ? 12 : 8)
       ctx.stroke()
 
-      let fxX = x - UI_SCALE / 2
-      const fxY = y - UI_SCALE - 48 - (isBoss ? 12 : 2)
-      for (let i = 0; i < fxs.length; i++) {
-        const fx = fxs[i]
+      if (dw.md.entities[entity.md].isMonster) {
+        let fxX = x - UI_SCALE / 2
+        const fxY = y - UI_SCALE - 48 - (isBoss ? 12 : 2)
+        for (let i = 0; i < fxs.length; i++) {
+          const fx = fxs[i]
 
-        switch (fx[0]) {
-          case 'skull':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(6, 0, fxX, fxY)
-            break
-          case 'merge':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(12, 59, fxX, fxY)
-            break
-          // this is a player only buff
-          // case 'frenzy':
-          //   drawBackdrop(fxX + 16, fxY + 16)
-          //   drawIcon(0, 56, fxX, fxY)
-          //   drawIcon(9, 14, fxX, fxY)
-          //   drawIcon(0, 29, fxX, fxY)
-          //   break
-          case 'bloodlust':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(3, 15, fxX, fxY)
-            break
-          case 'moreDmgMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(7, 58, fxX, fxY)
-            break
-          case 'hpIncMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(1, 0, fxX, fxY)
-            break
-          case 'resMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(15, 11, fxX, fxY)
-            break
-          case 'physDmgMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(10, 1, fxX, fxY)
-            break
-          case 'fireDmgMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(11, 1, fxX, fxY)
-            break
-          case 'coldDmgMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(12, 1, fxX, fxY)
-            break
-          case 'elecDmgMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(13, 1, fxX, fxY)
-            break
-          case 'acidDmgMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(14, 1, fxX, fxY)
-            break
-          case 'critMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(15, 0, fxX, fxY)
-            break
-          case 'strDefMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(8, 0, fxX, fxY)
-            break
-          case 'dexDefMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(15, 1, fxX, fxY)
-            break
-          case 'quickMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(0, 58, fxX, fxY)
-            break
-          case 'hpRegenMission':
-            drawBackdrop(fxX + 16, fxY + 16)
-            drawIcon(9, 14, fxX, fxY)
-            drawIcon(2, 58, fxX, fxY)
-            break
-          default:
-            continue
+          switch (fx[0]) {
+            case 'skull':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(6, 0, fxX, fxY)
+              break
+            case 'merge':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(12, 59, fxX, fxY)
+              break
+            // this is a player only buff
+            // case 'frenzy':
+            //   drawBackdrop(fxX + 16, fxY + 16)
+            //   drawIcon(0, 56, fxX, fxY)
+            //   drawIcon(9, 14, fxX, fxY)
+            //   drawIcon(0, 29, fxX, fxY)
+            //   break
+            case 'bloodlust':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(3, 15, fxX, fxY)
+              break
+            case 'moreDmgMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(7, 58, fxX, fxY)
+              break
+            case 'hpIncMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(1, 0, fxX, fxY)
+              break
+            case 'resMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(15, 11, fxX, fxY)
+              break
+            case 'physDmgMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(10, 1, fxX, fxY)
+              break
+            case 'fireDmgMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(11, 1, fxX, fxY)
+              break
+            case 'coldDmgMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(12, 1, fxX, fxY)
+              break
+            case 'elecDmgMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(13, 1, fxX, fxY)
+              break
+            case 'acidDmgMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(14, 1, fxX, fxY)
+              break
+            case 'critMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(15, 0, fxX, fxY)
+              break
+            case 'strDefMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(8, 0, fxX, fxY)
+              break
+            case 'dexDefMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(15, 1, fxX, fxY)
+              break
+            case 'quickMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(0, 58, fxX, fxY)
+              break
+            case 'hpRegenMission':
+              drawBackdrop(fxX + 16, fxY + 16)
+              drawIcon(9, 14, fxX, fxY)
+              drawIcon(2, 58, fxX, fxY)
+              break
+            default:
+              continue
+          }
+
+          const fxData = fx[1]
+          if (fxData && typeof fxData === 'object' && 's' in fxData && typeof fxData.s === 'number') {
+            const s = `${fxData.s}`
+            ctx.font = '15px system-ui'
+            ctx.textAlign = 'right'
+            ctx.fillStyle = 'white'
+            ctx.strokeStyle = 'black'
+            ctx.strokeText(s, fxX + 32, fxY + 32)
+            ctx.fillText(s, fxX + 32, fxY + 32)
+          }
+
+          fxX += 34
         }
-
-        const fxData = fx[1]
-        if (fxData && typeof fxData === 'object' && 's' in fxData && typeof fxData.s === 'number') {
-          const s = `${fxData.s}`
-          ctx.font = '15px system-ui'
-          ctx.textAlign = 'right'
-          ctx.fillStyle = 'white'
-          ctx.strokeStyle = 'black'
-          ctx.strokeText(s, fxX + 32, fxY + 32)
-          ctx.fillText(s, fxX + 32, fxY + 32)
-        }
-
-        fxX += 34
       }
     }
   }

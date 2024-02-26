@@ -117,19 +117,22 @@ declare namespace DeepestWorld {
       TERRAIN_WINTER: number
       TERRAIN_CLOUD: number
       TERRAIN_TREE: number
+      TERRAIN_STONE: number
       DMG_TYPES: Array<string>
       ATTR_TYPES: Array<string>
-      BASE_MOD_MULTS: Array<number>
       MOD_MULTS: Array<number>
       MAX_BASE_MOD_TIER: number
       MAX_MOD_TIER: number
       MAX_RES: number
+      MAX_DODGE: number
       MAX_DMG_TYPE_EFFECT: number
       WHITE: number
       GREEN: number
       BLUE: number
       PURPLE: number
       ORANGE: number
+      MIN_REP: number
+      MAX_REP: number
       /** @deprecated */
       CHUNK_DIM: [number, number, number]
       /** @deprecated */
@@ -565,6 +568,8 @@ declare namespace DeepestWorld {
 
     getChunkHash(x: number, y: number, z: number): string
 
+    getHitbox(md: string, v: number): Hitbox
+
     getItemBaseValue(item: DeepestWorld.Item): number | undefined
 
     getItemModValue(item: DeepestWorld.Item, s: string): number | undefined
@@ -886,6 +891,7 @@ declare namespace DeepestWorld {
     | YourCharacter
     | Character
     | Monster
+    | NPC
     | Tree
     | Ore
     | Station
@@ -1195,6 +1201,12 @@ declare namespace DeepestWorld {
     terrain: number
   }
 
+  export interface NPC extends Monster {
+    race: string
+    skin: number
+    questIds: Array<number>
+  }
+
   export interface Ore extends BaseEntity {
     /** Means that this is an ore. Value is always 1. */
     ore: 1
@@ -1363,6 +1375,10 @@ declare namespace DeepestWorld {
     }
   >
 
+  interface Hitbox extends Float32Array {
+    length: 2
+  }
+
   type RealEstateTable = Array<{
     dim: [number, number, number]
     id: number
@@ -1378,8 +1394,9 @@ declare namespace DeepestWorld {
     canCollide?: true
     /** @deprecated use canCollide instead */
     collidable?: true
-    hitbox: { w: number; h: number }
+    hitbox: Hitbox
     isMonster?: true
+    isNpc?: true
     isPlayer?: true
     isPortal?: true
     isStation?: true
@@ -1407,7 +1424,6 @@ declare namespace DeepestWorld {
     /** Lorem ipsum */
     gearSlots?: string[]
     gem?: true
-    hitbox: { w: number; h: number }
     isAccessory?: true
     isArmor?: true
     isBox?: true

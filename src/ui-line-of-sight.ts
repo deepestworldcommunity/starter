@@ -25,7 +25,16 @@ dw.on('drawUnder', (ctx, cx, cy) => {
   ctx.lineWidth = 4
 
   dw.entities.forEach((entity) => {
-    if (!('ai' in entity)) {
+    if (entity.z !== dw.c.z) {
+      return
+    }
+
+    if (
+      !('ai' in entity)
+      && !dw.md.entities[entity.md].canChop
+      && !dw.md.entities[entity.md].canGather
+      && !dw.md.entities[entity.md].canMine
+    ) {
       return
     }
 
