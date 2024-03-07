@@ -1,6 +1,6 @@
 import { addMenuButton } from './ui-buttons'
 
-const UI_SCALE = dw.constants.PIXELS_PER_UNIT
+const playerHitbox = dw.getHitbox(dw.c.md, 0)
 
 export type CollisionObject = {
   id?: number
@@ -78,7 +78,7 @@ for (let i = 0; i < dw.entities.length; i++) {
     continue
   }
 
-  const { w, h } = dw.md.items[entity.md]?.hitbox
+  const {w, h} = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
   collisionObjects.push({
     id: entity.id,
     x: entity.x,
@@ -101,7 +101,7 @@ dw.on('seenObjects', () => {
       continue
     }
 
-    const { w, h } = dw.md.items[entity.md]?.hitbox
+    const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
     collisionObjects.push({
       id: entity.id,
       x: entity.x,
@@ -135,8 +135,8 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   const my = height / 2
 
   const transpose = (wx: number, wy: number): [number, number] => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
+    mx + Math.floor((wx - cx) * dw.constants.PIXELS_PER_UNIT),
+    my + Math.floor((wy - cy) * dw.constants.PIXELS_PER_UNIT),
   ]
 
   const collisionObjectsInCurrentLayer = collisionObjects.filter(o => o.z === dw.c.z)
@@ -149,14 +149,14 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     }
 
     const [x, y] = transpose(
-      collisionObject.x - collisionObject.w * 0.5,
+      collisionObject.x - collisionObject.w / 2,
       collisionObject.y - collisionObject.h,
     )
 
     if (
-      x + collisionObject.w * UI_SCALE < 0
+      x + collisionObject.w * dw.constants.PIXELS_PER_UNIT < 0
       || x > ctx.canvas.width
-      || y + collisionObject.h * UI_SCALE < 0
+      || y + collisionObject.h * dw.constants.PIXELS_PER_UNIT < 0
       || y > ctx.canvas.height
     ) {
       continue
@@ -165,27 +165,37 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     ctx.strokeStyle = collisionObject.c
     ctx.fillStyle = ctx.strokeStyle + '40'
     ctx.beginPath()
-    ctx.rect(x, y, collisionObject.w * UI_SCALE, collisionObject.h * UI_SCALE)
+    ctx.rect(
+      x,
+      y,
+      collisionObject.w * dw.constants.PIXELS_PER_UNIT,
+      collisionObject.h * dw.constants.PIXELS_PER_UNIT,
+    )
     ctx.stroke()
     ctx.fill()
   }
 
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
-    if (dw.c.z !== entity.z || dw.md.entities[entity.md].isPlayer || dw.md.entities[entity.md]?.canCollide || !dw.md.entities[entity.md]?.hitbox) {
+    if (dw.c.z !== entity.z || dw.md.entities[entity.md].isPlayer || dw.md.entities[entity.md]?.canCollide) {
       continue
     }
 
-    const { w, h } = dw.md.items[entity.md].hitbox
+    const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
 
     const [x, y] = transpose(
-      entity.x - w * 0.5,
+      entity.x,
       entity.y - h,
     )
     ctx.strokeStyle = '#00FF00'
     ctx.fillStyle = ctx.strokeStyle + '40'
     ctx.beginPath()
-    ctx.rect(x, y, w * UI_SCALE, h * UI_SCALE)
+    ctx.rect(
+      x - w * dw.constants.PIXELS_PER_UNIT / 2,
+      y,
+      w * dw.constants.PIXELS_PER_UNIT,
+      h * dw.constants.PIXELS_PER_UNIT,
+    )
     ctx.stroke()
     ctx.fill()
   }
@@ -194,10 +204,10 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   ctx.fillStyle = ctx.strokeStyle + '40'
   ctx.beginPath()
   ctx.rect(
-    mx - dw.md.entities.human.hitbox.w * UI_SCALE / 2,
-    my - dw.md.entities.human.hitbox.h * UI_SCALE,
-    dw.md.entities.human.hitbox.w * UI_SCALE,
-    dw.md.entities.human.hitbox.h * UI_SCALE,
+    mx - playerHitbox.w * dw.constants.PIXELS_PER_UNIT / 2,
+    my - playerHitbox.h * dw.constants.PIXELS_PER_UNIT,
+    playerHitbox.w * dw.constants.PIXELS_PER_UNIT,
+    playerHitbox.h * dw.constants.PIXELS_PER_UNIT,
   )
   ctx.stroke()
   ctx.fill()

@@ -86,7 +86,7 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
       variant = entity.v
     }
 
-    const [w, h] = dw.getHitbox(entity.md, variant)
+    const { w, h } = dw.getHitbox(entity.md, variant)
     const x1 = entity.x - w / 2
     const x2 = entity.x + w / 2
     const y1 = entity.y - h
