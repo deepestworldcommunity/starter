@@ -241,7 +241,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current shield
       ctx.fillStyle = 'white'
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hps / entity.maxHp, isBoss ? 12 : 8)
+      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE * entity.hps / entity.maxHp, isBoss ? 12 : 8)
       ctx.fill()
 
       // Current HP
