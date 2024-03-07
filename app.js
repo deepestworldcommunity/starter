@@ -1,9 +1,12 @@
 const esbuild = require('esbuild')
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("node:path");
+const process = require("node:process");
 
 const config = require('./config')
 const tracking = require('./tracking')
+
+const chromeVersion = process.versions.chrome.split('.').shift()
 
 function log(...args) {
   console.log(new Date().toLocaleTimeString('en-GB'), ...args)
@@ -172,7 +175,7 @@ async function run() {
       ctx = await esbuild.context({
         entryPoints: [config.script],
         bundle: true,
-        target: 'chrome116',
+        target: `chrome${chromeVersion}`,
         plugins: [{
           name: 'watch-plugin',
           setup: (build) => {
