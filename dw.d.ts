@@ -568,7 +568,7 @@ declare namespace DeepestWorld {
 
     getChunkHash(x: number, y: number, z: number): string
 
-    getHitbox(md: string, v: number): Hitbox
+    getHitbox(md: string, v?: number): { w: number, h: number }
 
     getItemBaseValue(item: DeepestWorld.Item): number | undefined
 
@@ -1257,6 +1257,7 @@ declare namespace DeepestWorld {
     /** Storage of items */
     output?: Array<Item | null> | Record<string, Item>
     powerOn?: boolean
+    v?: number
   }
 
   export interface YourCharacter extends Character {
@@ -1489,6 +1490,7 @@ declare namespace DeepestWorld {
         }
       >
       minLevel?: number
+      professions?: Profession[]
     }
   >
 
