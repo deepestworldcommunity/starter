@@ -1,14 +1,3 @@
-window.addEventListener('unload', function onUnload() {
-  if (!window.top) {
-    return
-  }
-
-  const customButtons = window.top.document.querySelectorAll('.custom-btn')
-  for (let i = 0; i < customButtons.length; i++) {
-    customButtons[i].remove()
-  }
-})
-
 export function addMenuButton(icon: string, title: string, handler: () => void) {
   if (!window.top) {
     return
@@ -61,3 +50,16 @@ export function addInventoryButton(icon: string, title: string, handler: () => v
   })
   inventoryButtons.appendChild(button)
 }
+
+function onUnload() {
+  if (!window.top) {
+    return
+  }
+
+  const customButtons = window.top.document.querySelectorAll('.custom-btn')
+  for (let i = 0; i < customButtons.length; i++) {
+    customButtons[i].remove()
+  }
+}
+
+window.addEventListener('unload', onUnload)

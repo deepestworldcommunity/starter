@@ -191,7 +191,7 @@ async function run() {
                 console.warn(message)
               })
 
-              log('Updating code in game')
+              log(`Updating code in game (hash: ${result.outputFiles[0].hash})`)
 
               try {
                 while (!(await win.webContents.executeJavaScript(`dw.connected`))) {

@@ -1420,6 +1420,7 @@ declare namespace DeepestWorld {
     isPlayer?: true
     isPortal?: true
     isStation?: true
+    isVessel?: true
     /** @deprecated use isMonster instead */
     monster?: true
     /** @deprecated use canMine instead */

@@ -112,7 +112,6 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.strokeText(name, x - UI_SCALE / 2, y - UI_SCALE - 5)
       ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - 5)
 
-
       ctx.lineWidth = 1
 
       // Backdrop
@@ -144,7 +143,6 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.beginPath()
       ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE + 8, UI_SCALE, 3)
       ctx.stroke()
-
 
       continue
     }

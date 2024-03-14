@@ -73,6 +73,7 @@ const mobNames: Array<[string, number, string]> = [
   ['npc1', 2, 'Villager'],
   ['npc2', 2, 'Priest'],
   ['npc3', 2, 'Guard'],
+  ['npc4', 2, 'Runemaster'],
   ['goo', 1, 'Goo'],
   ['goo', 2, 'Goo'],
   ['goo', 4, 'Goo'],
