@@ -1288,6 +1288,8 @@ declare namespace DeepestWorld {
     /** Timestamp of the global cooldown */
     gcd?: number
 
+    gcdValue: number
+
     /** the amount of mana points you restore every 1.5s */
     hpRegen: number
 

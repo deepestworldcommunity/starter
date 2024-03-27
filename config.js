@@ -23,6 +23,10 @@ if (typeof characterName !== 'string') {
 
 const disableTracking = process.env.DW_DISABLE_TRACKING === "true"
 
+const recordDeaths = process.env.DW_RECORD_DEATHS === "true"
+
+const hideHints = process.env.DW_HIDE_HINTS === "true"
+
 /** @var {string} */
 const script = process.argv[2] ?? process.env.DW_SCRIPT ?? 'src/starter.js'
 
@@ -31,5 +35,7 @@ module.exports = {
   password,
   characterName,
   disableTracking,
+  recordDeaths,
+  hideHints,
   script,
 }

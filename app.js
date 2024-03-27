@@ -2,6 +2,7 @@ const esbuild = require('esbuild')
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("node:path");
 const process = require("node:process");
+const fs = require('node:fs');
 
 const config = require('./config')
 const tracking = require('./tracking')
@@ -14,6 +15,7 @@ function log(...args) {
 
 let characterId
 let character
+let codeHash
 
 function getCharacterBattleScore() {
   if (!character) {
@@ -125,6 +127,26 @@ async function run() {
     }
   })
 
+  ipcMain.on('death-recording', (event, dataUrl) => {
+    if (!config.recordDeaths) {
+      if (!config.hideHints) {
+        log('Death detected, but recording is disabled, enable via DW_RECORD_DEATHS=true or hide this hint via DW_HIDE_HINTS=true')
+      }
+      return
+    }
+
+    const contentStartsAt = dataUrl.indexOf('base64,') + 7
+    fs.writeFile(
+      `./recordings/${new Date().toISOString().substring(0, 19)}.mp4`,
+      Buffer.from(dataUrl.substring(contentStartsAt), 'base64'),
+      (err) => {
+        if (err) {
+          console.error('error writing recording', err)
+        }
+      }
+    )
+  })
+
   const win = new BrowserWindow({
     webPreferences: {
       // Prevents slowdown of script execution
@@ -191,7 +213,14 @@ async function run() {
                 console.warn(message)
               })
 
-              log(`Updating code in game (hash: ${result.outputFiles[0].hash})`)
+              if (codeHash === result.outputFiles[0].hash) {
+                log(`Code unchanged`)
+                return
+              }
+
+              codeHash = result.outputFiles[0].hash
+
+              log('Updating code in game')
 
               try {
                 while (!(await win.webContents.executeJavaScript(`dw.connected`))) {
