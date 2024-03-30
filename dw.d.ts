@@ -152,7 +152,7 @@ declare namespace DeepestWorld {
      * @param itemMd
      * @param max Number of items to craft. If you pass 0, your character will craft until it runs out of materials or space.
      */
-    craft(benchId: number, itemMd: string, max?: number = 1): Promise<void>
+    craft(benchId: number, itemMd: string, max?: number): Promise<void>
 
     /**
      * Indicates that debug information will appear in console
@@ -593,27 +593,12 @@ declare namespace DeepestWorld {
     getHitbox(md: string, v?: number): { w: number, h: number }
 
     /**
-     * Calculates the base damage/healing/armor of an item.
-     * Includes the added damage/healing/armor from local mods.
-     *
-     * `physDmgLocal` would be included.
-     *
-     * `physDmg` would not be included.
-     *
-     * `physDmgIncLocal` would not be included.
-     *
-     * `physDmgInc` would not be included.
-     * @param item item to evaluate
-     * @returns <number> or if the item is invalid <undefined>
-     * @deprecated use dw.itemBaseValue instead
+     * @see itemBaseValue
      */
     getItemBaseValue(item: DeepestWorld.Item): number | undefined
 
     /**
-     * @param item item to evaluate
-     * @param s md of the mod to evaluate
-     * @returns <number> or if the item or `modName` is invalid <undefined>
-     * @deprecated use dw.itemModValue instead
+     * @see getItemBaseValue
      */
     getItemModValue(item: DeepestWorld.Item, s: string): number | undefined
 
@@ -635,10 +620,21 @@ declare namespace DeepestWorld {
     getZoneTier(x?: number, y?: number, z?: number)
 
     /**
+     * Rune cooldown check
+     */
+    isOnCd(runeIndex: number): boolean
+
+    /**
+     * Global cooldown check.
+     */
+    isOnGcd(): boolean
+
+    /**
      * Checks whether the target would be in range for spell.
      * @param skillIndex
      * @param args
      * @deprecated use dw.canUseSkillRange instead
+     * @see canUseSkillRange
      */
     inSkillRange(
       skillIndex: number,
@@ -1418,8 +1414,7 @@ declare namespace DeepestWorld {
     quests: Array<{
       data: {
         name: string
-        [string]: unknown
-      }
+      } & Record<string, unknown>
       id: number
       items: Array<Item>
       maxProgress: number
