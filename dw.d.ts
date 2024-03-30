@@ -65,6 +65,8 @@ declare namespace DeepestWorld {
       ...args: [number] | [number, number] | [{ x: number; y: number }]
     ): boolean
 
+    chatHideDelay: number
+
     /** Another reference to your character */
     char: YourCharacter
 
@@ -83,7 +85,7 @@ declare namespace DeepestWorld {
     /**
      * Combines all stackable items in the combine section of your inventory.
      */
-    combine(): void
+    combine(): Promise<void>
 
     connected: boolean
 
@@ -145,7 +147,12 @@ declare namespace DeepestWorld {
       GCD: number
     }
 
-    craft(benchId: number, itemMd: string, max?: number): void
+    /**
+     * @param benchId
+     * @param itemMd
+     * @param max Number of items to craft. If you pass 0, your character will craft until it runs out of materials or space.
+     */
+    craft(benchId: number, itemMd: string, max?: number = 1): Promise<void>
 
     /**
      * Indicates that debug information will appear in console
@@ -168,10 +175,12 @@ declare namespace DeepestWorld {
     disenchant(enchantingDeviceId: number, itemIndex: number): Promise<void>
 
     /**
-     * Returns the distance between from and to
+     * Calculates the Euclidean distance between two points
      * @param from
      * @param to
      * @deprecated use the same function, but with 4 parameters now
+     * @example
+     * dw.distance(dw.character, target)
      */
     distance(
       from: { x: number; y: number },
@@ -179,11 +188,13 @@ declare namespace DeepestWorld {
     ): number
 
     /**
-     * Returns the distance between two points
+     * Calculates the Euclidean distance between two points
      * @param x1
      * @param y1
      * @param x2
      * @param y2
+     * @example
+     * dw.distance(dw.character.x, dw.character.y, target.x, target.y)
      */
     distance(x1: number, y1: number, x2: number, y2: number): number
 
@@ -191,6 +202,9 @@ declare namespace DeepestWorld {
 
     /** Your surroundings: monsters, characters, trees, etc */
     e: Array<Entity>
+
+    /** Monaco Editor */
+    editor: unknown
 
     emit(eventName: 'abandonMission'): void
 
@@ -303,7 +317,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'missionTable', data: { id: number }): void
 
-    emit(eventName: 'move', data: { x: number; y: number }): void
+    emit(eventName: 'move', data: { x?: number; y?: number }): void
 
     emit(
       eventName: 'moveCar',
@@ -491,7 +505,7 @@ declare namespace DeepestWorld {
     /**
      * @param portalId
      */
-    enterPortal(portalId: number): void
+    enterPortal(portalId: number): Promise<void>
 
     /** Your surroundings: monsters, characters, trees, etc */
     entities: Array<Entity>
@@ -566,34 +580,59 @@ declare namespace DeepestWorld {
 
     get(key: string): unknown | null
 
+    /**
+     * Returns the key of the chunk at this world position.
+     * @param x
+     * @param y
+     * @param z
+     */
+    getChunkKey(x: number, y: number, z: number): string
+
     getChunkHash(x: number, y: number, z: number): string
 
     getHitbox(md: string, v?: number): { w: number, h: number }
 
+    /**
+     * Calculates the base damage/healing/armor of an item.
+     * Includes the added damage/healing/armor from local mods.
+     *
+     * `physDmgLocal` would be included.
+     *
+     * `physDmg` would not be included.
+     *
+     * `physDmgIncLocal` would not be included.
+     *
+     * `physDmgInc` would not be included.
+     * @param item item to evaluate
+     * @returns <number> or if the item is invalid <undefined>
+     * @deprecated use dw.itemBaseValue instead
+     */
     getItemBaseValue(item: DeepestWorld.Item): number | undefined
 
+    /**
+     * @param item item to evaluate
+     * @param s md of the mod to evaluate
+     * @returns <number> or if the item or `modName` is invalid <undefined>
+     * @deprecated use dw.itemModValue instead
+     */
     getItemModValue(item: DeepestWorld.Item, s: string): number | undefined
 
     /**
-     * Returns the terrain at the given position
-     * 0 = Walkable
-     * any other value = There is a voxel here, limiting movement
-     * @param x
-     * @param y
-     * @param z
+     * Returns the terrain type at this world position.
      */
     getTerrain(x: number, y: number, z: number): number | undefined
 
     /**
      * Get either the zone level of location or of player location
      * when no other parameters were specified.
-     * @param x
-     * @param y
-     * @param z
      */
     getZoneLevel(x?: number, y?: number, z?: number): number
 
-    getZoneTier(x: number, y: number, z: number)
+    /**
+     * Get either the zone tier of location or of player location
+     * when no other parameters were specified.
+     */
+    getZoneTier(x?: number, y?: number, z?: number)
 
     /**
      * Checks whether the target would be in range for spell.
@@ -624,6 +663,29 @@ declare namespace DeepestWorld {
      * @deprecated use dw.canUseSkillCd instead
      */
     isSkillReady(skillIndex?: number): boolean
+
+    /**
+     * Calculates the base damage/healing/armor of an item.
+     * Includes the added damage/healing/armor from local mods.
+     *
+     * `physDmgLocal` would be included.
+     *
+     * `physDmg` would not be included.
+     *
+     * `physDmgIncLocal` would not be included.
+     *
+     * `physDmgInc` would not be included.
+     * @param item item to evaluate
+     * @returns <number> or if the item is invalid <undefined>
+     */
+    itemBaseValue(item: DeepestWorld.Item): number | undefined
+
+    /**
+     * @param item item to evaluate
+     * @param s md of the mod to evaluate
+     * @returns <number> or if the item or `modName` is invalid <undefined>
+     */
+    itemModValue(item: DeepestWorld.Item, s: string): number | undefined
 
     lastLog: number
 
@@ -656,11 +718,9 @@ declare namespace DeepestWorld {
     mine(toolBagIndex: number, target: number | { id: number }): void
 
     /**
-     * Moves towards x,y in a straight line
-     * @param x
-     * @param y
+     * To move your character. To stop, call the function without x, y.
      */
-    move(x: number, y: number): void
+    move(x?: number, y?: number): void
 
     moveCar(cardId: number, dx: number, dy: number)
 
@@ -685,6 +745,8 @@ declare namespace DeepestWorld {
       finderId?: number,
     ): void
 
+    nextChatHideAt: number
+
     off<E extends keyof Events>(eventName: E, listener: Events[E])
 
     on<E extends keyof Events>(
@@ -704,11 +766,13 @@ declare namespace DeepestWorld {
     openMission(missionTableId: number): Promise<number>
 
     /**
-     * Opens a portal to your respawn location ot a player with `targetName`.
-     * @param portalScrollIndex
-     * @param targetName
+     * To open a portal to your spawn.
+     * @param portalBagIndex
+     * @param characterName To instead open a portal to a character.
+     * They have to be in your party
+     * @returns the portal server ID
      */
-    openPortal(portalScrollIndex: number, targetName?: string): void
+    openPortal(portalBagIndex: number, characterName?: string): Promise<number>
 
     openPortalToEvent(
       eventBoardId: number,
