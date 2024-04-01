@@ -1,5 +1,3 @@
-import { PASSABLE_TERRAIN } from './consts'
-
 type Breadcrumb = {
   x: number
   y: number
@@ -33,8 +31,8 @@ export default function getBreadcrumbs() {
       if (
         wall === undefined
         || floor === undefined
-        || !PASSABLE_TERRAIN.includes(wall)
-        || PASSABLE_TERRAIN.includes(floor)
+        || wall > 0
+        || floor <= 0
       ) {
         continue
       }

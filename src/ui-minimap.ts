@@ -1,5 +1,3 @@
-import { PASSABLE_TERRAIN } from './consts'
-
 const RANGE = 15
 const PLAYER = '#ff0000';
 const WALL = '#000000';
@@ -82,14 +80,14 @@ function updateMinimap() {
 
   for (let dy = -RANGE; dy <= RANGE; dy++) {
     for (let dx = -RANGE; dx <= RANGE; dx++) {
-      const terrain = dw.getTerrain(ex+dx, ey+dy, ez)
-      const terrainBelow = dw.getTerrain(ex+dx, ey+dy, ez - 1)
-      if (terrain === undefined || !PASSABLE_TERRAIN.includes(terrain)) {
+      const wall = dw.getTerrain(ex+dx, ey+dy, ez)
+      const floor = dw.getTerrain(ex+dx, ey+dy, ez - 1)
+      if (wall === undefined || wall > 0) {
         ctx.fillStyle = WALL
-      } else if (terrainBelow === undefined) {
+      } else if (floor === undefined) {
         ctx.fillStyle = FALLBACK
       } else {
-        ctx.fillStyle = TERRAIN_COLORS[terrainBelow] || FALLBACK
+        ctx.fillStyle = TERRAIN_COLORS[floor] || FALLBACK
       }
 
       ctx.beginPath()

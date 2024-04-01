@@ -1,4 +1,4 @@
-import { BOSSES } from "./consts"
+import { bosses } from "./bosses"
 
 const tracker = {
   levels: 0,
@@ -23,7 +23,7 @@ dw.on('hit', (hits) => {
       tracker.levels += entity.level
       tracker.total++
 
-      if (BOSSES.includes(entity.md)) {
+      if (bosses.includes(entity.md)) {
         tracker.bossKills++
         return
       }

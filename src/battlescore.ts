@@ -1,4 +1,4 @@
-import { BOSSES } from './consts'
+import { bosses } from './bosses'
 
 export function getCharacterBattleScore() {
   let maxDmg = 0
@@ -43,7 +43,7 @@ export function getMonsterBattleScore(monster: DeepestWorld.Monster) {
   // Scale based on skulls on mob, extra 25% for bosses
   dmg *= 1
     + skullCount * 0.5
-    + (BOSSES.includes(monster.md) ? 0.25 : 0)
+    + (bosses.includes(monster.md) ? 0.25 : 0)
 
   // Powerful mobs deal 25% more dmg
   if (monster.fx.dmgMore) {

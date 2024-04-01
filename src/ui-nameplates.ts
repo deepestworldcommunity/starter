@@ -1,5 +1,5 @@
 import { getMonsterBattleScore, getCharacterBattleScore } from './battlescore'
-import { BOSSES } from './consts'
+import { bosses } from './bosses'
 import getMobName from './getMobName'
 import getSmoothPosition from './getSmoothPosition'
 import { addMenuButton } from './ui-buttons'
@@ -149,7 +149,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
     if ('ai' in entity) {
       const fxs = Object.entries(entity.fx).sort((a, b) => a[0].localeCompare(b[0]))
-      const isBoss = BOSSES.includes(entity.md)
+      const isBoss = bosses.includes(entity.md)
 
       ctx.lineWidth = 4
 

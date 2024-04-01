@@ -1,5 +1,3 @@
-import { PASSABLE_TERRAIN } from './consts'
-
 export function doesIntersect(ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number) {
   const bottom = (dy - cy) * (bx - ax) - (dx - cx) * (by - ay)
   if (bottom === 0) {
@@ -44,10 +42,7 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
         return false
       }
 
-      if (
-        PASSABLE_TERRAIN.includes(wall)
-        && !PASSABLE_TERRAIN.includes(floor)
-      ) {
+      if (wall <= 0 && floor > 0) {
         continue
       }
 
