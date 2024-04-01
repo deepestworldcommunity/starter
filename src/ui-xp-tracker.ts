@@ -84,7 +84,7 @@ function updateXPTracker() {
     ctx.rect(0, 0, canvas.width, canvas.height)
     ctx.fill()
 
-    let previousValue = max
+    let previousValue = recentXp[0]
     for (const [i, value] of recentXp.entries()) {
       let height = Math.floor(value / max * canvas.height)
       let fillStyle =  COLOR_XP
