@@ -1,6 +1,6 @@
 import { PASSABLE_TERRAIN } from './consts'
 
-const RANGE = 16
+const RANGE = 15
 const PLAYER = '#ff0000';
 const WALL = '#000000';
 const FALLBACK = '#dddddd';
@@ -17,6 +17,10 @@ const TERRAIN_COLORS: Record<number, string> = {
   [dw.constants.TERRAIN_WINTER]: '#E0FFFF', // Light Cyan (for a chilly feel, more distinct from white)
 } as const;
 
+const CONTAINER_SELECTOR = '#minimap'
+const ELEMENT_CLASS = 'custom-minimap'
+const ELEMENT_SELECTOR = `${CONTAINER_SELECTOR} .${ELEMENT_CLASS}`
+
 let done = false
 
 function createMinimapCanvas() {
@@ -25,13 +29,13 @@ function createMinimapCanvas() {
     return
   }
 
-  const container = window.top.document.querySelector('#minimap')
+  const container = window.top.document.querySelector(CONTAINER_SELECTOR)
   if (!container) {
     return []
   }
 
   const canvas = window.top.document.createElement('canvas')!
-  canvas.className = 'custom-minimap ui mt-2'
+  canvas.className = `${ELEMENT_CLASS} ui mt-2`
   canvas.style.width = '100%'
   canvas.style.height = 'auto'
   canvas.width = RANGE * 2 + 1
@@ -43,6 +47,10 @@ function createMinimapCanvas() {
 let x: number
 let y: number
 let z: number
+
+function isCanvas(element: Element): element is HTMLCanvasElement {
+  return element.nodeName === 'CANVAS'
+}
 
 function updateMinimap() {
   if (!window.top) {
@@ -62,8 +70,8 @@ function updateMinimap() {
     return
   }
 
-  const canvas = window.top.document.querySelector('#minimap .custom-minimap') as HTMLCanvasElement | null
-  if (!canvas) {
+  const canvas = window.top.document.querySelector(ELEMENT_SELECTOR)
+  if (!canvas || !isCanvas(canvas)) {
     return
   }
 
@@ -112,7 +120,7 @@ function onUnload() {
 
   done = true
 
-  for (const elem of window.top.document.querySelectorAll('#minimap .custom-minimap')) {
+  for (const elem of window.top.document.querySelectorAll(ELEMENT_SELECTOR)) {
     elem.remove()
   }
 }
