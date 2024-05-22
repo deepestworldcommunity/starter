@@ -2,12 +2,7 @@ declare namespace DeepestWorld {
   interface Account {
     coins: number
     id: number
-    plots: Array<{
-      dim: [number, number, number]
-      id: number
-      pos: [number, number, number]
-      sellCd: number
-    }>
+    plots: Array<Plot>
   }
 
   interface API {
@@ -19,7 +14,17 @@ declare namespace DeepestWorld {
      * @example
      * dw.abandonMission()
      */
-    abandonMission(): void
+    abandonMission(): Promise<unknown>
+
+    /**
+     * Abandon a quest
+     * @param questId
+     * @returns the quest ID
+     *
+     * @example
+     * await dw.abandonQuest(questId)
+     */
+    abandonQuest(questId: number): Promise<number>
 
     /**
      * Accept the first mission in the mission table storage
@@ -33,21 +38,40 @@ declare namespace DeepestWorld {
      */
     acceptMission(missionTableId: number): void
 
+    /**
+     * Accept a quest
+     * @param questId
+     * @returns the quest ID
+     *
+     * @example
+     * await dw.acceptQuest(questId)
+     */
+    acceptQuest(questId: number): Promise<number>
+
     account: Account
 
     addMog(stationId: number, bagIndex: number): void
 
     buyPlot(
       realEstateTableId: number,
-      location: [number, number, number],
-      size: [number, number, number],
+      x: number,
+      y: number,
+      z: number,
+      w: number,
+      h: number,
+      l: number,
     ): void
 
     /** Reference to your character */
     c: YourCharacter
 
+    canUseRune(
+      runeIndex: number,
+      ...args: [number] | [number, number] | [{ x: number; y: number }]
+    ): boolean
+
     canUseSkill(
-      skillIndex,
+      skillIndex: number,
       ...args: [number] | [number, number] | [{ x: number; y: number }]
     ): boolean
 
@@ -85,7 +109,7 @@ declare namespace DeepestWorld {
     /**
      * Combines all stackable items in the combine section of your inventory.
      */
-    combine(): Promise<void>
+    combine(): Promise<unknown>
 
     connected: boolean
 
@@ -148,11 +172,21 @@ declare namespace DeepestWorld {
     }
 
     /**
-     * @param benchId
-     * @param itemMd
-     * @param max Number of items to craft. If you pass 0, your character will craft until it runs out of materials or space.
+     * Complete a quest
+     * @param questId
+     * @returns the quest ID
+     *
+     * @example
+     * await dw.completeQuest(questId)
      */
-    craft(benchId: number, itemMd: string, max?: number): Promise<void>
+    completeQuest(questId: number): Promise<number>
+
+    /**
+     * @param benchId
+     * @param recipeMd
+     * @param numItemsToCraft Number of items to craft. If you pass 0, your character will craft until it runs out of materials or space.
+     */
+    craft(benchId: number | undefined, recipeMd: string, numItemsToCraft?: number): Promise<unknown>
 
     /**
      * Indicates that debug information will appear in console
@@ -172,7 +206,7 @@ declare namespace DeepestWorld {
      * @param enchantingDeviceId
      * @param itemIndex
      */
-    disenchant(enchantingDeviceId: number, itemIndex: number): Promise<void>
+    disenchant(enchantingDeviceId: number, itemIndex: number): Promise<unknown>
 
     /**
      * Calculates the Euclidean distance between two points
@@ -198,6 +232,8 @@ declare namespace DeepestWorld {
      */
     distance(x1: number, y1: number, x2: number, y2: number): number
 
+    donate(altarId: number, amount: number): Promise<void>
+
     draw: boolean
 
     /** Your surroundings: monsters, characters, trees, etc */
@@ -208,11 +244,16 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'abandonMission'): void
 
+    emit(eventName: 'abandonQuest', data: { id: number }): void
+
     emit(eventName: 'acceptMission', data: { id: number }): void
+
 
     emit(eventName: 'acceptPartyInvite', data: { id: number }): void
 
-    emit(eventName: 'addMog', data: { i: number; id: number }): void
+    emit(eventName: 'acceptQuest', data: { id: number }): void
+
+    emit(eventName: 'addXmog', data: { i: number; id: number }): void
 
     emit(eventName: 'auth', data: { token: string; name: string }): void
 
@@ -240,6 +281,8 @@ declare namespace DeepestWorld {
      */
     emit(eventName: 'combine'): void
 
+    emit(eventName: 'completeQuest', data: { id: number }): void
+
     emit(
       eventName: 'craft',
       data: {
@@ -256,6 +299,8 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'destroyBuilding', data: { id: number }): void
 
+    emit(eventName: 'donate', data: { id: number, n: number }): void
+
     emit(eventName: 'dungeonBoard', data: { id: number }): void
 
     emit(
@@ -267,10 +312,11 @@ declare namespace DeepestWorld {
     ): void
 
     emit(
-      eventName: 'enchant',
+      eventName: 'enchantItem',
       data: {
         id: number
         md: string
+        i: number
       },
     ): void
 
@@ -298,7 +344,11 @@ declare namespace DeepestWorld {
       data: { i: number; x: number; y: number; z: number },
     ): void
 
-    emit(eventName: 'gather', data: { id: number }): void
+    emit(eventName: 'forceKillChar'): void
+
+    emit(eventName: 'gather', data: { i: number, id: number }): void
+
+    emit(eventName: 'listQuest', data: { id: number }): void
 
     emit(eventName: 'loadout', data: { id: number }): void
 
@@ -317,7 +367,26 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'missionTable', data: { id: number }): void
 
+    emit(eventName: 'move'): void
+
     emit(eventName: 'move', data: { x?: number; y?: number }): void
+
+    emit(
+      eventName: 'moveItem',
+      data: {
+        a: {
+          i: number
+          id?: number
+          name: string
+        }
+        b: {
+          i?: number
+          id?: number
+          name?: string
+        }
+        fId?: number
+      }
+    ): void
 
     emit(
       eventName: 'moveCar',
@@ -345,6 +414,8 @@ declare namespace DeepestWorld {
       },
     ): void
 
+    emit(eventName: 'newQuest', data: { id: number }): void
+
     emit(eventName: 'openItem', data: { i: number }): void
 
     emit(
@@ -354,6 +425,8 @@ declare namespace DeepestWorld {
         name?: string
       },
     ): void
+
+    emit(eventName: 'readSign', data: { id: number }): void
 
     emit(eventName: 'renameStation', data: { id: number, name: string }): void
 
@@ -393,7 +466,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'realEstateTable', data: { id: number }): void
 
-    emit(eventName: 'removeMog', data: { id: number }): void
+    emit(eventName: 'removeXmog', data: { id: number }): void
 
     emit(eventName: 'repair', data: { i: number; id: number }): void
 
@@ -454,6 +527,8 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'startCode'): void
 
+    emit(eventName: 'stationInfo', data: { id: number, info?: string | Record<string, unknown>})
+
     emit(
       eventName: 'takeBlock',
       data: { i: number; x: number; y: number; z: number },
@@ -471,7 +546,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'talkWhisper', data: { name: string; m: string }): void
 
-    emit(eventName: 'toggleMog', data: { id: number; md: string }): void
+    emit(eventName: 'toggleXmog', data: { id: number; md: string }): void
 
     emit(eventName: 'toggleStation', data: { id: number }): void
 
@@ -493,7 +568,22 @@ declare namespace DeepestWorld {
      */
     emit(eventName: 'unstuck'): void
 
-    enchant(enchantingDeviceId: number, enchantMd: string): void
+    /**
+     * Enchant an item
+     * @param enchantingDeviceId
+     * @param enchantMd
+     * @param baxIndex
+     */
+    enchant(enchantingDeviceId: number, enchantMd: string, baxIndex: number): void
+
+    /**
+     * Enchant an item
+     * @param enchantingDeviceId
+     * @param enchantMd
+     * @param baxIndex
+     * @deprecated use `enchant` instead
+     */
+    enchantItem(enchantingDeviceId: number, enchantMd: string, baxIndex: number): void
 
     enterCar(carId: number): void
 
@@ -525,12 +615,14 @@ declare namespace DeepestWorld {
         listener: Events[E],
         timeout?: number,
       )
+      onAll(listener: any[])
       once<E extends keyof Events>(
         eventName: E,
         listener: Events[E],
         timeout?: number,
       )
       off<E extends keyof Events>(eventName: E, listener: Events[E])
+      offAll(listener: any[])
       removeListener<E extends keyof Events>(eventName: E, listener: Events[E])
       clear<E extends keyof Events>(eventName: E): void
     }
@@ -562,7 +654,19 @@ declare namespace DeepestWorld {
       callback: (data?: RealEstateTable, error?: string) => void,
     ): void
 
+    fetchQuests(
+      npcId: number,
+    ): Promise<unknown>
+
     fillItem(toolBagIndex: number, x: number, y: number, z: number): void
+
+    /**
+     * Find all entities matching a filter criteria.
+     *
+     * @param filter
+     * @alias findEntities
+     */
+    findAllEntities(filter: (entity: Entity) => boolean): Entity[]
 
     findClosestEntity(
       filter?: (entity: Entity) => boolean,
@@ -572,11 +676,30 @@ declare namespace DeepestWorld {
       filter?: (entity: Monster) => boolean,
     ): Monster | undefined
 
+    findClosestTree(
+      filter?: (entity: Tree) => boolean,
+    ): Monster | undefined
+
+    /**
+     * Find all entities matching a filter criteria.
+     * @param filter
+     */
     findEntities(filter: (entity: Entity) => boolean): Entity[]
 
+    /**
+     * Find a single entity matching a filter criteria.
+     * @param filter
+     */
     findEntity(filter: (entity: Entity) => boolean): Entity | undefined
 
-    gather(target: number | { id: number }): void
+    /**
+     * Find a single entity matching a filter criteria.
+     * @param filter
+     * @alias findEntity
+     */
+    findOneEntity(filter: (entity: Entity) => boolean): Entity | undefined
+
+    gather(toolBagIndex: number, target: number | { id: number }): void
 
     get(key: string): unknown | null
 
@@ -587,6 +710,16 @@ declare namespace DeepestWorld {
      * @param z
      */
     getChunkKey(x: number, y: number, z: number): string
+
+    /**
+     * Returns the key of the chunk at this world position.
+     * @param x
+     * @param y
+     * @param z
+     *
+     * @deprecated use `getChunkKey` instead
+     */
+    getChunkName(x: number, y: number, z: number): string
 
     getChunkHash(x: number, y: number, z: number): string
 
@@ -618,6 +751,17 @@ declare namespace DeepestWorld {
      * when no other parameters were specified.
      */
     getZoneTier(x?: number, y?: number, z?: number)
+
+    hasMp(runeIndex: number): boolean
+
+    hasTag(tagName: string, itemMd: string): boolean
+
+    isInRange(
+      runeIndex: number,
+      ...args:
+        | [number]
+        | [number, number]
+    ): boolean
 
     /**
      * Rune cooldown check
@@ -741,6 +885,8 @@ declare namespace DeepestWorld {
       finderId?: number,
     ): void
 
+    newQuest(npcId: number): Promise<void>
+
     nextChatHideAt: number
 
     off<E extends keyof Events>(eventName: E, listener: Events[E])
@@ -757,7 +903,7 @@ declare namespace DeepestWorld {
       timeout?: number,
     ): void
 
-    openItem(bagIndex: number): Promise<void>
+    openItem(bagIndex: number): Promise<unknown>
 
     openMission(missionTableId: number): Promise<number>
 
@@ -794,10 +940,13 @@ declare namespace DeepestWorld {
      * @param itemIndex index of the item in dw.character.bag
      * @param x
      * @param y
+     * @param variation
      */
-    placeItem(itemIndex: number, x: number, y: number): void
+    placeItem(itemIndex: number, x: number, y: number, variation?: number): void
 
     pourItem(toolBagIndex: number, targetId: number): void
+
+    readSign(signId: number): Promise<unknown>
 
     removeAllListeners<E extends keyof Events>(eventName: E): void
 
@@ -816,6 +965,22 @@ declare namespace DeepestWorld {
     ): Promise<number>
 
     repair(toolBagIndex: number, objectId: number): void
+
+    /**
+     * Force kills the character.
+     * Will lose 5% XP and place the character at the spawn.
+     *
+     * @deprecated use `suicide` instead
+     */
+    rip(): void
+
+    /**
+     * Force kills the character.
+     * Will lose 5% XP and place the character at the spawn.
+     *
+     * @deprecated use `suicide` instead
+     */
+    selfDestruct(): void
 
     sellPlot(realEstateTableId: number, plotId: number): void
 
@@ -843,16 +1008,41 @@ declare namespace DeepestWorld {
      */
     setTarget(id: number): void
 
+    /**
+     * Sorts your inventory aka the bag
+     */
     sortInv(): void
+
+    /**
+     * Sorts your inventory aka the bag
+     *
+     * @alias dw.sortInv
+     */
+    sortInventory(): void
+
+    /**
+     * Adds data to a station. It can be string or object.
+     * @param stationId
+     * @param info
+     */
+    stationInfo(stationId: number, info: string | Record<string, unknown>): void
+
+    stop(): void
 
     /**
      * Cancels the craft in progress.
      */
     stopCraft(): void
 
+    /**
+     * Force kills the character.
+     * Will lose 5% XP and place the character at the spawn.
+     */
+    suicide(): void
+
     takeBlock(toolBagIndex: number, x: number, y: number, z: number): void
 
-    takeItem(toolBagIndex: number, itemId): Promise<void>
+    takeItem(toolBagIndex: number, itemId): Promise<unknown>
 
     takeItemAsync(toolBagIndex: number, itemId): Promise<number>
 
@@ -882,6 +1072,20 @@ declare namespace DeepestWorld {
     unstuck(): void
 
     useElevator(elevatorId: number, z: number): void
+
+    useRune(
+      runeIndex: number,
+      ...args:
+        | [number]
+        | [number, number]
+        | [number, number, number]
+        | [{ id: number }]
+        | [{
+          x: number
+          y: number
+          z?: number
+          }],
+    ): Promise<unknown>
 
     // /**
     //  * Use skill on a target.
@@ -942,6 +1146,9 @@ declare namespace DeepestWorld {
     /** Character's appearance */
     mtx: Record<string, number>
 
+    /** Account id */
+    aid: number
+    /** Character id */
     cid: number
   }
 
@@ -983,8 +1190,11 @@ declare namespace DeepestWorld {
     '*': (msg: string, data: unknown) => void
 
     // Socket Events
+    abandonQuest: (data: { error: string } | unknown) => void
 
     acceptMission: (data: { error: string }) => void
+
+    acceptQuest: (data: { error: string } | unknown) => void
 
     afx: (data: {
       id: number
@@ -1008,6 +1218,8 @@ declare namespace DeepestWorld {
     callLimitDc: (data: {}) => void
 
     combat: (data: number) => void
+
+    completeQuest: (data: { error: string } | unknown) => void
 
     cd: (data: string) => void
 
@@ -1099,6 +1311,8 @@ declare namespace DeepestWorld {
 
     levelUp: (data: { id: number }) => void
 
+    listQuest: (data: { error?: string} ) => void
+
     loot: (
       data: Array<{
         i: number
@@ -1126,6 +1340,8 @@ declare namespace DeepestWorld {
       },
     ) => void
 
+    newQuest: (data: { error?: string }) => void
+
     proj: (data: {
       md: string
       mwd: string
@@ -1150,6 +1366,8 @@ declare namespace DeepestWorld {
 
     openPortal: (data: { error: string }) => void
 
+    readSign: (data: { error: string }) => void
+
     realEstateTable: (
       data: ['realEstateTable', RealEstateTable] | { error: string },
     ) => void
@@ -1160,14 +1378,7 @@ declare namespace DeepestWorld {
 
     sendPartyInvite: (data: { error: string }) => void
 
-    seenChunks: (
-      data: Record<
-        string,
-        {
-          terrain: Array<Array<Array<number>>>
-        }
-      >,
-    ) => void
+    seenChunks: (data: Record<string, number[][][]>) => void
 
     seenObjects: (data: unknown) => void
 
@@ -1458,6 +1669,21 @@ declare namespace DeepestWorld {
 
   interface Hitbox extends Float32Array {
     length: 2
+  }
+
+  type Plot = {
+    id: number
+    x: number
+    y: number
+    z: number
+    w: number
+    h: number
+    d: number
+    sellCd: number
+    /** @deprecated use `w`, `h`, `l` instead */
+    dim: [number, number, number]
+    /** @deprecated use `x`, `y`, `z` instead */
+    pos: [number, number, number]
   }
 
   type RealEstateTable = Array<{
