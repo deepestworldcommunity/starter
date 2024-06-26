@@ -14,7 +14,7 @@
   "author": "Kevin Sandow",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^20.14.8",
+    "@types/node": "^20.14.9",
     "dotenv": "^16.4.5",
     "electron": "^31.0.2",
     "esbuild": "^0.21.5",
