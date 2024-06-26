@@ -16,7 +16,7 @@
   "dependencies": {
     "@types/node": "^20.14.8",
     "dotenv": "^16.4.5",
-    "electron": "^31.0.2",
+    "electron": "^31.1.0",
     "esbuild": "^0.21.5",
     "typescript": "^5.5.2"
   }
