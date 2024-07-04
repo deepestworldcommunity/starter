@@ -1,9 +1,14 @@
 declare namespace DeepestWorld {
   interface Account {
-    coins: number
+    /** Currency to buy plots */
+    gold: number
+    /** Account ID */
     id: number
+    /** Plots that you own */
     plots: Array<Plot>
   }
+
+  type Ai = symbol
 
   interface API {
     a: Account
@@ -11,15 +16,19 @@ declare namespace DeepestWorld {
     /**
      * Abandon the current mission
      *
+     * @group Mission
+     *
      * @example
      * dw.abandonMission()
      */
-    abandonMission(): Promise<unknown>
+    abandonMission(): Promise<void>
 
     /**
      * Abandon a quest
      * @param questId
      * @returns the quest ID
+     *
+     * @group Quest
      *
      * @example
      * await dw.abandonQuest(questId)
@@ -29,9 +38,11 @@ declare namespace DeepestWorld {
     /**
      * Accept the first mission in the mission table storage
      *
+     * @group Mission
+     *
      * @example
      * const missionTable = dw.findClosestEntity(
-     *   (e) => e.md === 'missionTable' && e.owner
+     *   (e) => e.md === 'missionTable' && !!e.owner
      * )
      *
      * dw.acceptMission(missionTable.id)
@@ -43,6 +54,8 @@ declare namespace DeepestWorld {
      * @param questId
      * @returns the quest ID
      *
+     * @group Quest
+     *
      * @example
      * await dw.acceptQuest(questId)
      */
@@ -50,8 +63,27 @@ declare namespace DeepestWorld {
 
     account: Account
 
+    /**
+     * Add a transmog
+     * @param stationId
+     * @param bagIndex
+     *
+     * @group Other
+     */
     addMog(stationId: number, bagIndex: number): void
 
+    /**
+     * Buy a plot of land
+     * @param realEstateTableId
+     * @param x
+     * @param y
+     * @param z
+     * @param w
+     * @param h
+     * @param d
+     *
+     * @group Building
+     */
     buyPlot(
       realEstateTableId: number,
       x: number,
@@ -59,17 +91,51 @@ declare namespace DeepestWorld {
       z: number,
       w: number,
       h: number,
-      l: number,
+      d: number,
     ): void
+
+    /**
+     * Buy a teleport to an event via an event board
+     * @param eventBoardId
+     * @param eventId
+     *
+     * @group Travel
+     */
+    buyTeleport(eventBoardId: number, eventId: number): Promise<void>
 
     /** Reference to your character */
     c: YourCharacter
 
+    /**
+     * Rune mana costs check.
+     * @param skillIndex
+     *
+     * @group Skill
+     */
+    canPayCost(skillIndex: number): boolean
+
+    /**
+     * Checks whether the rune can be used - mana, range, global cooldown and rune cooldown checks.
+     * @param runeIndex
+     * @param args
+     * @deprecated use dw.canUseSkill instead
+     */
     canUseRune(
       runeIndex: number,
       ...args: [number] | [number, number] | [{ x: number; y: number }]
     ): boolean
 
+    /**
+     * Checks whether the rune can be used - mana, range, global cooldown and rune cooldown checks.
+     * @param skillIndex
+     * @param args
+     *
+     * @group Skill
+     *
+     * @example
+     * dw.canUseSkill(0, target.id)
+     * dw.canUseSkill(0, x, y, z)
+     */
     canUseSkill(
       skillIndex: number,
       ...args: [number] | [number, number] | [{ x: number; y: number }]
@@ -79,17 +145,27 @@ declare namespace DeepestWorld {
      * Checks whether the skill is on cooldown,
      * can be used without `skillIndex` to check for GCD.
      * @param skillIndex
+     * @deprecated use dw.isOnCd instead
      */
     canUseSkillCd(skillIndex?: number): boolean
 
+    /**
+     * Checks whether the skill can be used with the current resources.
+     * @param skillIndex
+     * @deprecated use dw.canPayCost instead
+     */
     canUseSkillCost(skillIndex?: number): boolean
 
+    /**
+     * Checks whether the target would be in range for spell.
+     * @param skillIndex
+     * @param args
+     * @deprecated use dw.isInRange instead
+     */
     canUseSkillRange(
       skillIndex,
       ...args: [number] | [number, number] | [{ x: number; y: number }]
     ): boolean
-
-    chatHideDelay: number
 
     /** Another reference to your character */
     char: YourCharacter
@@ -98,25 +174,55 @@ declare namespace DeepestWorld {
     character: YourCharacter
 
     /**
+     * Determines how long the chat will be visible after adding a new message.
+     */
+    chatHideDelay: number
+
+    /**
      * Chop a tree.
      * @param toolBagIndex id of the tool in toolBag
      * @param target tree entity id or entity
+     * @deprecated use `dw.gather` instead
      */
     chop(toolBagIndex: number, target: number | { id: number }): void
 
+    /**
+     * This contains the chunks of the world.
+     *
+     * @deprecated use `dw.getTerrainAt` instead
+     */
     chunks: Record<string, Chunk>
 
     /**
      * Combines all stackable items in the combine section of your inventory.
+     *
+     * @group Item
+     *
+     * @example
+     * await dw.combine()
      */
     combine(): Promise<unknown>
 
-    connected: boolean
+    /**
+     * Complete a quest
+     * @param questId
+     * @returns the quest ID
+     *
+     * @group Quest
+     *
+     * @example
+     * await dw.completeQuest(questId)
+     */
+    completeQuest(questId: number): Promise<number>
 
     constants: {
       VERSION: number
       INTERACT_RANGE: number
-      CHUNK_DIMENSION: [number, number, number]
+      CHUNK_SIZE: {
+        w: number
+        h: number
+        d: number
+      }
       ZONE_LEVEL_RADIUS: number
       ZONE_LEVELS_PER_ZONE_TIER: number
       RANGE_MELEE_BASE: number
@@ -133,6 +239,7 @@ declare namespace DeepestWorld {
       DMG_TYPE_FX_CHANCE_BASE: number
       DMG_TYPE_FX_MAX: number
       LEVEL_BUFFER: number
+      XP_DEATH_PENALTY: number
       MISSION_RANGE: number
       TERRAIN_WATER: number
       TERRAIN_EMPTY: number
@@ -144,21 +251,31 @@ declare namespace DeepestWorld {
       TERRAIN_CLOUD: number
       TERRAIN_TREE: number
       TERRAIN_STONE: number
+      TERRAIN_WOODWALL1: number
+      TERRAIN_STONEROOF1: number
+      TERRAIN_WINTER_CAVE: number
+      TERRAIN_DESERT_CAVE: number
       DMG_TYPES: Array<string>
       ATTR_TYPES: Array<string>
-      MOD_MULTS: Array<number>
+      // MOD_MULTS: Array<number>
       MAX_BASE_MOD_TIER: number
       MAX_MOD_TIER: number
       MAX_RES: number
       MAX_DODGE: number
       MAX_DMG_TYPE_EFFECT: number
-      WHITE: number
-      GREEN: number
-      BLUE: number
-      PURPLE: number
-      ORANGE: number
+      RARITY_WHITE: number
+      RARITY_GREEN: number
+      RARITY_BLUE: number
+      RARITY_PURPLE: number
+      RARITY_ORANGE: number
       MIN_REP: number
       MAX_REP: number
+      CALL_LIMIT: number
+      CALL_LIMIT_TIMESPAN: number
+      BYTE_LIMIT: number
+      BYTE_LIMIT_TIMESPAN: number
+      /** @deprecated */
+      CHUNK_DIMENSION: [number, number, number]
       /** @deprecated */
       CHUNK_DIM: [number, number, number]
       /** @deprecated */
@@ -172,21 +289,20 @@ declare namespace DeepestWorld {
     }
 
     /**
-     * Complete a quest
-     * @param questId
-     * @returns the quest ID
-     *
-     * @example
-     * await dw.completeQuest(questId)
-     */
-    completeQuest(questId: number): Promise<number>
-
-    /**
      * @param benchId
      * @param recipeMd
-     * @param numItemsToCraft Number of items to craft. If you pass 0, your character will craft until it runs out of materials or space.
+     * @param limit Number of items to craft. If you pass 0, your character will craft until they run out of mats or space. Default is 0
+     *
+     * @group Item
+     *
+     * @example
+     * await dw.craft(undefined, 'stoneColumn')
      */
-    craft(benchId: number | undefined, recipeMd: string, numItemsToCraft?: number): Promise<unknown>
+    craft(
+      benchId: number | undefined,
+      recipeMd: string,
+      limit?: number,
+    ): Promise<void>
 
     /**
      * Indicates that debug information will appear in console
@@ -194,25 +310,45 @@ declare namespace DeepestWorld {
     debug?: boolean
 
     /**
-     * @param itemIndex index of the item in dw.character.bag
+     * @param bagIndex index of the item in dw.character.bag
+     *
+     * @group Item
+     *
+     * @example
+     * dw.deleteItem(bagIndex)
      */
-    deleteItem(itemIndex: number): void
+    deleteItem(bagIndex: number): Promise<void>
 
+    /**
+     * Destroys a station
+     * @param buildingId
+     *
+     * @group Building
+     *
+     * @example
+     * dw.destroyBuilding(furnace.id)
+     */
     destroyBuilding(buildingId: number): void
 
     /**
      * Disenchants item in bag with index `indexItem,
      * uses an enchanting device provided by `enchantingDeviceId`.
-     * @param enchantingDeviceId
-     * @param itemIndex
+     * @param altarOfSacrificeId
+     * @param bagIndex
+     *
+     * @group Item
+     *
+     * @example
+     * dw.disenchant(altarOfSacrifice.id, 0)
      */
-    disenchant(enchantingDeviceId: number, itemIndex: number): Promise<unknown>
+    disenchant(altarOfSacrificeId: number, bagIndex: number): Promise<void>
 
     /**
      * Calculates the Euclidean distance between two points
      * @param from
      * @param to
      * @deprecated use the same function, but with 4 parameters now
+     *
      * @example
      * dw.distance(dw.character, target)
      */
@@ -227,13 +363,29 @@ declare namespace DeepestWorld {
      * @param y1
      * @param x2
      * @param y2
+     *
+     * @group Basic
+     *
      * @example
      * dw.distance(dw.character.x, dw.character.y, target.x, target.y)
      */
     distance(x1: number, y1: number, x2: number, y2: number): number
 
+    /**
+     * Donates to an altar
+     * @param altarId
+     * @param amount
+     *
+     * @group Other
+     *
+     * @example
+     * dw.donate(altar.id, 30)
+     */
     donate(altarId: number, amount: number): Promise<void>
 
+    /**
+     * Indicates that the game will draw the world
+     */
     draw: boolean
 
     /** Your surroundings: monsters, characters, trees, etc */
@@ -247,7 +399,6 @@ declare namespace DeepestWorld {
     emit(eventName: 'abandonQuest', data: { id: number }): void
 
     emit(eventName: 'acceptMission', data: { id: number }): void
-
 
     emit(eventName: 'acceptPartyInvite', data: { id: number }): void
 
@@ -299,7 +450,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'destroyBuilding', data: { id: number }): void
 
-    emit(eventName: 'donate', data: { id: number, n: number }): void
+    emit(eventName: 'donate', data: { id: number; n: number }): void
 
     emit(eventName: 'dungeonBoard', data: { id: number }): void
 
@@ -346,7 +497,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'forceKillChar'): void
 
-    emit(eventName: 'gather', data: { i: number, id: number }): void
+    emit(eventName: 'gather', data: { i: number; id: number }): void
 
     emit(eventName: 'listQuest', data: { id: number }): void
 
@@ -385,7 +536,7 @@ declare namespace DeepestWorld {
           name?: string
         }
         fId?: number
-      }
+      },
     ): void
 
     emit(
@@ -428,7 +579,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'readSign', data: { id: number }): void
 
-    emit(eventName: 'renameStation', data: { id: number, name: string }): void
+    emit(eventName: 'renameStation', data: { id: number; name: string }): void
 
     emit(eventName: 'partyKick', data: { name: string }): void
 
@@ -527,7 +678,10 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'startCode'): void
 
-    emit(eventName: 'stationInfo', data: { id: number, info?: string | Record<string, unknown>})
+    emit(
+      eventName: 'stationInfo',
+      data: { id: number; info?: string | Record<string, unknown> },
+    )
 
     emit(
       eventName: 'takeBlock',
@@ -569,126 +723,243 @@ declare namespace DeepestWorld {
     emit(eventName: 'unstuck'): void
 
     /**
-     * Enchant an item
-     * @param enchantingDeviceId
-     * @param enchantMd
-     * @param baxIndex
+     * Emits an unknown event
+     * @param eventName
+     * @param data
      */
-    enchant(enchantingDeviceId: number, enchantMd: string, baxIndex: number): void
+    emit(eventName: string, data: unknown): void
+
+    /**
+     * Enchant an item
+     * @param stationId
+     * @param recipeMd
+     * @param baxIndex
+     *
+     * @group Item
+     *
+     * @example
+     * dw.enchant(station.id, 'randAllMods', 0)
+     */
+    enchant(
+      stationId: number,
+      recipeMd: string,
+      baxIndex: number,
+    ): Promise<void>
 
     /**
      * Enchant an item
      * @param enchantingDeviceId
      * @param enchantMd
      * @param baxIndex
-     * @deprecated use `enchant` instead
+     *
+     * @deprecated use `dw.enchant` instead
      */
-    enchantItem(enchantingDeviceId: number, enchantMd: string, baxIndex: number): void
+    enchantItem(
+      enchantingDeviceId: number,
+      enchantMd: string,
+      baxIndex: number,
+    ): Promise<void>
 
+    /**
+     * Enter a car
+     * @param carId
+     *
+     * @group Travel
+     *
+     * @example
+     * dw.enterCar(car.id)
+     */
     enterCar(carId: number): void
 
     /**
+     * Use a magic shrub to teleport to a new location
      * @param magicShrubId
+     *
+     * @group Travel
+     *
+     * @example
+     * dw.enterMagicShrub(magicShrub.id)
      */
-    enterMagicShrub(magicShrubId: number): void
+    enterMagicShrub(magicShrubId: number): Promise<void>
 
     /**
+     * Enter a mission
+     * @param missionTableId
+     *
+     * @group Mission
+     *
+     * @example
+     * dw.enterMission(missionTable.id)
+     */
+    enterMission(missionTableId: number): Promise<void>
+
+    /**
+     * Use the portal to get to the linked portal
      * @param portalId
+     *
+     * @group Travel
+     *
+     * @example
+     * dw.enterPortal(portal.id)
      */
     enterPortal(portalId: number): Promise<void>
 
     /** Your surroundings: monsters, characters, trees, etc */
     entities: Array<Entity>
 
+    enums: {
+      Ai: Record<string, Ai>
+      Rarity: Record<string, Rarity>
+      Tag: Record<string, Tag>
+      Terrain: Record<string, Terrain>
+    }
+
     /**
      * Equip an item.
      * @param itemIndex
      * @param slotName
+     *
+     * @group Item
+     *
+     * @example
+     * dw.equip(0)
+     * dw.equip(1, 'ring1')
      */
-    equip(itemIndex: number, slotName: string): void
+    equip(itemIndex: number, slotName?: string): Promise<void>
 
+    /**
+     * Indicator to show errors
+     */
+    errors: boolean
+
+    /**
+     * This should not be used directly, use `dw.on`, `dw.once`, `dw.off` instead.
+     */
     eventDispatcher: {
-      listeners: Record<string, Array<(...args: unknown[]) => void>>
-      onceListeners: Record<string, Array<(...args: unknown[]) => void>>
-      on<E extends keyof Events>(
-        eventName: E,
-        listener: Events[E],
-        timeout?: number,
-      )
-      onAll(listener: any[])
-      once<E extends keyof Events>(
-        eventName: E,
-        listener: Events[E],
-        timeout?: number,
-      )
-      off<E extends keyof Events>(eventName: E, listener: Events[E])
-      offAll(listener: any[])
-      removeListener<E extends keyof Events>(eventName: E, listener: Events[E])
-      clear<E extends keyof Events>(eventName: E): void
+      listeners: Record<keyof Events, Map<unknown, unknown>>
     }
 
+    /**
+     * Exists the car
+     *
+     * @group Travel
+     *
+     * @example
+     * dw.exitCar()
+     */
     exitCar(): void
 
+    /**
+     * Retrieve discovered dungeons from the dungeon board     *
+     * @param dungeonBoardId
+     * @param callback
+     *
+     * @group Other
+     *
+     * @example
+     * dw.fetchDungeons(dungeonBoard.id, console.table)
+     */
     fetchDungeons(
       dungeonBoardId: number,
       callback: (data?: DungeonBoard, error?: string) => void,
     ): void
 
+    /**
+     * Retrieve active events from the event board
+     * @param eventBoardId
+     * @param callback
+     *
+     * @group Other
+     *
+     * @example
+     * dw.fetchEvents(eventBoard.id, console.table)
+     */
     fetchEvents(
       eventBoardId: number,
       callback: (data?: EventBoard, error?: string) => void,
     ): void
 
-    fetchMarket(
-      tradingPostId: number,
-      callback: (data?: TradingPost, error?: string) => void,
-    ): void
-
-    fetchMissions(
-      missionTableId: number,
-      callback: (data?: MissionTable, error?: string) => void,
-    ): void
-
+    /**
+     * @param realEstateTableId
+     * @param callback
+     *
+     * @group Other
+     *
+     * @example
+     * dw.fetchPlots(realEstateTable.id, console.table)
+     */
     fetchPlots(
       realEstateTableId: number,
       callback: (data?: RealEstateTable, error?: string) => void,
     ): void
 
-    fetchQuests(
-      npcId: number,
-    ): Promise<unknown>
+    /**
+     * @param npcId
+     *
+     * @group Quest
+     *
+     * @example
+     * await dw.fetchQuests(npc.id)
+     */
+    fetchQuests(npcId: number): Promise<Quest[]>
 
+    /**
+     * Fill a bucket in toolBag with water from a water source at x, y, z
+     * @param toolBagIndex
+     * @param x
+     * @param y
+     * @param z
+     */
     fillItem(toolBagIndex: number, x: number, y: number, z: number): void
 
     /**
      * Find all entities matching a filter criteria.
      *
      * @param filter
-     * @alias findEntities
+     *
+     * @group Entity
      */
     findAllEntities(filter: (entity: Entity) => boolean): Entity[]
 
-    findClosestEntity(
-      filter?: (entity: Entity) => boolean,
-    ): Entity | undefined
+    /**
+     * Find the closest entity matching a filter criteria.
+     * @param filter
+     *
+     * @group Entity
+     */
+    findClosestEntity(filter?: (entity: Entity) => boolean): Entity | undefined
 
+    /**
+     * Find the closest monster matching a filter criteria.
+     * @param filter
+     *
+     * @group Entity
+     */
     findClosestMonster(
       filter?: (entity: Monster) => boolean,
     ): Monster | undefined
 
-    findClosestTree(
-      filter?: (entity: Tree) => boolean,
-    ): Monster | undefined
+    /**
+     * Find the closest tree matching a filter criteria.
+     * @param filter
+     *
+     * @group Entity
+     */
+    findClosestTree(filter?: (entity: Tree) => boolean): Tree | undefined
 
     /**
      * Find all entities matching a filter criteria.
      * @param filter
+     *
+     * @deprecated use `dw.findAllEntities` instead
      */
     findEntities(filter: (entity: Entity) => boolean): Entity[]
 
     /**
      * Find a single entity matching a filter criteria.
      * @param filter
+     *
+     * @deprecated use `dw.findOneEntity` instead
      */
     findEntity(filter: (entity: Entity) => boolean): Entity | undefined
 
@@ -696,18 +967,48 @@ declare namespace DeepestWorld {
      * Find a single entity matching a filter criteria.
      * @param filter
      * @alias findEntity
+     *
+     * @group Entity
      */
     findOneEntity(filter: (entity: Entity) => boolean): Entity | undefined
 
+    /**
+     * Current framerate = frames per second
+     */
+    fps: number
+
+    /**
+     * Gather a resource, requires specific tool for each resource.
+     * `axe` for trees, `pickaxe` for rocks and `ores`, `sickle` for plants.
+     * @param toolBagIndex
+     * @param target
+     */
     gather(toolBagIndex: number, target: number | { id: number }): void
 
-    get(key: string): unknown | null
+    /**
+     * Retrieve something from `localStorage`, it will have been `JSON.parse`d already.
+     * @param key
+     *
+     * @group Other
+     */
+    get<T = unknown>(key: string): T | null
+
+    /**
+     * @param x
+     * @param y
+     * @param z
+     *
+     * @deprecated will be removed soon
+     */
+    getChunkHash(x: number, y: number, z: number): string
 
     /**
      * Returns the key of the chunk at this world position.
      * @param x
      * @param y
      * @param z
+     *
+     * @deprecated will be removed soon
      */
     getChunkKey(x: number, y: number, z: number): string
 
@@ -717,73 +1018,141 @@ declare namespace DeepestWorld {
      * @param y
      * @param z
      *
-     * @deprecated use `getChunkKey` instead
+     * @deprecated will be removed soon
      */
     getChunkName(x: number, y: number, z: number): string
 
-    getChunkHash(x: number, y: number, z: number): string
-
-    getHitbox(md: string, v?: number): { w: number, h: number }
+    /**
+     * Collider when moving with your character.
+     * @param md Metadata ID
+     * @param variation default is 0
+     */
+    getHitbox(md: string, variation?: number): Dimension2
 
     /**
+     * @deprecated use `dw.itemBaseValue` instead
      * @see itemBaseValue
      */
     getItemBaseValue(item: DeepestWorld.Item): number | undefined
 
     /**
-     * @see getItemBaseValue
+     * @deprecated use `dw.itemModValue` instead
+     * @see itemModValue
      */
     getItemModValue(item: DeepestWorld.Item, s: string): number | undefined
 
     /**
-     * Returns the terrain type at this world position.
+     * Collider when placing objects on the ground.
+     * @param md Metadata ID
+     * @param variation Variation. Default is 0
      */
-    getTerrain(x: number, y: number, z: number): number | undefined
+    getPlacebox(md: string, variation?: number): Dimension2
 
     /**
-     * Get either the zone level of location or of player location
-     * when no other parameters were specified.
+     * Returns the terrain type at this world position.
+     *
+     * @deprecated use `dw.getTerrainAt` instead
+     * @see getTerrainAt
+     */
+    getTerrain(x: number, y: number, z: number): Terrain | undefined
+
+    /**
+     * Returns the terrain type at this world position.
+     * Greater than 0 is unpassable terrain,
+     * 0 is empty and lower than 0 is passable terrain such as water.
+     * @param x
+     * @param y
+     * @param z
+     */
+    getTerrainAt(x: number, y: number, z: number): Terrain | undefined
+
+    /**
+     * If you pass nothing to the function, it will use your character position.
+     * @param x
+     * @param y
+     * @param z
+     *
+     * @group Basic
      */
     getZoneLevel(x?: number, y?: number, z?: number): number
 
     /**
-     * Get either the zone tier of location or of player location
-     * when no other parameters were specified.
+     * If you pass nothing to the function, it will use your character position.
+     * @param x
+     * @param y
+     * @param z
+     *
+     * @group Basic
      */
     getZoneTier(x?: number, y?: number, z?: number)
 
-    hasMp(runeIndex: number): boolean
+    /**
+     * @param runeIndex
+     *
+     * @deprecated use `dw.canPayCost` instead
+     * @see canPayCost
+     */
+    hasMap(runeIndex: number): boolean
 
+    /**
+     * @param tagName
+     * @param itemMd Metadata ID
+     *
+     * @group Other
+     */
     hasTag(tagName: string, itemMd: string): boolean
-
-    isInRange(
-      runeIndex: number,
-      ...args:
-        | [number]
-        | [number, number]
-    ): boolean
-
-    /**
-     * Rune cooldown check
-     */
-    isOnCd(runeIndex: number): boolean
-
-    /**
-     * Global cooldown check.
-     */
-    isOnGcd(): boolean
 
     /**
      * Checks whether the target would be in range for spell.
      * @param skillIndex
      * @param args
-     * @deprecated use dw.canUseSkillRange instead
-     * @see canUseSkillRange
+     * @deprecated use `dw.isInRange` instead
+     * @see isInRange
      */
     inSkillRange(
       skillIndex: number,
       ...args: [number] | [number, number] | [{ x: number; y: number }]
     ): boolean
+
+    /**
+     * @param aiName
+     * @param entityMd Metadata ID
+     *
+     * @group Other
+     */
+    isAi(aiName: string, entityMd: string): boolean | undefined
+
+    /**
+     * Rune range check.
+     * @param runeIndex
+     * @param args
+     *
+     * @group Skill
+     *
+     * @example
+     * dw.isInRange(0, target.id);
+     * dw.isInRange(0, x, y);
+     */
+    isInRange(runeIndex: number, ...args: [number] | [number, number]): boolean
+
+    /**
+     * Rune cooldown check
+     *
+     * @group Skill
+     */
+    isOnCd(runeIndex: number): boolean
+
+    /**
+     * Global cooldown check.
+     *
+     * @group Skill
+     */
+    isOnGcd(): boolean
+
+    /**
+     * Indicate the game is in a ready state.
+     */
+    isReady: boolean
 
     /**
      * Checks whether the target would be in range for spell.
@@ -800,7 +1169,8 @@ declare namespace DeepestWorld {
      * Checks whether the skill is on cooldown,
      * can be used without `skillIndex` to check for GCD.
      * @param skillIndex
-     * @deprecated use dw.canUseSkillCd instead
+     * @deprecated use `dw.canUseSkillCd` instead
+     * @see canUseSkillCd
      */
     isSkillReady(skillIndex?: number): boolean
 
@@ -817,6 +1187,8 @@ declare namespace DeepestWorld {
      * `physDmgInc` would not be included.
      * @param item item to evaluate
      * @returns <number> or if the item is invalid <undefined>
+     *
+     * @group Item
      */
     itemBaseValue(item: DeepestWorld.Item): number | undefined
 
@@ -824,45 +1196,84 @@ declare namespace DeepestWorld {
      * @param item item to evaluate
      * @param s md of the mod to evaluate
      * @returns <number> or if the item or `modName` is invalid <undefined>
+     *
+     * @group Item
      */
     itemModValue(item: DeepestWorld.Item, s: string): number | undefined
 
-    lastLog: number
+    /**
+     * Loads a script
+     * @param script
+     */
+    loadScript(script: string): Promise<void>
 
+    /**
+     * Switches to the loadout of the station.
+     * @param stationId
+     *
+     * @group Other
+     */
     loadout(stationId: number): void
 
+    /**
+     * Locks all items on the station.
+     * @param stationId
+     *
+     * @group Other
+     */
     lockItems(stationId: number): void
 
-    log(message: unknown)
+    /**
+     * Outputs a message in the chat window that only you can see.
+     * @param message
+     */
+    log(message: unknown): void
 
-    marketSell(tradingPostId: number, itemMd: string): void
-
+    /**
+     * @deprecated use `dw.mdInfo` instead
+     * @see mdInfo
+     */
     md: {
       chunkSize: number
       chunkSizeX: number
       chunkSizeY: number
       chunkSizeZ: number
-      e: Record<string, MetaDataEntity>
-      entities: Record<string, MetaDataEntity>
-      i: Record<string, MetaDataItem>
-      items: Record<string, MetaDataItem>
-      recipes: Record<string, MetaDataRecipe>
-      skills: Record<string, MetaDataSkill>
+      e: Record<string, OldMetaDataEntity>
+      entities: Record<string, OldMetaDataEntity>
+      i: Record<string, OldMetaDataItem>
+      items: Record<string, OldMetaDataItem>
+      recipes: Record<string, OldMetaDataRecipe>
+      skills: Record<string, OldMetaDataSkill>
     }
+
+    mdInfo: Record<string, MetaData>
 
     /**
      * Mine an ore.
      * @param toolBagIndex the id of the ore
      * @param target the id of the ore
+     *
+     * @deprecated use `dw.gather` instead
+     * @see gather
      */
     mine(toolBagIndex: number, target: number | { id: number }): void
 
     /**
-     * To move your character. To stop, call the function without x, y.
+     * Moves your character.
+     *
+     * @group Basic
      */
-    move(x?: number, y?: number): void
+    move(x: number, y: number): void
 
-    moveCar(cardId: number, dx: number, dy: number)
+    /**
+     * Move the car
+     * @param cardId
+     * @param dx
+     * @param dy
+     *
+     * @group Travel
+     */
+    moveCar(cardId: number, dx: number, dy: number): void
 
     /**
      * Your character bag names are: 'bag', 'craftIn', 'abilities', 'abilityBag'.
@@ -871,40 +1282,85 @@ declare namespace DeepestWorld {
      * @param bagIndexFrom Index of the item in the bag
      * @param bagNameTo
      * @param bagIndexTo
-     * @param itemIdFrom can be omitted if transferring from your character
-     * @param itemIdTo can be omitted if transferring to your character
-     * @param finderId
+     * @param storageIdFrom When interacting with a station
+     * @param storageIdTo When interacting with a station
+     * @param finderId When interacting with a book or essence finder
+     *
+     * @group Item
      */
     moveItem(
       bagNameFrom: string,
       bagIndexFrom: number,
       bagNameTo: string,
       bagIndexTo?: number,
-      itemIdFrom?: number,
-      itemIdTo?: number,
+      storageIdFrom?: number,
+      storageIdTo?: number,
       finderId?: number,
-    ): void
+    ): Promise<void>
 
+    /**
+     * @param npcId
+     *
+     * @group Quest
+     */
     newQuest(npcId: number): Promise<void>
 
+    /**
+     * A timestamp for when the chat message will next be hidden.
+     */
     nextChatHideAt: number
 
-    off<E extends keyof Events>(eventName: E, listener: Events[E])
+    /**
+     * Removes an event listener previously registered with `dw.on()` or `dw.once()`.
+     * @param eventName
+     * @param listener
+     *
+     * @group Other
+     */
+    off<E extends keyof Events>(eventName: E, listener: Events[E]): void
 
+    /**
+     * Adds an event listener that will be called every time when the specified event is triggered.
+     * @param eventName
+     * @param listener
+     * @param timeout
+     *
+     * @group Other
+     */
     on<E extends keyof Events>(
       eventName: E,
       listener: Events[E],
       timeout?: number,
     ): void
 
+    /**
+     * Adds an event listener that will be called one time when the specified event is triggered.
+     * @param eventName
+     * @param listener
+     * @param timeout
+     *
+     * @group Other
+     */
     once<E extends keyof Events>(
       eventName: E,
       listener: Events[E],
       timeout?: number,
     ): void
 
+    /**
+     * To open items such as mission bags, packages, etc.
+     * @param bagIndex
+     *
+     * @group Item
+     */
     openItem(bagIndex: number): Promise<unknown>
 
+    /**
+     * @param missionTableId
+     *
+     * @deprecated use `dw.acceptMission` instead
+     * @see acceptMission
+     */
     openMission(missionTableId: number): Promise<number>
 
     /**
@@ -916,81 +1372,215 @@ declare namespace DeepestWorld {
      */
     openPortal(portalBagIndex: number, characterName?: string): Promise<number>
 
+    /**
+     * @param eventBoardId
+     * @param eventId
+     * @param portalScrollBagIndex
+     *
+     * @deprecated use `dw.buyTeleport` instead
+     * @see buyTeleport
+     */
     openPortalToEvent(
       eventBoardId: number,
       eventId: number,
       portalScrollBagIndex: number,
-    ): void
-
-    partyAccept(partyInviteId: number): void
-
-    partyDecline(partyInviteId: number): void
-
-    partyInvite(targetName: string): void
-
-    partyKick(targetName: string): void
-
-    partyLeave(): void
-
-    partyPromote(targetName: string): void
-
-    placeBlock(bagIndex: number, x: number, y: number, z: number): void
+    ): Promise<void>
 
     /**
-     * @param itemIndex index of the item in dw.character.bag
+     * Accept a party invitation.
+     * @param partyInviteId
+     *
+     * @group Party
+     *
+     * @example
+     * dw.on('partyInvite', data => {
+     *     dw.partyAccept(data.id)
+     * })
+     */
+    partyAccept(partyInviteId: number): Promise<void>
+
+    /**
+     * Decline a party invitation.
+     * @param partyInviteId
+     *
+     * @group Party
+     *
+     * @example
+     * dw.on('partyInvite', data => {
+     *     dw.partyDecline(data.id)
+     * })
+     */
+    partyDecline(partyInviteId: number): Promise<void>
+
+    /**
+     * Invite a player to your party.
+     * @param targetName
+     *
+     * @group Party
+     */
+    partyInvite(targetName: string): Promise<void>
+
+    /**
+     * Kick a player from your party.
+     * @param targetName
+     *
+     * @group Party
+     */
+    partyKick(targetName: string): Promise<void>
+
+    /**
+     * Leave your current party.
+     *
+     * @group Party
+     */
+    partyLeave(): Promise<void>
+
+    /**
+     * Promote a player to party leader.
+     * @param targetName
+     *
+     * @group Party
+     */
+    partyPromote(targetName: string): Promise<void>
+
+    /**
+     * Place a block in the world.
+     * @param toolBagIndex
+     * @param x
+     * @param y
+     * @param z
+     *
+     * @group Building
+     */
+    placeBlock(toolBagIndex: number, x: number, y: number, z: number): void
+
+    /**
+     * Place an item in the world.
+     * @param bagIndex index of the item in dw.character.bag
      * @param x
      * @param y
      * @param variation
+     *
+     * @group Building
      */
-    placeItem(itemIndex: number, x: number, y: number, variation?: number): void
+    placeItem(
+      bagIndex: number,
+      x: number,
+      y: number,
+      variation?: number,
+    ): Promise<void>
 
+    /**
+     * Pour an item onto a station.
+     * @param toolBagIndex
+     * @param targetId
+     */
     pourItem(toolBagIndex: number, targetId: number): void
 
+    /**
+     * Read a sign.
+     * @param signId
+     *
+     * @group Other
+     */
     readSign(signId: number): Promise<unknown>
 
+    /**
+     * Removes all event listeners previously registered with `dw.on()` or `dw.once()`.
+     * @param eventName
+     *
+     * @group Other
+     */
     removeAllListeners<E extends keyof Events>(eventName: E): void
 
+    /**
+     * @param eventName
+     * @param listener
+     *
+     * @deprecated use `dw.off` instead
+     * @see off
+     */
     removeListener<E extends keyof Events>(
       eventName: E,
       listener: Events[E],
     ): void
 
+    /**
+     * @param stationId
+     * @param itemMd
+     * @param bagIndex
+     *
+     * @group Other
+     */
     removeMog(stationId: number, itemMd: string, bagIndex: number): void
 
-    renameStation(stationId: number, name: string): void
-
+    /**
+     * @param missionTableId
+     * @param portalBagIndex
+     *
+     * @deprecated use `dw.enterMission` instead
+     * @see enterMission
+     */
     reopenMission(
       missionTableId: number,
       portalBagIndex: number,
     ): Promise<number>
 
+    /**
+     * Repair a station.
+     * @param toolBagIndex
+     * @param objectId
+     *
+     * @group Building
+     */
     repair(toolBagIndex: number, objectId: number): void
 
     /**
-     * Force kills the character.
-     * Will lose 5% XP and place the character at the spawn.
-     *
-     * @deprecated use `suicide` instead
+     * @deprecated use `dw.suicide` instead
+     * @see suicide
      */
     rip(): void
 
     /**
-     * Force kills the character.
-     * Will lose 5% XP and place the character at the spawn.
-     *
      * @deprecated use `suicide` instead
+     * @see suicide
      */
     selfDestruct(): void
 
+    /**
+     * @param realEstateTableId
+     * @param plotId
+     *
+     * @group Building
+     */
     sellPlot(realEstateTableId: number, plotId: number): void
 
     /**
-     *
+     * Send an item to another player. The receiver has to be in your party.
      * @param receiver Either the ID or the name of the receiving player
      * @param itemIndex index of the item in your dw.character.bag
+     *
+     * @group Item
      */
     sendItem(receiver: number | string, itemIndex: number): void
 
+    /**
+     * Send items to another player via mailbox
+     * @param mailboxId
+     * @param recipientName If the character doesn't exist, mail will be sent back to you, but the shipping cost won't be refunded
+     * @param itemsBagIndexes Items to package and send. Max 8 items
+     * @param portalScrollsBagIndexes Used to pay shipping cost
+     *
+     * @group Item
+     *
+     * @example
+     * // Sends to "Gnal" the items at indexes 0, 1, 2.
+     * // Uses a portal scroll at index 3 to pay item at index 0 shipping cost.
+     * // Uses a portal scroll at index 4 to pay item at index 1 shipping cost.
+     * // Uses a portal scroll at index 5 to pay item at index 2 shipping cost.
+     *
+     * dw.sendMail(mailbox.id, 'Gnal', [0, 1, 2], [3, 4, 5])
+     */
     sendMail(
       mailboxId: number,
       recipientName: string,
@@ -998,27 +1588,36 @@ declare namespace DeepestWorld {
       portalScrollsBagIndexes: Array<number>,
     ): void
 
+    /**
+     * Adds a value to `localStorage`, it will have been `JSON.stringify`d already.
+     * @param key
+     * @param value
+     */
     set(key: string, value: unknown): void
 
+    /**
+     * Sets the location where you respawn when you die and where portals you open lead to.
+     */
     setSpawn(): void
 
     /**
-     * Set the UI to show this target
-     * @param id
+     * To show the target unit frame top left of the screen.
+     * @param targetId
      */
-    setTarget(id: number): void
-
-    /**
-     * Sorts your inventory aka the bag
-     */
-    sortInv(): void
+    setTarget(targetId: number): void
 
     /**
      * Sorts your inventory aka the bag
      *
-     * @alias dw.sortInv
+     * @deprecated use `dw.sortInventory` instead
+     * @see sortInventory
      */
-    sortInventory(): void
+    sortInv(): Promise<void>
+
+    /**
+     * Sorts your inventory aka the bag
+     */
+    sortInventory(): Promise<void>
 
     /**
      * Adds data to a station. It can be string or object.
@@ -1027,52 +1626,118 @@ declare namespace DeepestWorld {
      */
     stationInfo(stationId: number, info: string | Record<string, unknown>): void
 
+    /**
+     * Stops your character from moving.
+     *
+     * @group Basic
+     */
     stop(): void
 
     /**
      * Cancels the craft in progress.
+     *
+     * @group Item
      */
     stopCraft(): void
 
     /**
-     * Force kills the character.
-     * Will lose 5% XP and place the character at the spawn.
+     * If you're unable to get out of somewhere, this will kill your character.
+     * Counts as a regular death.
      */
     suicide(): void
 
+    /**
+     * @param toolBagIndex
+     * @param x
+     * @param y
+     * @param z
+     *
+     * @group Building
+     */
     takeBlock(toolBagIndex: number, x: number, y: number, z: number): void
 
-    takeItem(toolBagIndex: number, itemId): Promise<unknown>
+    /**
+     * @param toolBagIndex
+     * @param itemId
+     *
+     * @group Building
+     */
+    takeItem(toolBagIndex: number, itemId): Promise<void>
 
-    takeItemAsync(toolBagIndex: number, itemId): Promise<number>
-
+    /**
+     * @param name
+     * @param message
+     * @param isJson If true, the message will be JSON.stringify()
+     */
     talkWhisper(name: string, message: string, isJson: false | undefined): void
 
+    /**
+     * @param name
+     * @param message
+     * @param isJson If true, the message will be JSON.stringify()
+     */
     talkWhisper(name: string, message: unknown, isJson: true): void
 
+    /**
+     * The current target id.
+     */
     targetId: number | null
 
+    /**
+     * Terrain data, accessed via `dw.getTerrainAt()`
+     */
+    terrain: Map<number, Terrain[][]>
+
+    /**
+     * @param stationId
+     * @param itemMd
+     *
+     * @group Other
+     */
     toggleMog(stationId: number, itemMd: string): void
 
+    /**
+     * @param stationId
+     */
     toggleStation(stationId: number): void
 
     /**
      * Uneqip an item and put it in bag slow with index `itemIndex`
      * @param slotName which slot to unequip the item from. Possible values can be found in dw.c.gear
-     * @param itemIndex index in dw.character.bag to unequip the item to
+     * @param bagIndex index in `dw.character.bag` to unequip the item to
      */
-    unequip(slotName: string, itemIndex?: number): void
+    unequip(slotName: string, bagIndex?: number): void
 
+    /**
+     * Unlocks all items on the station.
+     * @param stationId
+     *
+     * @group Other
+     */
     unlockItems(stationId: number): void
 
     /**
-     * In case your character is stuck, and you have no way of unstucking yourself,
-     * you can use this to return to "1.0.0". This will reset your spawn to "1.0.0".
+     * If you're stuck inside a wall or an object, this will teleport you to your spawn.
+     *
+     * @group Other
      */
     unstuck(): void
 
+    /**
+     * @param elevatorId
+     * @param z
+     *
+     * @group Travel
+     */
     useElevator(elevatorId: number, z: number): void
 
+    /**
+     * @param runeIndex
+     * @param args
+     *
+     * @deprecated use `dw.useSkill` instead
+     * @see useSkill
+     */
     useRune(
       runeIndex: number,
       ...args:
@@ -1080,29 +1745,25 @@ declare namespace DeepestWorld {
         | [number, number]
         | [number, number, number]
         | [{ id: number }]
-        | [{
+        | [
+        {
           x: number
           y: number
           z?: number
-          }],
-    ): Promise<unknown>
+        },
+      ]
+    ): Promise<void>
 
-    // /**
-    //  * Use skill on a target.
-    //  * @param skillIndex
-    //  * @param targetId
-    //  */
-    // useSkill(skillIndex: number, targetId: number): void
-    //
-    // /**
-    //  * Use a movement skill on a position.
-    //  * @param skillIndex
-    //  * @param x
-    //  * @param y
-    //  * @param z
-    //  */
-    // useSkill(skillIndex: number, x: number, y: number, z?: number): void
-
+    /**
+     * @param skillIndex
+     * @param args
+     *
+     * @group Skill
+     *
+     * @example
+     * dw.useSkill(0, target.id);
+     * dw.useSkill(0, x, y, z);
+     */
     useSkill(
       skillIndex: number,
       ...args:
@@ -1116,7 +1777,7 @@ declare namespace DeepestWorld {
           z?: number
         },
       ]
-    )
+    ): Promise<void>
   }
 
   interface BaseEntity {
@@ -1153,6 +1814,17 @@ declare namespace DeepestWorld {
   }
 
   export type Chunk = Array<Array<Array<number>>>
+
+  export type Dimension2 = {
+    /**
+     * Length on x
+     */
+    w: number
+    /**
+     * Length on y
+     */
+    h: number
+  }
 
   export type Entity =
     | YourCharacter
@@ -1215,7 +1887,7 @@ declare namespace DeepestWorld {
      * @example
      * dw.on('callLimitDc', () => alert('got disconnected due to call limit'))
      */
-    callLimitDc: (data: {}) => void
+    callLimitDc: (data: Record<string, never>) => void
 
     combat: (data: number) => void
 
@@ -1311,7 +1983,7 @@ declare namespace DeepestWorld {
 
     levelUp: (data: { id: number }) => void
 
-    listQuest: (data: { error?: string} ) => void
+    listQuest: (data: { error?: string }) => void
 
     loot: (
       data: Array<{
@@ -1672,13 +2344,18 @@ declare namespace DeepestWorld {
   }
 
   type Plot = {
+    /** Server ID */
     id: number
     x: number
     y: number
     z: number
+    /** length on x-axis */
     w: number
+    /** length on y-axis */
     h: number
+    /** length on z-axis */
     d: number
+    /** Timestamp when you can sell the plot */
     sellCd: number
     /** @deprecated use `w`, `h`, `l` instead */
     dim: [number, number, number]
@@ -1693,7 +2370,7 @@ declare namespace DeepestWorld {
     pos: [number, number, number]
   }>
 
-  type MetaDataEntity = {
+  type OldMetaDataEntity = {
     canChop?: true
     canGather?: true
     canHunt?: true
@@ -1701,11 +2378,13 @@ declare namespace DeepestWorld {
     canCollide?: true
     /** @deprecated use canCollide instead */
     collidable?: true
-    hitbox: Hitbox
+    hitbox?: [number, number]
+    isBox?: true
     isMonster?: true
     isNpc?: true
     isPlayer?: true
     isPortal?: true
+    isResource?: true
     isStation?: true
     isVessel?: true
     /** @deprecated use isMonster instead */
@@ -1716,20 +2395,19 @@ declare namespace DeepestWorld {
     player?: true
     /** @deprecated use isPortal instead */
     portal?: true
-    /** @deprecated use canGather instead */
+    /** @deprecated use isResource instead */
     resource?: true
     /** @deprecated use canChop instead */
     tree?: true
   }
 
-  type MetaDataItem = {
+  type OldMetaDataItem = {
     /** @deprecated use isArmor instead */
     armor?: true
     box?: true
     cd?: number
     dmgTypes?: string[]
     essence?: true
-    /** Lorem ipsum */
     gearSlots?: string[]
     gem?: true
     isAccessory?: true
@@ -1752,7 +2430,7 @@ declare namespace DeepestWorld {
     /** @deprecated use isStation instead */
     placeable?: true
     recipe?: {
-      professions?: Record<Profession, null | number>,
+      professions?: Record<Profession, null | number>
       stationType: string
     }
     s?: number
@@ -1760,6 +2438,7 @@ declare namespace DeepestWorld {
     slots?: string[]
     /** @deprecated use isSkill/isRune instead */
     skill?: true
+    tags?: Set<symbol>
     /** @deprecated use isTool instead */
     tool?: true
     vessel?: true
@@ -1767,7 +2446,7 @@ declare namespace DeepestWorld {
     weapon?: true
   }
 
-  type MetaDataRecipe = Record<
+  type OldMetaDataRecipe = Record<
     string,
     {
       mats: Record<
@@ -1782,9 +2461,99 @@ declare namespace DeepestWorld {
     }
   >
 
-  type MetaDataSkill = {
+  type OldMetaDataSkill = {
     cd?: number
     movement?: boolean
+  }
+
+  type MetaData = {
+    ai?: symbol
+    armor?: true
+    box?: true
+    canChop?: true
+    canCollide?: true
+    canGather?: true
+    canHunt?: true
+    canMine?: true
+    canOpen?: true
+    cd?: number
+    collidable?: true
+    dmgTypes?: ('acid' | 'cold' | 'elec' | 'fire' | 'phys')[]
+    essence?: true
+    gearSlots?: (
+      | 'amulet'
+      | 'ring1'
+      | 'ring2'
+      | 'chest'
+      | 'helmet'
+      | 'gloves'
+      | 'boots'
+      | 'belt'
+      | 'shield'
+      | 'mainHand'
+      )[]
+    gem?: true
+    hitbox?: Hitbox
+    isAccessory?: true
+    isArmor?: true
+    isBox?: true
+    isEssence?: true
+    isGem?: true
+    isMat?: true
+    isMission?: true
+    isMonster?: true
+    isNpc?: true
+    isPlant?: true
+    isPlayer?: true
+    isPortal?: true
+    isResource?: true
+    isRune?: true
+    isSkill?: true
+    isStation?: true
+    isTool?: true
+    isVessel?: true
+    isWeapon?: true
+    jewelry?: true
+    mat?: true
+    monster?: true
+    movement?: true
+    ore?: true
+    placeable?: true
+    player?: true
+    portal?: true
+    recipe?: {
+      mats: Record<
+        string,
+        {
+          n: number
+          r?: number
+        }
+      >
+      minLevel?: number
+      minLvl?: number
+      professions?: Profession[]
+      stationType: string
+    }
+    resource?: true
+    s?: number
+    skill?: true
+    slots?: (
+      | 'amulet'
+      | 'ring1'
+      | 'ring2'
+      | 'chest'
+      | 'helmet'
+      | 'gloves'
+      | 'boots'
+      | 'belt'
+      | 'shield'
+      | 'mainHand'
+      )[]
+    tags?: Set<symbol> | symbol[]
+    tool?: true
+    tree?: true
+    type?: string
+    vessel?: true
   }
 
   type MissionTable = Record<string, number>
@@ -1815,6 +2584,61 @@ declare namespace DeepestWorld {
     | 'wandsmith'
     | 'woodcutting'
     | 'woodworking'
+
+  type Quest = {
+    /**
+     * Server ID
+     */
+    id: number
+    /**
+     * Metadata ID
+     */
+    md: number
+    /**
+     * NPC x
+     */
+    x: number
+    /**
+     * NPC y
+     */
+    y: number
+    /**
+     * NPC z
+     */
+    z: number
+    maxProgress: number
+    /**
+     * Server ID
+     */
+    npcId: number
+    progress: number
+    reward: QuestReward
+    /**
+     * Objective
+     */
+    target: QuestTarget
+  }
+
+  type QuestReward = {
+    items: Item[]
+    professionXp: Record<string, number>
+    xp: number
+  }
+
+  type QuestTarget = {
+    /**
+     * Metadata ID
+     */
+    md: string
+    minLvl: number
+    r: Rarity
+  }
+
+  type Rarity = number
+
+  type Tag = symbol
+
+  type Terrain = number
 
   type TradingPost = Record<string, Record<number, number>>
 }
