@@ -70,10 +70,6 @@ function isCanvas(element: Element): element is HTMLCanvasElement {
   return element.nodeName === 'CANVAS'
 }
 
-function isDiv(element: Element): element is HTMLDivElement {
-  return element.nodeName === 'DIV'
-}
-
 function isSpan(element: Element): element is HTMLSpanElement {
   return element.nodeName === 'SPAN'
 }

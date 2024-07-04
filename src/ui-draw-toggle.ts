@@ -1,4 +1,4 @@
-import { addMinimapButton, addMenuButton } from './ui-buttons'
+import { addMinimapButton } from './ui-buttons'
 
 function clearCanvas() {
   const canvas = window.top?.document?.querySelector('#scene')

@@ -1,6 +1,6 @@
 import errorTracker from './errorTracker'
 
-dw.on('drawEnd', (ctx, cx, cy) => {
+dw.on('drawEnd', (ctx) => {
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2
