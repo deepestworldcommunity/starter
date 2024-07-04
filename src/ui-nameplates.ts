@@ -3,8 +3,7 @@ import { bosses } from './bosses'
 import getMobName from './getMobName'
 import getSmoothPosition from './getSmoothPosition'
 import { addMenuButton } from './ui-buttons'
-
-const UI_SCALE = dw.constants.PIXELS_PER_UNIT
+import { UI_SCALE } from './ui-scale'
 
 const icons = new Image()
 icons.src = '/images/icons.png'
@@ -13,23 +12,12 @@ const COLOR_HP = '#c55050'
 const COLOR_BORDER = '#3c3c3c'
 const COLOR_BACKGROUND = '#0c0c0c'
 
-let showBuffNames = dw.get('showBuffNames') ?? false
 let showBattleScore = dw.get('showBattleScore') ?? false
-let showNpcQuests = dw.get('showNpcQuests') ?? false
-
-addMenuButton('💪', 'Toggle Buff Names', () => {
-  showBuffNames = !showBuffNames
-  dw.set('showBuffNames', showBuffNames)
-})
+const fontFamily = ' SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace'
 
 addMenuButton('💯', 'Toggle BattleScore', () => {
   showBattleScore = !showBattleScore
   dw.set('showBattleScore', showBattleScore)
-})
-
-addMenuButton('⁉️', 'Toggle NPC Quests', () => {
-  showNpcQuests = !showNpcQuests
-  dw.set('showNpcQuests', showNpcQuests)
 })
 
 dw.on('drawEnd', (ctx, cx, cy) => {
@@ -70,23 +58,36 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     if (dw.debug) {
       const debug = `#${entity.id}`
       ctx.lineWidth = 4
-      ctx.font = '10px system-ui'
+      ctx.font = `10px ${fontFamily}`
       ctx.fillStyle = 'black'
       ctx.strokeStyle = 'white'
       ctx.textAlign = 'center'
-      ctx.strokeText(debug, x, y)
-      ctx.fillText(debug, x, y)
+      ctx.strokeText(debug, x, y + 4)
+      ctx.fillText(debug, x, y + 4)
     }
 
-    if ('hp' in entity && (dw.md.entities[entity.md]?.canGather || dw.md.entities[entity.md]?.canChop || dw.md.entities[entity.md]?.canMine)) {
+    const isGatherable = dw.md.entities[entity.md]?.canGather || dw.md.entities[entity.md]?.canChop || dw.md.entities[entity.md]?.canMine
+    if (!isGatherable && 'station' in entity && entity.hp <= entity.maxHp - 10) {
+      ctx.lineWidth = 4
+      ctx.strokeStyle = 'white'
+      ctx.fillStyle = 'red'
+      ctx.font = `14px ${fontFamily}`
+      ctx.textAlign = 'center'
+      const hp = `${entity.hp}`
+      ctx.strokeText(hp, x, y - 8)
+      ctx.fillText(hp, x, y - 8)
+      continue
+    }
+
+    if (isGatherable && 'station' in entity) {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'blue'
       ctx.fillStyle = 'lightblue'
-      ctx.font = '14px system-ui'
+      ctx.font = `14px ${fontFamily}`
       ctx.textAlign = 'center'
       const hp = `${entity.hp}`
-      ctx.strokeText(hp, x, y - 16)
-      ctx.fillText(hp, x, y - 16)
+      ctx.strokeText(hp, x, y - 8)
+      ctx.fillText(hp, x, y - 8)
       continue
     }
 
@@ -96,7 +97,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Level
       ctx.fillStyle = dw.c.name === entity.name ? 'white' : '#00ffff'
       ctx.strokeStyle = COLOR_BORDER
-      ctx.font = '32px system-ui'
+      ctx.font = `32px ${fontFamily}`
       ctx.textAlign = 'right'
       const level = `${entity.level}`
       ctx.strokeText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
@@ -104,7 +105,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
       // Name + BattleScore?
       ctx.textAlign = 'left'
-      ctx.font = '14px system-ui'
+      ctx.font = `14px ${fontFamily}`
       let name = entity.name
       if (dw.c.name === entity.name && showBattleScore) {
         name += ` · ${getCharacterBattleScore().toLocaleString([], { maximumFractionDigits: 0 })}`
@@ -165,15 +166,15 @@ dw.on('drawEnd', (ctx, cx, cy) => {
         ctx.fillStyle = 'red'
       }
       ctx.strokeStyle = COLOR_BORDER
-      ctx.font = `${isBoss ? 48 : 32}px system-ui`
+      ctx.font = `${isBoss ? 48 : 32}px ${fontFamily}`
       ctx.textAlign = 'right'
       let level = `${entity.level}`
-      if (entity.md.includes('ealer')) {
-        level = '❤️‍🩹' + level
-      }
-      if (entity.md.includes('alarm')) {
-        level = '🔔' + level
-      }
+      // if (entity.aiType.includes('ealer')) {
+      //   level = '❤️‍🩹' + level
+      // }
+      // if (entity.md.includes('alarm')) {
+      //   level = '🔔' + level
+      // }
       if (dw.md.entities[entity.md]?.canHunt) {
         level = '🎯' + level
       }
@@ -182,37 +183,11 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
       // Name + BattleScore?
       ctx.textAlign = 'left'
-      ctx.font = `${isBoss ? 20 : 14}px system-ui`
-      let name = getMobName(entity.md, entity.terrain)
-
-      if (showBuffNames) {
-        for (let i = 0; i < fxs.length; i++) {
-          const fx = fxs[i]
-
-          switch (fx[0]) {
-            case 'dmgMore':
-              name = `Fierce ${name}`
-              break
-            case 'hpRegen':
-              name = `Regenerating ${name}`
-              break
-            case 'hpMore':
-              name = `Healthy ${name}`
-              break
-            case 'quick':
-              name = `Quick ${name}`
-              break
-            case 'skull':
-              name = `Elite ${name}`
-              break
-            default:
-              break
-          }
-        }
-      }
+      ctx.font = `${isBoss ? 20 : 14}px ${fontFamily}`
+      let name = getMobName(entity.md)
 
       if (showBattleScore) {
-        name += `· ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
+        name += ` · ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
       }
       ctx.strokeText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
       ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
@@ -221,7 +196,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (entity.badCd && entity.hp === entity.maxHp && !entity.targetId) {
         const activation = Math.floor((entity.badCd - Date.now()) / 1000)
         if (activation > 0) {
-          ctx.font = '32px system-ui'
+          ctx.font = `32px ${fontFamily}`
           ctx.textAlign = 'center'
           ctx.strokeText(`${activation}`, x, y - 32)
           ctx.fillText(`${activation}`, x, y - 32)
@@ -352,7 +327,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
           const fxData = fx[1]
           if (fxData && typeof fxData === 'object' && 's' in fxData && typeof fxData.s === 'number') {
             const s = `${fxData.s}`
-            ctx.font = '15px system-ui'
+            ctx.font = `15px ${fontFamily}`
             ctx.textAlign = 'right'
             ctx.fillStyle = 'white'
             ctx.strokeStyle = 'black'
@@ -362,34 +337,6 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
           fxX += 34
         }
-      }
-
-      if (
-        dw.md.entities[entity.md].isNpc
-        && showNpcQuests
-        && 'questIds' in entity
-        && entity.questIds.length > 0
-      ) {
-        let questStatus = '?'
-        let color = 'orange'
-        if (entity.questIds.some((questId) => !!dw.c.quests.find(
-          (q) => q.id === questId))
-        ) {
-          questStatus = '!'
-          color = 'lightgray'
-        }
-        if (entity.questIds.some((questId) => !!dw.c.quests.find(
-          (q) => q.id === questId && q.progress === q.maxProgress))
-        ) {
-          questStatus = '!'
-          color = 'orange'
-        }
-        ctx.font = '64px system-ui'
-        ctx.fillStyle = color
-        ctx.textAlign = 'center'
-        ctx.strokeStyle = 'black'
-        ctx.fillText(`${questStatus}`, x, y - 116)
-        ctx.strokeText(`${questStatus}`, x, y - 116)
       }
     }
   }

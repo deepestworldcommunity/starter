@@ -1788,6 +1788,10 @@ declare namespace DeepestWorld {
     // Portals or stations have an owner
     cid?: number
 
+    hp: number
+    maxHp: number
+    hps: number
+
     /** @deprecated */
     l: number
     x: number
@@ -2111,9 +2115,6 @@ declare namespace DeepestWorld {
 
   export interface LivingEntity extends BaseEntity {
     level: number
-    /** Life */
-    hp: number
-    maxHp: number
     /** Mana */
     mp: number
     maxMp: number
@@ -2155,10 +2156,6 @@ declare namespace DeepestWorld {
     ore: 1
     /** Quality */
     qual: number
-
-    hp: number
-    maxHp: number
-    hps: number
   }
 
   export interface Tree extends BaseEntity {
@@ -2166,10 +2163,6 @@ declare namespace DeepestWorld {
     tree: 1
     /** Quality */
     qual: number
-
-    hp: number
-    maxHp: number
-    hps: number
   }
 
   export interface Skill {
@@ -2195,6 +2188,11 @@ declare namespace DeepestWorld {
     owner: number
     /** Owner Database ID */
     aid: number
+    level: number
+    lvl: number
+    qual: number
+    safe: number
+    wild: number
     /** Storage of items */
     storage: Array<Item | null> | Record<string, Item>
     /** Storage of items */
@@ -2318,6 +2316,8 @@ declare namespace DeepestWorld {
       x: number
       y: number
     }
+
+    xmogs: Record<string, Item>
 
     xp: number
   }

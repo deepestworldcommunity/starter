@@ -1,7 +1,7 @@
 function mineOres() {
   // Find the closest ore
-  const target = dw.findEntities(
-      (e) => 'ore' in e,
+  const target = dw.findAllEntities(
+      (e) => !!dw.mdInfo[e.md]?.canMine,
     ).sort(
       (a, b) => dw.distance(dw.c.x, dw.c.y, a.x, a.y) - dw.distance(dw.c.x, dw.c.y, b.x, b.y),
     ).shift()
@@ -26,12 +26,12 @@ function mineOres() {
     return
   }
 
-  if (!dw.canUseSkillCd()) {
+  if (!dw.isOnGcd()) {
     // We have to wait for GCD
     return
   }
 
-  dw.mine(toolIndex, target.id)
+  dw.gather(toolIndex, target)
 }
 
 setInterval(mineOres, 250)

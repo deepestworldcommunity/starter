@@ -1,4 +1,8 @@
-export default function formatDuration(durationInSeconds: number, skipSeconds = false) {
+export default function formatDuration(
+  durationInSeconds: number,
+  skipSeconds = false,
+  maxElements?: number,
+) {
   const secondsInMinute = 60
   const secondsInHour = secondsInMinute * 60
   const secondsInDay = secondsInHour * 24
@@ -23,6 +27,10 @@ export default function formatDuration(durationInSeconds: number, skipSeconds = 
 
   if ((!skipSeconds && seconds > 0) || formattedDuration.length === 0) {
     formattedDuration.push(`${seconds}s`)
+  }
+
+  if (maxElements) {
+    return formattedDuration.slice(0, maxElements).join(', ')
   }
 
   return formattedDuration.join(', ')

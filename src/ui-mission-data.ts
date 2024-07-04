@@ -3,25 +3,21 @@ function addMissionData() {
     return
   }
 
-  const missionTitle = window.top.document.querySelector('#mission div:has(.mission-title)')
+  const missionTitle = window.top.document.querySelector('#mission div.mission-title')
   if (!missionTitle || !missionTitle.parentNode) {
     return
   }
 
   const missionData = window.top.document.createElement('div')
   missionData.id = 'missionData'
-  missionData.className = 'ui-content'
+  missionData.className = 'ui-content p-1'
 
   missionTitle.parentNode.insertBefore(missionData, missionTitle)
 
   missionData.innerHTML = `
     <div class="d-flex justify-content-between small">
       <div class="text-alt">Location:</div>
-      <div>
-        <span class="text-alt">x</span> <span data-content="location-x"></span>
-        <span class="text-alt">y</span> <span data-content="location-y"></span>
-        <span class="text-alt">z</span> <span data-content="location-z"></span>
-      </div>
+      <div data-content="location"></div>
     </div>
     <div class="d-flex justify-content-between small">
       <div class="text-alt">Distance:</div>
@@ -68,7 +64,6 @@ const data: Record<string, () => string> = {
       }
     }
 
-
     return `${direction} ${dist.toLocaleString([], { maximumFractionDigits: 0 })}`
   },
   'level-range': () => {
@@ -79,9 +74,11 @@ const data: Record<string, () => string> = {
 
     return `${zoneLevel >= minLevel && zoneLevel <= maxLevel ? '🎯 ' : '🚨 '} ${minLevel} - ${maxLevel}`
   },
-  'location-x': () => `${dw.c.mission?.x?.toLocaleString([], { maximumFractionDigits: 0 })}`,
-  'location-y': () => `${dw.c.mission?.y?.toLocaleString([], { maximumFractionDigits: 0 })}`,
-  'location-z': () => `${dw.c.mission?.z?.toLocaleString([], { maximumFractionDigits: 0 })}`,
+  'location': () => `
+    ${dw.c.mission?.x?.toLocaleString([], { maximumFractionDigits: 0 })},
+    ${dw.c.mission?.y?.toLocaleString([], { maximumFractionDigits: 0 })},
+    ${dw.c.mission?.z?.toLocaleString([], { maximumFractionDigits: 0 })}
+  `,
 }
 
 function getMissionData() {

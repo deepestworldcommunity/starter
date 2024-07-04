@@ -1,11 +1,13 @@
+import { UI_SCALE } from './ui-scale'
+
 dw.on('drawUnder', (ctx, cx, cy) => {
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2
 
   const transpose = (wx: number, wy: number) => [
-    mx + Math.floor((wx - cx) * dw.constants.PIXELS_PER_UNIT),
-    my + Math.floor((wy - cy) * dw.constants.PIXELS_PER_UNIT),
+    mx + Math.floor((wx - cx) * UI_SCALE),
+    my + Math.floor((wy - cy) * UI_SCALE),
   ]
 
   for (let i = 0; i < dw.entities.length; i++) {
@@ -52,7 +54,7 @@ dw.on('drawUnder', (ctx, cx, cy) => {
     if (entity.dx === undefined || entity.dy === undefined) {
       ctx.beginPath()
       ctx.fillStyle = '#ffff0040'
-      ctx.arc(x, y, 3 * dw.constants.PIXELS_PER_UNIT, 0, Math.PI * 2)
+      ctx.arc(x, y, 3 * UI_SCALE, 0, Math.PI * 2)
       ctx.fill()
     }
 
@@ -60,7 +62,7 @@ dw.on('drawUnder', (ctx, cx, cy) => {
       const angle = Math.atan2(entity.dy, entity.dx)
       ctx.beginPath()
       ctx.fillStyle = '#ff000040'
-      ctx.arc(x, y, 3 * dw.constants.PIXELS_PER_UNIT, angle - Math.PI / 2, angle + Math.PI / 2)
+      ctx.arc(x, y, 3 * UI_SCALE, angle - Math.PI / 2, angle + Math.PI / 2)
       ctx.fill()
     }
   }

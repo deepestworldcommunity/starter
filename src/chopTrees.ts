@@ -1,7 +1,7 @@
 function chopTrees() {
   // Find the closest tree
-  const target = dw.findEntities(
-      (e) => 'tree' in e,
+  const target = dw.findAllEntities(
+      (e) => !!dw.mdInfo[e.md]?.canChop,
     ).sort(
       (a, b) => dw.distance(dw.c.x, dw.c.y, a.x, a.y) - dw.distance(dw.c.x, dw.c.y, b.x, b.y),
     ).shift()
@@ -26,12 +26,12 @@ function chopTrees() {
     return
   }
 
-  if (!dw.canUseSkillCd()) {
+  if (!dw.isOnGcd()) {
     // We have to wait for GCD
     return
   }
 
-  dw.chop(toolIndex, target.id)
+  dw.gather(toolIndex, target)
 }
 
 setInterval(chopTrees, 250)

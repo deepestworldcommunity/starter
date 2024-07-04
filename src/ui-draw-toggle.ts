@@ -1,15 +1,16 @@
-import { addMenuButton } from './ui-buttons'
-
+import { addMinimapButton, addMenuButton } from './ui-buttons'
 
 function clearCanvas() {
-  const canvas = window.top?.document?.querySelector('#main-canvas')
+  const canvas = window.top?.document?.querySelector('#scene')
   if (!canvas || canvas.nodeName !== 'CANVAS') {
-    throw new Error('Could not find canvas')
+    console.error('Could not find canvas')
+    return
   }
 
   const ctx = (canvas as HTMLCanvasElement).getContext('2d')
   if (!ctx) {
-    throw new Error('Could not get 2d context')
+    console.error('Could not get 2d context')
+    return
   }
 
   const { width, height } = ctx.canvas
@@ -17,16 +18,18 @@ function clearCanvas() {
   ctx.clearRect(0, 0, width, height)
 }
 
-addMenuButton('🎨', 'Toggle Drawing',() => {
+function onClick() {
   dw.draw = !dw.draw
   dw.set('draw', dw.draw)
 
   if (!dw.draw) {
     clearCanvas()
   }
-})
+}
 
 dw.draw = dw.get('draw') !== false
 if (!dw.draw) {
   clearCanvas()
 }
+
+addMinimapButton('🎨', 'Toggle Drawing', onClick)

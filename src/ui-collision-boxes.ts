@@ -1,4 +1,5 @@
 import { addMenuButton } from './ui-buttons'
+import { UI_SCALE } from './ui-scale'
 
 const playerHitbox = dw.getHitbox(dw.c.md, 0)
 
@@ -39,7 +40,7 @@ for (const chunkName in dw.chunks) {
 
 dw.on('seenChunks', (data) => {
   for (const chunkName in data) {
-    const chunk = data[chunkName].terrain[0]
+    const chunk = data[chunkName][0]
 
     const [l, y, x] = chunkName.split('.').map(Number)
 
@@ -135,13 +136,39 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   const my = height / 2
 
   const transpose = (wx: number, wy: number): [number, number] => [
-    mx + Math.floor((wx - cx) * dw.constants.PIXELS_PER_UNIT),
-    my + Math.floor((wy - cy) * dw.constants.PIXELS_PER_UNIT),
+    mx + Math.floor((wx - cx) * UI_SCALE),
+    my + Math.floor((wy - cy) * UI_SCALE),
   ]
 
   const collisionObjectsInCurrentLayer = collisionObjects.filter(o => o.z === dw.c.z)
 
   ctx.lineWidth = 2
+
+  for (let i = 0; i < dw.entities.length; i++) {
+    const entity = dw.entities[i]
+    const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
+    const { w: pw, h: ph } = dw.getPlacebox(entity.md, 'v' in entity ? entity.v : 0)
+
+    if (w === pw && h === ph) {
+      continue
+    }
+
+    const [x, y] = transpose(
+      entity.x,
+      entity.y - ph,
+    )
+    ctx.strokeStyle = '#FF000080'
+    ctx.fillStyle = '#FF000020'
+    ctx.beginPath()
+    ctx.rect(
+      x - pw * UI_SCALE / 2,
+      y,
+      pw * UI_SCALE,
+      ph * UI_SCALE,
+    )
+    ctx.stroke()
+    ctx.fill()
+  }
 
   for (const collisionObject of collisionObjectsInCurrentLayer) {
     if (dw.c.z !== collisionObject.z) {
@@ -154,9 +181,9 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     )
 
     if (
-      x + collisionObject.w * dw.constants.PIXELS_PER_UNIT < 0
+      x + collisionObject.w * UI_SCALE < 0
       || x > ctx.canvas.width
-      || y + collisionObject.h * dw.constants.PIXELS_PER_UNIT < 0
+      || y + collisionObject.h * UI_SCALE < 0
       || y > ctx.canvas.height
     ) {
       continue
@@ -168,8 +195,8 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     ctx.rect(
       x,
       y,
-      collisionObject.w * dw.constants.PIXELS_PER_UNIT,
-      collisionObject.h * dw.constants.PIXELS_PER_UNIT,
+      collisionObject.w * UI_SCALE,
+      collisionObject.h * UI_SCALE,
     )
     ctx.stroke()
     ctx.fill()
@@ -191,10 +218,10 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     ctx.fillStyle = ctx.strokeStyle + '40'
     ctx.beginPath()
     ctx.rect(
-      x - w * dw.constants.PIXELS_PER_UNIT / 2,
+      x - w * UI_SCALE / 2,
       y,
-      w * dw.constants.PIXELS_PER_UNIT,
-      h * dw.constants.PIXELS_PER_UNIT,
+      w * UI_SCALE,
+      h * UI_SCALE,
     )
     ctx.stroke()
     ctx.fill()
@@ -204,11 +231,49 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   ctx.fillStyle = ctx.strokeStyle + '40'
   ctx.beginPath()
   ctx.rect(
-    mx - playerHitbox.w * dw.constants.PIXELS_PER_UNIT / 2,
-    my - playerHitbox.h * dw.constants.PIXELS_PER_UNIT,
-    playerHitbox.w * dw.constants.PIXELS_PER_UNIT,
-    playerHitbox.h * dw.constants.PIXELS_PER_UNIT,
+    mx - playerHitbox.w * UI_SCALE / 2,
+    my - playerHitbox.h * UI_SCALE,
+    playerHitbox.w * UI_SCALE,
+    playerHitbox.h * UI_SCALE,
   )
   ctx.stroke()
   ctx.fill()
+})
+
+dw.on('drawUnder', (ctx, cx, cy) => {
+  if (!show) {
+    return
+  }
+
+  const { width, height } = ctx.canvas
+  const mx = width / 2
+  const my = height / 2
+
+  const transpose = (wx: number, wy: number): [number, number] => [
+    mx + Math.floor((wx - cx) * UI_SCALE),
+    my + Math.floor((wy - cy) * UI_SCALE),
+  ]
+
+  ctx.lineWidth = 2
+  ctx.strokeStyle = '#FFFFFF7F'
+
+  for (const plot of dw.a.plots) {
+    if (dw.distance(dw.c.x, dw.c.y, plot.x, plot.y) > 32) {
+      continue
+    }
+
+    const [x, y] = transpose(
+      plot.x,
+      plot.y,
+    )
+
+    ctx.beginPath()
+    ctx.rect(
+      x,
+      y,
+      plot.w * UI_SCALE,
+      plot.h * UI_SCALE,
+    )
+    ctx.stroke()
+  }
 })
