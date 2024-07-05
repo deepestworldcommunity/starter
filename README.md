@@ -30,7 +30,7 @@ You might wonder how you would create a `.env` file under Windows, you can use t
 ```shell
 echo. > .env
 ```
-5. start Election via:
+5. start Electron via:
 ```shell
 npm start
 ```
