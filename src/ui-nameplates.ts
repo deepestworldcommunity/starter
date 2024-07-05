@@ -66,7 +66,8 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.fillText(debug, x, y + 4)
     }
 
-    const isGatherable = dw.md.entities[entity.md]?.canGather || dw.md.entities[entity.md]?.canChop || dw.md.entities[entity.md]?.canMine
+    const metaData = dw.mdInfo[entity.md]
+    const isGatherable =  !!metaData?.canGather || !!metaData?.canChop || !!metaData?.canMine
     if (!isGatherable && 'station' in entity && entity.hp <= entity.maxHp - 10) {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'white'
@@ -159,7 +160,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (entity.bad) {
         ctx.fillStyle = 'orange'
       }
-      if (dw.md.entities[entity.md].isNpc) {
+      if (dw.mdInfo[entity.md]?.isNpc) {
         ctx.fillStyle = '#00ff00'
       }
       if (entity.targetId === dw.c.id) {
@@ -175,7 +176,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // if (entity.md.includes('alarm')) {
       //   level = '🔔' + level
       // }
-      if (dw.md.entities[entity.md]?.canHunt) {
+      if (dw.mdInfo[entity.md]?.canHunt) {
         level = '🎯' + level
       }
       ctx.strokeText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
@@ -229,7 +230,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE, isBoss ? 12 : 8)
       ctx.stroke()
 
-      if (dw.md.entities[entity.md].isMonster) {
+      if (dw.mdInfo[entity.md]?.isMonster) {
         let fxX = x - UI_SCALE / 2
         const fxY = y - UI_SCALE - 48 - (isBoss ? 12 : 2)
         for (let i = 0; i < fxs.length; i++) {

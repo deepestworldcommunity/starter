@@ -31,10 +31,10 @@ dw.on('drawUnder', (ctx, cx, cy) => {
     }
 
     if (
-      !('ai' in entity)
-      && !dw.md.entities[entity.md].canChop
-      && !dw.md.entities[entity.md].canGather
-      && !dw.md.entities[entity.md].canMine
+      !dw.mdInfo[entity.md].ai
+      && !dw.mdInfo[entity.md].canChop
+      && !dw.mdInfo[entity.md].canGather
+      && !dw.mdInfo[entity.md].canMine
     ) {
       return
     }

@@ -71,7 +71,7 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
       continue
     }
 
-    if (!(entity.md in dw.md.entities) || !dw.md.entities[entity.md].canCollide) {
+    if (!dw.mdInfo[entity.md].canCollide) {
       // Doesn't have collision
       continue
     }

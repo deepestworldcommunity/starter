@@ -37,12 +37,12 @@ async function FindTarget() {
 async function ChooseRune() {
   let runeMd = 'attackRune'
   if (dw.c.gear.mainHand) {
-    const weaponTags = dw.md.items[dw.c.gear.mainHand?.md]?.tags
-    if (weaponTags?.has(dw.enums.Tag.RANGED)) {
+    const weaponTags = dw.mdInfo[dw.c.gear.mainHand?.md]?.tags
+    if (weaponTags instanceof Set && weaponTags?.has(dw.enums.Tag.RANGED)) {
       runeMd = 'rangedRune'
     }
 
-    if (weaponTags?.has(dw.enums.Tag.CASTER)) {
+    if (weaponTags instanceof Set && weaponTags?.has(dw.enums.Tag.CASTER)) {
       runeMd = 'physbolt1'
     }
   }
