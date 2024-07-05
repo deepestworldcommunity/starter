@@ -20,7 +20,7 @@ gh repo clone kevinsandow/deepestworld-starter
 cd deepestworld-starter
 npm install
 ```
-4. create a `.env` file containing your credentials like so:
+4. create a `.env` file or copy the `.env.example` file add edit it accordingly, so it contains your credentials like so:
 ```
 DW_USERNAME=myUserName
 DW_PASSWORD=secretPassword
