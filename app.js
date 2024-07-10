@@ -15,47 +15,12 @@ function log(...args) {
 }
 
 let characterId
-let character
 let codeHash
-
-function getCharacterBattleScore() {
-  if (!character) {
-    return 0
-  }
-
-  let maxDmg = 0
-  character.skills.forEach((skill) => {
-    if (!skill || /heal|shield/.test(skill.md)) {
-      return
-    }
-
-    let dmg = (skill?.phys ?? 0) + (skill?.fire ?? 0) + (skill.acid ?? 0) + (skill.cold ?? 0) + (skill.elec ?? 0)
-    dmg *= 1 + (skill.crit ?? 0) * ((skill.critMult ?? 1) - 1)
-
-    if (dmg > maxDmg) {
-      maxDmg = dmg
-    }
-  })
-
-  // Can we use armor somehow?
-  // const armor = Math.min(
-  //   character.physArmor,
-  //   character.fireArmor,
-  //   character.coldArmor,
-  //   character.acidArmor,
-  //   character.elecArmor,
-  // )
-  //
-  // const effectiveHp = (character.maxHp + 5 * character.hpRegen) / Math.max(0.25, 1 - (armor / (armor + character.level * 100)))
-  //
-  // return Math.sqrt(maxDmg * effectiveHp)
-  return Math.sqrt(maxDmg * character.maxHp)
-}
 
 async function run() {
   await app.whenReady()
 
-  ipcMain.on('send-ws-data', (event, data) => {
+  ipcMain.on('send-ws-data', (_event, _data) => {
     // log('>', data)
     // event.
   })
@@ -101,30 +66,6 @@ async function run() {
 
     if (json[0] === '' && json[1] === "byteLimitDc") {
       log(`[Disconnect] You've got disconnected due to sending too big requests (byte limit)`)
-    }
-
-    if (json[0] === '' && json[1] === 'seenObjects') {
-      for (let i = 0; i < json[2].length; i++) {
-        if (json[2][i].id === characterId) {
-          character = json[2][i]
-        }
-      }
-    }
-
-    if (json[0] === '' && json[1] === 'diff') {
-      for (let i = 0; i < json[2].length; i++) {
-        if (json[2][i].id !== characterId) {
-          continue
-        }
-
-        const beforeBattleScore = getCharacterBattleScore()
-        character = {...character, ...json[2][i]}
-        const afterBattleScore = getCharacterBattleScore()
-
-        if (beforeBattleScore !== afterBattleScore) {
-          log(`[BattleScore] ${beforeBattleScore.toLocaleString([], { maximumFractionDigits: 0 })} -> ${afterBattleScore.toLocaleString([], { maximumFractionDigits: 0 })}`)
-        }
-      }
     }
   })
 
