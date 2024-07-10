@@ -138,7 +138,7 @@ function updateXPTracker() {
 
       ctx.fillStyle = COLOR_STEP
       ctx.beginPath()
-      ctx.rect(i, (1 - stepProgress) * canvas.height, 1, 1)
+      ctx.rect(i, Math.floor((1 - stepProgress) * canvas.height), 1, 1)
       ctx.fill()
     }
   }

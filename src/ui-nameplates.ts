@@ -1,9 +1,9 @@
 import { getMonsterBattleScore, getCharacterBattleScore } from './battlescore'
 import { bosses } from './bosses'
-import getMobName from './getMobName'
 import getSmoothPosition from './getSmoothPosition'
 import { addMenuButton } from './ui-buttons'
-import { UI_SCALE } from './ui-scale'
+
+const ZOOM = dw.constants.PX_PER_UNIT_ZOOMED / dw.constants.PX_PER_UNIT
 
 const icons = new Image()
 icons.src = '/images/icons.png'
@@ -13,7 +13,7 @@ const COLOR_BORDER = '#3c3c3c'
 const COLOR_BACKGROUND = '#0c0c0c'
 
 let showBattleScore = dw.get('showBattleScore') ?? false
-const fontFamily = ' SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace'
+const fontFamily = 'SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace'
 
 addMenuButton('💯', 'Toggle BattleScore', () => {
   showBattleScore = !showBattleScore
@@ -21,15 +21,6 @@ addMenuButton('💯', 'Toggle BattleScore', () => {
 })
 
 dw.on('drawEnd', (ctx, cx, cy) => {
-  const { width, height } = ctx.canvas
-  const mx = width / 2
-  const my = height / 2
-
-  const transpose = (wx: number, wy: number): [number, number] => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
-  ]
-
   const drawBackdrop = (x: number, y: number) => {
     ctx.fillStyle = COLOR_BACKGROUND
     ctx.beginPath()
@@ -50,15 +41,13 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
     const smoothPosition = getSmoothPosition(entity)
 
-    const [x, y] = transpose(
-      'player' in entity && entity.name === dw.c.name ? cx : smoothPosition.x,
-      'player' in entity && entity.name === dw.c.name ? cy : smoothPosition.y,
-    )
+    const x = dw.toCanvasX('player' in entity && entity.name === dw.c.name ? cx : smoothPosition.x)
+    const y = dw.toCanvasY('player' in entity && entity.name === dw.c.name ? cy : smoothPosition.y)
 
     if (dw.debug) {
       const debug = `#${entity.id}`
       ctx.lineWidth = 4
-      ctx.font = `10px ${fontFamily}`
+      ctx.font = `${3 * ZOOM}px ${fontFamily}`
       ctx.fillStyle = 'black'
       ctx.strokeStyle = 'white'
       ctx.textAlign = 'center'
@@ -72,7 +61,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'white'
       ctx.fillStyle = 'red'
-      ctx.font = `14px ${fontFamily}`
+      ctx.font = `${5 * ZOOM}px ${fontFamily}`
       ctx.textAlign = 'center'
       const hp = `${entity.hp}`
       ctx.strokeText(hp, x, y - 8)
@@ -84,7 +73,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'blue'
       ctx.fillStyle = 'lightblue'
-      ctx.font = `14px ${fontFamily}`
+      ctx.font = `${5 * ZOOM}px ${fontFamily}`
       ctx.textAlign = 'center'
       const hp = `${entity.hp}`
       ctx.strokeText(hp, x, y - 8)
@@ -98,52 +87,52 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Level
       ctx.fillStyle = dw.c.name === entity.name ? 'white' : '#00ffff'
       ctx.strokeStyle = COLOR_BORDER
-      ctx.font = `32px ${fontFamily}`
+      ctx.font = `${11 * ZOOM}px ${fontFamily}`
       ctx.textAlign = 'right'
       const level = `${entity.level}`
-      ctx.strokeText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
-      ctx.fillText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
+      ctx.strokeText(level, x - dw.constants.PX_PER_UNIT_ZOOMED / 2 - 4, y - dw.constants.PX_PER_UNIT_ZOOMED + 8)
+      ctx.fillText(level, x - dw.constants.PX_PER_UNIT_ZOOMED / 2 - 4, y - dw.constants.PX_PER_UNIT_ZOOMED + 8)
 
       // Name + BattleScore?
       ctx.textAlign = 'left'
-      ctx.font = `14px ${fontFamily}`
+      ctx.font = `${5 * ZOOM}px ${fontFamily}`
       let name = entity.name
       if (dw.c.name === entity.name && showBattleScore) {
         name += ` · ${getCharacterBattleScore().toLocaleString([], { maximumFractionDigits: 0 })}`
       }
-      ctx.strokeText(name, x - UI_SCALE / 2, y - UI_SCALE - 5)
-      ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - 5)
+      ctx.strokeText(name, x - dw.constants.PX_PER_UNIT_ZOOMED / 2, y - dw.constants.PX_PER_UNIT_ZOOMED - 5)
+      ctx.fillText(name, x - dw.constants.PX_PER_UNIT_ZOOMED / 2, y - dw.constants.PX_PER_UNIT_ZOOMED - 5)
 
       ctx.lineWidth = 1
 
       // Backdrop
       ctx.fillStyle = COLOR_BACKGROUND
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE, 12)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED, dw.constants.PX_PER_UNIT_ZOOMED, 12)
       ctx.fill()
 
       // Current HP
       ctx.fillStyle = COLOR_HP
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE * entity.hp / entity.maxHp, 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED, dw.constants.PX_PER_UNIT_ZOOMED * entity.hp / entity.maxHp, 8)
       ctx.fill()
 
       // Border
       ctx.strokeStyle = COLOR_BORDER
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE, UI_SCALE, 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED, dw.constants.PX_PER_UNIT_ZOOMED, 8)
       ctx.stroke()
 
       // Current MP
       ctx.fillStyle = 'blue'
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE + 8, UI_SCALE * entity.mp / entity.maxMp, 2)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED + 8, dw.constants.PX_PER_UNIT_ZOOMED * entity.mp / entity.maxMp, 2)
       ctx.fill()
 
       // Border
       ctx.strokeStyle = COLOR_BORDER
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE + 8, UI_SCALE, 3)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED + 8, dw.constants.PX_PER_UNIT_ZOOMED, 3)
       ctx.stroke()
 
       continue
@@ -167,7 +156,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
         ctx.fillStyle = 'red'
       }
       ctx.strokeStyle = COLOR_BORDER
-      ctx.font = `${isBoss ? 48 : 32}px ${fontFamily}`
+      ctx.font = `${(isBoss ? 16 : 11) * ZOOM}px ${fontFamily}`
       ctx.textAlign = 'right'
       let level = `${entity.level}`
       // if (entity.aiType.includes('ealer')) {
@@ -179,25 +168,25 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (dw.mdInfo[entity.md]?.canHunt) {
         level = '🎯' + level
       }
-      ctx.strokeText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
-      ctx.fillText(level, x - UI_SCALE / 2 - 4, y - UI_SCALE + 8)
+      ctx.strokeText(level, x - dw.constants.PX_PER_UNIT_ZOOMED / 2 - 4, y - dw.constants.PX_PER_UNIT_ZOOMED + 8)
+      ctx.fillText(level, x - dw.constants.PX_PER_UNIT_ZOOMED / 2 - 4, y - dw.constants.PX_PER_UNIT_ZOOMED + 8)
 
       // Name + BattleScore?
       ctx.textAlign = 'left'
-      ctx.font = `${isBoss ? 20 : 14}px ${fontFamily}`
-      let name = getMobName(entity.md)
+      ctx.font = `${(isBoss ? 6 : 5) * ZOOM}px ${fontFamily}`
+      let name = dw.mdInfo[entity.md]?.name ?? entity.md
 
       if (showBattleScore) {
         name += ` · ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
       }
-      ctx.strokeText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
-      ctx.fillText(name, x - UI_SCALE / 2, y - UI_SCALE - (isBoss ? 11 : 5))
+      ctx.strokeText(name, x - dw.constants.PX_PER_UNIT_ZOOMED / 2, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 11 : 5))
+      ctx.fillText(name, x - dw.constants.PX_PER_UNIT_ZOOMED / 2, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 11 : 5))
 
       // Cooldown before entity starts moving/attacking
       if (entity.badCd && entity.hp === entity.maxHp && !entity.targetId) {
         const activation = Math.floor((entity.badCd - Date.now()) / 1000)
         if (activation > 0) {
-          ctx.font = `32px ${fontFamily}`
+          ctx.font = `${11 * ZOOM}px ${fontFamily}`
           ctx.textAlign = 'center'
           ctx.strokeText(`${activation}`, x, y - 32)
           ctx.fillText(`${activation}`, x, y - 32)
@@ -209,30 +198,30 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Backdrop
       ctx.fillStyle = COLOR_BACKGROUND
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE, isBoss ? 12 : 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED, isBoss ? 12 : 8)
       ctx.fill()
 
       // Current shield
       ctx.fillStyle = 'white'
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE * entity.hps / entity.maxHp, isBoss ? 12 : 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED * entity.hps / entity.maxHp, isBoss ? 12 : 8)
       ctx.fill()
 
       // Current HP
       ctx.fillStyle = COLOR_HP
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE * entity.hp / entity.maxHp, isBoss ? 12 : 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED * entity.hp / entity.maxHp, isBoss ? 12 : 8)
       ctx.fill()
 
       // Border
       ctx.strokeStyle = COLOR_BORDER
       ctx.beginPath()
-      ctx.rect(x - UI_SCALE * 0.5, y - UI_SCALE - (isBoss ? 4 : 0), UI_SCALE, isBoss ? 12 : 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED, isBoss ? 12 : 8)
       ctx.stroke()
 
       if (dw.mdInfo[entity.md]?.isMonster) {
-        let fxX = x - UI_SCALE / 2
-        const fxY = y - UI_SCALE - 48 - (isBoss ? 12 : 2)
+        let fxX = x - dw.constants.PX_PER_UNIT_ZOOMED / 2
+        const fxY = y - dw.constants.PX_PER_UNIT_ZOOMED - 48 - (isBoss ? 12 : 2)
         for (let i = 0; i < fxs.length; i++) {
           const fx = fxs[i]
 
@@ -328,7 +317,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
           const fxData = fx[1]
           if (fxData && typeof fxData === 'object' && 's' in fxData && typeof fxData.s === 'number') {
             const s = `${fxData.s}`
-            ctx.font = `15px ${fontFamily}`
+            ctx.font = `${5 * ZOOM}px ${fontFamily}`
             ctx.textAlign = 'right'
             ctx.fillStyle = 'white'
             ctx.strokeStyle = 'black'

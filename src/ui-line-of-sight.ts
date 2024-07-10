@@ -1,6 +1,5 @@
 import { hasLineOfSight } from './hasLineOfSight'
 import { addMenuButton } from './ui-buttons'
-import { UI_SCALE } from './ui-scale'
 
 let show = dw.get('showLineOfSight') ?? true
 
@@ -9,7 +8,7 @@ addMenuButton('👀', 'Toggle Line of Sight', () => {
   dw.set('showLineOfSight', show)
 })
 
-dw.on('drawUnder', (ctx, cx, cy) => {
+dw.on('drawUnder', (ctx) => {
   if (!show) {
     return
   }
@@ -17,11 +16,6 @@ dw.on('drawUnder', (ctx, cx, cy) => {
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2
-
-  const transpose = (wx: number, wy: number) => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
-  ]
 
   ctx.lineWidth = 4
 
@@ -39,7 +33,8 @@ dw.on('drawUnder', (ctx, cx, cy) => {
       return
     }
 
-    const [x, y] = transpose(entity.x, entity.y)
+    const x = dw.toCanvasX(entity.x)
+    const y = dw.toCanvasY(entity.y)
     ctx.strokeStyle = hasLineOfSight(entity) ? '#00ff0080' : '#ff000080'
     ctx.beginPath()
     ctx.moveTo(mx, my)

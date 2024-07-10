@@ -1,6 +1,5 @@
 import getBreadcrumbs from './breadcrumbs'
 import { addMenuButton } from './ui-buttons'
-import { UI_SCALE } from './ui-scale'
 
 let show = dw.get('showBreadcrumbs') ?? true
 
@@ -9,19 +8,10 @@ addMenuButton('🍞', 'Toggle Breadcrumbs', () => {
   dw.set('showBreadcrumbs', show)
 })
 
-dw.on('drawUnder', (ctx, cx, cy) => {
+dw.on('drawUnder', (ctx) => {
   if (!show) {
     return
   }
-
-  const { width, height } = ctx.canvas
-  const mx = width / 2
-  const my = height / 2
-
-  const transpose = (wx: number, wy: number): [number, number] => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
-  ]
 
   ctx.lineWidth = 2
   ctx.fillStyle = '#ffff0040'
@@ -31,10 +21,11 @@ dw.on('drawUnder', (ctx, cx, cy) => {
       return
     }
 
-    const [x, y] = transpose(breadcrumb.x + 0.5, breadcrumb.y + 0.5)
+    const x = dw.toCanvasX(breadcrumb.x + 0.5)
+    const y = dw.toCanvasY(breadcrumb.y + 0.5)
 
     ctx.beginPath()
-    ctx.arc(x, y, breadcrumb.value * UI_SCALE / 2, 0, 2 * Math.PI)
+    ctx.arc(x, y, breadcrumb.value * dw.constants.PX_PER_UNIT_ZOOMED / 2, 0, 2 * Math.PI)
     ctx.fill()
   })
 })

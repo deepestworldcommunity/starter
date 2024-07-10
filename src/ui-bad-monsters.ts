@@ -1,25 +1,12 @@
-import { UI_SCALE } from './ui-scale'
-
-dw.on('drawUnder', (ctx, cx, cy) => {
-  const { width, height } = ctx.canvas
-  const mx = width / 2
-  const my = height / 2
-
-  const transpose = (wx: number, wy: number) => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
-  ]
-
+dw.on('drawUnder', (ctx) => {
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
     if (!('ai' in entity) || entity.z !== dw.c.z || !!entity.targetId) {
       continue
     }
 
-    const [x, y] = transpose(
-      entity.x,
-      entity.y,
-    )
+    const x = dw.toCanvasX(entity.x)
+    const y = dw.toCanvasY(entity.y)
 
     let dx = entity.dx ?? 0
     let dy = entity.dy ?? 1
@@ -28,10 +15,8 @@ dw.on('drawUnder', (ctx, cx, cy) => {
     dx *= entity.moveSpeed / dLength
     dy *= entity.moveSpeed / dLength
 
-    const [tx, ty] = transpose(
-      entity.x + dx,
-      entity.y + dy,
-    )
+    const tx = dw.toCanvasX(entity.x + dx)
+    const ty = dw.toCanvasY(entity.y + dy)
 
     ctx.lineWidth = 4
     ctx.strokeStyle = '#ff0000'
@@ -54,7 +39,7 @@ dw.on('drawUnder', (ctx, cx, cy) => {
     if (entity.dx === undefined || entity.dy === undefined) {
       ctx.beginPath()
       ctx.fillStyle = '#ffff0040'
-      ctx.arc(x, y, 3 * UI_SCALE, 0, Math.PI * 2)
+      ctx.arc(x, y, 3 * dw.constants.PX_PER_UNIT_ZOOMED, 0, Math.PI * 2)
       ctx.fill()
     }
 
@@ -62,7 +47,7 @@ dw.on('drawUnder', (ctx, cx, cy) => {
       const angle = Math.atan2(entity.dy, entity.dx)
       ctx.beginPath()
       ctx.fillStyle = '#ff000040'
-      ctx.arc(x, y, 3 * UI_SCALE, angle - Math.PI / 2, angle + Math.PI / 2)
+      ctx.arc(x, y, 3 * dw.constants.PX_PER_UNIT_ZOOMED, angle - Math.PI / 2, angle + Math.PI / 2)
       ctx.fill()
     }
   }

@@ -20,6 +20,7 @@ export function addMenuButton(icon: string, title: string, handler: () => void) 
     button.style.marginLeft = "calc(var(--px)* 1)";
     firstMenuButton = false
   }
+  button.setAttribute('data-tooltip', title)
   button.title = title
   button.addEventListener('click', (e) => {
     e.preventDefault()
@@ -29,7 +30,7 @@ export function addMenuButton(icon: string, title: string, handler: () => void) 
   const buttonText = window.top.document.createElement('span')
   buttonText.innerText = icon
   buttonText.style.fontSize = '28px'
-  buttonText.style.paddingTop = '4px'
+  buttonText.style.paddingTop = '3px'
   button.appendChild(buttonText)
 
   menuButtons.appendChild(button)
@@ -56,7 +57,7 @@ export function addMinimapButton(icon: string, title: string, handler: () => voi
   }
 
   const button = window.top.document.createElement('div')
-  button.className = 'ui-btn-frame p-0 w-8 h-8'
+  button.className = 'ui-btn-frame p-0 w-9 h-9'
   button.style.bottom = '-21px'
   button.title = title
   button.addEventListener('click', (e) => {
@@ -70,7 +71,6 @@ export function addMinimapButton(icon: string, title: string, handler: () => voi
   buttonText.setAttribute('data-tooltip', title)
   buttonText.innerText = icon
   buttonText.style.fontSize = '16px'
-  buttonText.style.paddingTop = '2px'
   button.appendChild(buttonText)
 
   minimapButtons.appendChild(button)

@@ -107,6 +107,14 @@ declare namespace DeepestWorld {
     c: YourCharacter
 
     /**
+     * The camera position for the main canvas
+     */
+    camera: {
+      x: number
+      y: number
+    }
+
+    /**
      * Rune mana costs check.
      * @param skillIndex
      *
@@ -216,76 +224,77 @@ declare namespace DeepestWorld {
     completeQuest(questId: number): Promise<number>
 
     constants: {
-      VERSION: number
-      INTERACT_RANGE: number
+      ATTR_TYPES: Array<string>
+      BYTE_LIMIT: number
+      BYTE_LIMIT_TIMESPAN: number
+      CALL_LIMIT: number
+      CALL_LIMIT_TIMESPAN: number
+      CHARACTER_DMG_BASE: number
+      CHARACTER_HP_BASE: number
+      /** @deprecated */
+      CHARACTER_SPEED: number
+      /** @deprecated */
+      CHUNK_DIM: [number, number, number]
+      /** @deprecated */
+      CHUNK_DIMENSION: [number, number, number]
       CHUNK_SIZE: {
         w: number
         h: number
         d: number
       }
-      ZONE_LEVEL_RADIUS: number
-      ZONE_LEVELS_PER_ZONE_TIER: number
-      RANGE_MELEE_BASE: number
-      RANGE_RANGED_BASE: number
-      MOVEMENT_SPEED_BASE: number
-      PIXELS_PER_UNIT: number
-      GCD_BASE: number
-      GCD_MIN: number
       CRIT_BASE: number
       CRIT_MULT_BASE: number
-      CHARACTER_HP_BASE: number
-      MONSTER_HP_BASE: number
-      CHARACTER_DMG_BASE: number
+      DMG_TYPES: Array<string>
       DMG_TYPE_FX_CHANCE_BASE: number
       DMG_TYPE_FX_MAX: number
-      LEVEL_BUFFER: number
-      XP_DEATH_PENALTY: number
-      MISSION_RANGE: number
-      TERRAIN_WATER: number
-      TERRAIN_EMPTY: number
-      TERRAIN_GRASS: number
-      TERRAIN_DIRT: number
-      TERRAIN_DESERT: number
-      TERRAIN_UNDERWATER: number
-      TERRAIN_WINTER: number
-      TERRAIN_CLOUD: number
-      TERRAIN_TREE: number
-      TERRAIN_STONE: number
-      TERRAIN_WOODWALL1: number
-      TERRAIN_STONEROOF1: number
-      TERRAIN_WINTER_CAVE: number
-      TERRAIN_DESERT_CAVE: number
-      DMG_TYPES: Array<string>
-      ATTR_TYPES: Array<string>
-      // MOD_MULTS: Array<number>
-      MAX_BASE_MOD_TIER: number
-      MAX_MOD_TIER: number
-      MAX_RES: number
-      MAX_DODGE: number
-      MAX_DMG_TYPE_EFFECT: number
-      RARITY_WHITE: number
-      RARITY_GREEN: number
-      RARITY_BLUE: number
-      RARITY_PURPLE: number
-      RARITY_ORANGE: number
-      MIN_REP: number
-      MAX_REP: number
-      CALL_LIMIT: number
-      CALL_LIMIT_TIMESPAN: number
-      BYTE_LIMIT: number
-      BYTE_LIMIT_TIMESPAN: number
-      /** @deprecated */
-      CHUNK_DIMENSION: [number, number, number]
-      /** @deprecated */
-      CHUNK_DIM: [number, number, number]
-      /** @deprecated */
-      ZONE_TIER_ZONE_LEVEL_RADIUS: number
-      /** @deprecated */
-      MELEE_RANGE: number
-      /** @deprecated */
-      CHARACTER_SPEED: number
       /** @deprecated */
       GCD: number
+      GCD_BASE: number
+      GCD_MIN: number
+      INTERACT_RANGE: number
+      LEVEL_BUFFER: number
+      MAX_BASE_MOD_TIER: number
+      MAX_DMG_TYPE_EFFECT: number
+      MAX_DODGE: number
+      MAX_MOD_TIER: number
+      MAX_REP: number
+      MAX_RES: number
+      /** @deprecated */
+      MELEE_RANGE: number
+      MIN_REP: number
+      MISSION_RANGE: number
+      MONSTER_HP_BASE: number
+      MOVEMENT_SPEED_BASE: number
+      PIXELS_PER_UNIT: number
+      PX_PER_UNIT: number
+      PX_PER_UNIT_ZOOMED: number
+      RANGE_MELEE_BASE: number
+      RANGE_RANGED_BASE: number
+      RARITY_BLUE: number
+      RARITY_GREEN: number
+      RARITY_ORANGE: number
+      RARITY_PURPLE: number
+      RARITY_WHITE: number
+      TERRAIN_CLOUD: number
+      TERRAIN_DESERT: number
+      TERRAIN_DESERT_CAVE: number
+      TERRAIN_DIRT: number
+      TERRAIN_EMPTY: number
+      TERRAIN_GRASS: number
+      TERRAIN_STONE: number
+      TERRAIN_STONEROOF1: number
+      TERRAIN_TREE: number
+      TERRAIN_UNDERWATER: number
+      TERRAIN_WATER: number
+      TERRAIN_WINTER: number
+      TERRAIN_WINTER_CAVE: number
+      TERRAIN_WOODWALL1: number
+      VERSION: number
+      XP_DEATH_PENALTY: number
+      ZONE_LEVELS_PER_ZONE_TIER: number
+      ZONE_LEVEL_RADIUS: number
+      /** @deprecated */
+      ZONE_TIER_ZONE_LEVEL_RADIUS: number
     }
 
     /**
@@ -1023,6 +1032,14 @@ declare namespace DeepestWorld {
     getChunkName(x: number, y: number, z: number): string
 
     /**
+     * Get name for an entity by their metadata ID.
+     * @param md
+     *
+     * @deprecated use `dw.mdInfo[md]?.name` instead
+     */
+    getEntityName(md: string): string | undefined
+
+    /**
      * Collider when moving with your character.
      * @param md Metadata ID
      * @param variation default is 0
@@ -1092,7 +1109,7 @@ declare namespace DeepestWorld {
      * @deprecated use `dw.canPayCost` instead
      * @see canPayCost
      */
-    hasMap(runeIndex: number): boolean
+    hasMp(runeIndex: number): boolean
 
     /**
      * @param tagName
@@ -1365,12 +1382,24 @@ declare namespace DeepestWorld {
 
     /**
      * To open a portal to your spawn.
-     * @param portalBagIndex
      * @param characterName To instead open a portal to a character.
      * They have to be in your party
      * @returns the portal server ID
      */
-    openPortal(portalBagIndex: number, characterName?: string): Promise<number>
+    openPortal(characterName?: string): Promise<number>
+
+    /**
+     * To open a portal to your spawn.
+     * @param portalBagIndex
+     * @param characterNameOld To instead open a portal to a character.
+     * They have to be in your party
+     * @returns the portal server ID
+     * @deprecated use `dw.openPortal` without the `portalBagIndex` parameter
+     */
+    openPortal(
+      portalBagIndex: unknown,
+      characterNameOld?: string,
+    ): Promise<number>
 
     /**
      * @param eventBoardId
@@ -1689,6 +1718,18 @@ declare namespace DeepestWorld {
     terrain: Map<number, Terrain[][]>
 
     /**
+     * Converts world position to canvas position
+     * @param x
+     */
+    toCanvasX(x: number): number
+
+    /**
+     * Converts world position to canvas position
+     * @param y
+     */
+    toCanvasY(y: number): number
+
+    /**
      * @param stationId
      * @param itemMd
      *
@@ -1893,6 +1934,18 @@ declare namespace DeepestWorld {
      */
     callLimitDc: (data: Record<string, never>) => void
 
+    /**
+     * This event is triggered when a chunk can no longer be seen.
+     * @param data
+     */
+    chunks0: (data: number) => void
+
+    /**
+     * This event is triggered when new chunks become visible to the user
+     * @param data
+     */
+    chunks1: (data: (number | number[][])[]) => void
+
     combat: (data: number) => void
 
     completeQuest: (data: { error: string } | unknown) => void
@@ -2054,6 +2107,10 @@ declare namespace DeepestWorld {
 
     sendPartyInvite: (data: { error: string }) => void
 
+    /**
+     * @param data
+     * @deprecated use `dw.on('chunk1', ...)` instead
+     */
     seenChunks: (data: Record<string, number[][][]>) => void
 
     seenObjects: (data: unknown) => void
@@ -2068,10 +2125,10 @@ declare namespace DeepestWorld {
 
     talk: (data: { name: string; text: string }) => void
 
-    tradingPost: (
-      data: ['tradingPost', TradingPost] | { error: string },
-    ) => void
-
+    /**
+     * @param data
+     * @deprecated use `dw.on('chunk0', ...)` instead
+     */
     unseenChunks: (data: string) => void
 
     unseenObjects: (data: Array<number>) => void
@@ -2517,6 +2574,7 @@ declare namespace DeepestWorld {
     mat?: true
     monster?: true
     movement?: true
+    name?: string
     ore?: true
     placeable?: true
     player?: true
@@ -2639,8 +2697,6 @@ declare namespace DeepestWorld {
   type Tag = symbol
 
   type Terrain = number
-
-  type TradingPost = Record<string, Record<number, number>>
 }
 
 declare const dw: DeepestWorld.API

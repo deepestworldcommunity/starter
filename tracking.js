@@ -1,9 +1,19 @@
 const crypto = require('node:crypto')
 
 const BASE_URL = 'https://dw.kvn.wtf'
+/**
+ * @type {Map<string, string>}
+ */
 const seenChunks = new Map()
+/**
+ * @type {Set<string>}
+ */
 const seenObjects = new Set()
 
+/**
+ * @param chunk {number[][]}
+ * @returns {string}
+ */
 function hashChunk(chunk) {
   return crypto
     .createHash('sha1')

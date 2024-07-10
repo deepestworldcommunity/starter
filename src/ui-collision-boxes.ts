@@ -1,5 +1,4 @@
 import { addMenuButton } from './ui-buttons'
-import { UI_SCALE } from './ui-scale'
 
 const playerHitbox = dw.getHitbox(dw.c.md, 0)
 
@@ -126,7 +125,7 @@ addMenuButton('📦', 'Toggle Collision Boxes', () => {
   dw.set('showCollisionBoxes', show)
 })
 
-dw.on('drawEnd', (ctx, cx, cy) => {
+dw.on('drawEnd', (ctx) => {
   if (!show) {
     return
   }
@@ -134,11 +133,6 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   const { width, height } = ctx.canvas
   const mx = width / 2
   const my = height / 2
-
-  const transpose = (wx: number, wy: number): [number, number] => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
-  ]
 
   const collisionObjectsInCurrentLayer = collisionObjects.filter(o => o.z === dw.c.z)
 
@@ -153,18 +147,16 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       continue
     }
 
-    const [x, y] = transpose(
-      entity.x,
-      entity.y - ph,
-    )
+    const x = dw.toCanvasX(entity.x)
+    const y = dw.toCanvasY(entity.y - ph)
     ctx.strokeStyle = '#FF000080'
     ctx.fillStyle = '#FF000020'
     ctx.beginPath()
     ctx.rect(
-      x - pw * UI_SCALE / 2,
+      x - pw * dw.constants.PX_PER_UNIT_ZOOMED / 2,
       y,
-      pw * UI_SCALE,
-      ph * UI_SCALE,
+      pw * dw.constants.PX_PER_UNIT_ZOOMED,
+      ph * dw.constants.PX_PER_UNIT_ZOOMED,
     )
     ctx.stroke()
     ctx.fill()
@@ -175,15 +167,13 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       continue
     }
 
-    const [x, y] = transpose(
-      collisionObject.x - collisionObject.w / 2,
-      collisionObject.y - collisionObject.h,
-    )
+    const x = dw.toCanvasX(collisionObject.x - collisionObject.w / 2)
+    const y = dw.toCanvasY(collisionObject.y - collisionObject.h)
 
     if (
-      x + collisionObject.w * UI_SCALE < 0
+      x + collisionObject.w * dw.constants.PX_PER_UNIT_ZOOMED < 0
       || x > ctx.canvas.width
-      || y + collisionObject.h * UI_SCALE < 0
+      || y + collisionObject.h * dw.constants.PX_PER_UNIT_ZOOMED < 0
       || y > ctx.canvas.height
     ) {
       continue
@@ -195,8 +185,8 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     ctx.rect(
       x,
       y,
-      collisionObject.w * UI_SCALE,
-      collisionObject.h * UI_SCALE,
+      collisionObject.w * dw.constants.PX_PER_UNIT_ZOOMED,
+      collisionObject.h * dw.constants.PX_PER_UNIT_ZOOMED,
     )
     ctx.stroke()
     ctx.fill()
@@ -210,18 +200,17 @@ dw.on('drawEnd', (ctx, cx, cy) => {
 
     const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
 
-    const [x, y] = transpose(
-      entity.x,
-      entity.y - h,
-    )
+    const x = dw.toCanvasX(entity.x)
+    const y = dw.toCanvasY(entity.y - h)
+
     ctx.strokeStyle = '#00FF00'
     ctx.fillStyle = ctx.strokeStyle + '40'
     ctx.beginPath()
     ctx.rect(
-      x - w * UI_SCALE / 2,
+      x - w * dw.constants.PX_PER_UNIT_ZOOMED / 2,
       y,
-      w * UI_SCALE,
-      h * UI_SCALE,
+      w * dw.constants.PX_PER_UNIT_ZOOMED,
+      h * dw.constants.PX_PER_UNIT_ZOOMED,
     )
     ctx.stroke()
     ctx.fill()
@@ -231,28 +220,19 @@ dw.on('drawEnd', (ctx, cx, cy) => {
   ctx.fillStyle = ctx.strokeStyle + '40'
   ctx.beginPath()
   ctx.rect(
-    mx - playerHitbox.w * UI_SCALE / 2,
-    my - playerHitbox.h * UI_SCALE,
-    playerHitbox.w * UI_SCALE,
-    playerHitbox.h * UI_SCALE,
+    mx - playerHitbox.w * dw.constants.PX_PER_UNIT_ZOOMED / 2,
+    my - playerHitbox.h * dw.constants.PX_PER_UNIT_ZOOMED,
+    playerHitbox.w * dw.constants.PX_PER_UNIT_ZOOMED,
+    playerHitbox.h * dw.constants.PX_PER_UNIT_ZOOMED,
   )
   ctx.stroke()
   ctx.fill()
 })
 
-dw.on('drawUnder', (ctx, cx, cy) => {
+dw.on('drawUnder', (ctx) => {
   if (!show) {
     return
   }
-
-  const { width, height } = ctx.canvas
-  const mx = width / 2
-  const my = height / 2
-
-  const transpose = (wx: number, wy: number): [number, number] => [
-    mx + Math.floor((wx - cx) * UI_SCALE),
-    my + Math.floor((wy - cy) * UI_SCALE),
-  ]
 
   ctx.lineWidth = 2
   ctx.strokeStyle = '#FFFFFF7F'
@@ -262,17 +242,15 @@ dw.on('drawUnder', (ctx, cx, cy) => {
       continue
     }
 
-    const [x, y] = transpose(
-      plot.x,
-      plot.y,
-    )
+    const x = dw.toCanvasX(plot.x)
+    const y = dw.toCanvasY(plot.y)
 
     ctx.beginPath()
     ctx.rect(
       x,
       y,
-      plot.w * UI_SCALE,
-      plot.h * UI_SCALE,
+      plot.w * dw.constants.PX_PER_UNIT_ZOOMED,
+      plot.h * dw.constants.PX_PER_UNIT_ZOOMED,
     )
     ctx.stroke()
   }
