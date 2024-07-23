@@ -18,6 +18,6 @@
     "dotenv": "^16.4.5",
     "electron": "^31.2.1",
     "esbuild": "^0.23.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   }
 }
