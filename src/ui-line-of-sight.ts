@@ -2,6 +2,7 @@ import { hasLineOfSight } from './hasLineOfSight'
 import { addMenuButton } from './ui-buttons'
 
 let show = dw.get('showLineOfSight') ?? true
+const ZOOM = dw.constants.PX_PER_UNIT_ZOOMED / dw.constants.PX_PER_UNIT
 
 addMenuButton('👀', 'Toggle Line of Sight', () => {
   show = !show
@@ -17,7 +18,7 @@ dw.on('drawUnder', (ctx) => {
   const mx = width / 2
   const my = height / 2
 
-  ctx.lineWidth = 4
+  ctx.lineWidth = ZOOM
 
   dw.entities.forEach((entity) => {
     if (entity.z !== dw.c.z) {
@@ -27,7 +28,7 @@ dw.on('drawUnder', (ctx) => {
     if (
       !dw.mdInfo[entity.md].ai
       && !dw.mdInfo[entity.md].canChop
-      && !dw.mdInfo[entity.md].canGather
+      && !dw.mdInfo[entity.md].canHarvest
       && !dw.mdInfo[entity.md].canMine
     ) {
       return

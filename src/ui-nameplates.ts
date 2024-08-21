@@ -56,7 +56,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     }
 
     const metaData = dw.mdInfo[entity.md]
-    const isGatherable =  !!metaData?.canGather || !!metaData?.canChop || !!metaData?.canMine
+    const isGatherable =  !!metaData?.canHarvest || !!metaData?.canChop || !!metaData?.canMine
     if (!isGatherable && 'station' in entity && entity.hp <= entity.maxHp - 10) {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'white'
@@ -149,7 +149,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (entity.bad) {
         ctx.fillStyle = 'orange'
       }
-      if (dw.mdInfo[entity.md]?.isNpc) {
+      if (dw.mdInfo[entity.md]?.isPlayer) {
         ctx.fillStyle = '#00ff00'
       }
       if (entity.targetId === dw.c.id) {

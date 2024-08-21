@@ -224,15 +224,10 @@ declare namespace DeepestWorld {
     completeQuest(questId: number): Promise<number>
 
     constants: {
-      ATTR_TYPES: Array<string>
       BYTE_LIMIT: number
       BYTE_LIMIT_TIMESPAN: number
       CALL_LIMIT: number
       CALL_LIMIT_TIMESPAN: number
-      CHARACTER_DMG_BASE: number
-      CHARACTER_HP_BASE: number
-      /** @deprecated */
-      CHARACTER_SPEED: number
       /** @deprecated */
       CHUNK_DIM: [number, number, number]
       /** @deprecated */
@@ -242,18 +237,15 @@ declare namespace DeepestWorld {
         h: number
         d: number
       }
-      CRIT_BASE: number
-      CRIT_MULT_BASE: number
-      DMG_TYPES: Array<string>
+      CRIT: number
+      CRIT_MULT: number
       DMG_TYPE_FX_CHANCE_BASE: number
       DMG_TYPE_FX_MAX: number
       /** @deprecated */
       GCD: number
       GCD_BASE: number
-      GCD_MIN: number
       INTERACT_RANGE: number
       LEVEL_BUFFER: number
-      MAX_BASE_MOD_TIER: number
       MAX_DMG_TYPE_EFFECT: number
       MAX_DODGE: number
       MAX_MOD_TIER: number
@@ -263,38 +255,16 @@ declare namespace DeepestWorld {
       MELEE_RANGE: number
       MIN_REP: number
       MISSION_RANGE: number
-      MONSTER_HP_BASE: number
       MOVEMENT_SPEED_BASE: number
       PIXELS_PER_UNIT: number
       PX_PER_UNIT: number
       PX_PER_UNIT_ZOOMED: number
       RANGE_MELEE_BASE: number
-      RANGE_RANGED_BASE: number
-      RARITY_BLUE: number
-      RARITY_GREEN: number
-      RARITY_ORANGE: number
-      RARITY_PURPLE: number
-      RARITY_WHITE: number
-      TERRAIN_CLOUD: number
-      TERRAIN_DESERT: number
-      TERRAIN_DESERT_CAVE: number
-      TERRAIN_DIRT: number
-      TERRAIN_EMPTY: number
-      TERRAIN_GRASS: number
-      TERRAIN_STONE: number
-      TERRAIN_STONEROOF1: number
-      TERRAIN_TREE: number
-      TERRAIN_UNDERWATER: number
-      TERRAIN_WATER: number
-      TERRAIN_WINTER: number
-      TERRAIN_WINTER_CAVE: number
-      TERRAIN_WOODWALL1: number
+      RANGED_RANGE: number
       VERSION: number
       XP_DEATH_PENALTY: number
       ZONE_LEVELS_PER_ZONE_TIER: number
       ZONE_LEVEL_RADIUS: number
-      /** @deprecated */
-      ZONE_TIER_ZONE_LEVEL_RADIUS: number
     }
 
     /**
@@ -1243,6 +1213,8 @@ declare namespace DeepestWorld {
     /**
      * Outputs a message in the chat window that only you can see.
      * @param message
+     *
+     * @group Other
      */
     log(message: unknown): void
 
@@ -1251,10 +1223,6 @@ declare namespace DeepestWorld {
      * @see mdInfo
      */
     md: {
-      chunkSize: number
-      chunkSizeX: number
-      chunkSizeY: number
-      chunkSizeZ: number
       e: Record<string, OldMetaDataEntity>
       entities: Record<string, OldMetaDataEntity>
       i: Record<string, OldMetaDataItem>
@@ -2428,8 +2396,9 @@ declare namespace DeepestWorld {
   }>
 
   type OldMetaDataEntity = {
+    ai?: true
     canChop?: true
-    canGather?: true
+    canHarvest?: true
     canHunt?: true
     canMine?: true
     canCollide?: true
@@ -2439,34 +2408,18 @@ declare namespace DeepestWorld {
     isBox?: true
     isMonster?: true
     isNpc?: true
+    isPlant?: true
     isPlayer?: true
     isPortal?: true
     isResource?: true
     isStation?: true
     isVessel?: true
-    /** @deprecated use isMonster instead */
-    monster?: true
-    /** @deprecated use canMine instead */
-    ore?: true
-    /** @deprecated use isPlayer instead */
-    player?: true
-    /** @deprecated use isPortal instead */
-    portal?: true
-    /** @deprecated use isResource instead */
-    resource?: true
-    /** @deprecated use canChop instead */
-    tree?: true
   }
 
   type OldMetaDataItem = {
-    /** @deprecated use isArmor instead */
-    armor?: true
-    box?: true
+    canOpen?: true
     cd?: number
     dmgTypes?: string[]
-    essence?: true
-    gearSlots?: string[]
-    gem?: true
     isAccessory?: true
     isArmor?: true
     isBox?: true
@@ -2479,28 +2432,19 @@ declare namespace DeepestWorld {
     isTool?: true
     isVessel?: true
     isWeapon?: true
-    /** @deprecated use isAccessory instead */
-    jewelry?: true
-    /** @deprecated use isMat instead */
-    mat?: true
     movement?: true
-    /** @deprecated use isStation instead */
-    placeable?: true
+    name?: string
     recipe?: {
+      mats: Record<string, { n?: number, r?: number }>
+      minLevel?: number
+      minLvl?: number
       professions?: Record<Profession, null | number>
       stationType: string
     }
     s?: number
-    /** @alias gearSlots */
     slots?: string[]
-    /** @deprecated use isSkill/isRune instead */
-    skill?: true
     tags?: Set<symbol>
-    /** @deprecated use isTool instead */
-    tool?: true
-    vessel?: true
-    /** @deprecated use isWeapon instead */
-    weapon?: true
+    type?: string
   }
 
   type OldMetaDataRecipe = Record<
@@ -2513,6 +2457,7 @@ declare namespace DeepestWorld {
           r?: number
         }
       >
+      minLvl?: number
       minLevel?: number
       professions?: Profession[]
     }
@@ -2525,32 +2470,14 @@ declare namespace DeepestWorld {
 
   type MetaData = {
     ai?: symbol
-    armor?: true
-    box?: true
     canChop?: true
     canCollide?: true
-    canGather?: true
+    canHarvest?: true
     canHunt?: true
     canMine?: true
     canOpen?: true
     cd?: number
     collidable?: true
-    dmgTypes?: ('acid' | 'cold' | 'elec' | 'fire' | 'phys')[]
-    essence?: true
-    gearSlots?: (
-      | 'amulet'
-      | 'ring1'
-      | 'ring2'
-      | 'chest'
-      | 'helmet'
-      | 'gloves'
-      | 'boots'
-      | 'belt'
-      | 'shield'
-      | 'mainHand'
-      )[]
-    gem?: true
-    hitbox?: Hitbox
     isAccessory?: true
     isArmor?: true
     isBox?: true
@@ -2559,26 +2486,17 @@ declare namespace DeepestWorld {
     isMat?: true
     isMission?: true
     isMonster?: true
-    isNpc?: true
     isPlant?: true
     isPlayer?: true
     isPortal?: true
     isResource?: true
-    isRune?: true
     isSkill?: true
     isStation?: true
     isTool?: true
     isVessel?: true
     isWeapon?: true
-    jewelry?: true
-    mat?: true
-    monster?: true
     movement?: true
     name?: string
-    ore?: true
-    placeable?: true
-    player?: true
-    portal?: true
     recipe?: {
       mats: Record<
         string,
@@ -2592,9 +2510,7 @@ declare namespace DeepestWorld {
       professions?: Profession[]
       stationType: string
     }
-    resource?: true
     s?: number
-    skill?: true
     slots?: (
       | 'amulet'
       | 'ring1'
@@ -2607,11 +2523,8 @@ declare namespace DeepestWorld {
       | 'shield'
       | 'mainHand'
       )[]
-    tags?: Set<symbol> | symbol[]
-    tool?: true
-    tree?: true
+    tags?: Set<symbol>
     type?: string
-    vessel?: true
   }
 
   type MissionTable = Record<string, number>
