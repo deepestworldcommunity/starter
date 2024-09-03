@@ -241,8 +241,8 @@ declare namespace DeepestWorld {
       CRIT_MULT: number
       DMG_TYPE_FX_CHANCE_BASE: number
       DMG_TYPE_FX_MAX: number
-      /** @deprecated */
       GCD: number
+      /** @deprecated */
       GCD_BASE: number
       INTERACT_RANGE: number
       LEVEL_BUFFER: number
@@ -251,14 +251,17 @@ declare namespace DeepestWorld {
       MAX_MOD_TIER: number
       MAX_REP: number
       MAX_RES: number
-      /** @deprecated */
       MELEE_RANGE: number
       MIN_REP: number
+      /** @deprecated */
       MISSION_RANGE: number
+      /** @deprecated */
       MOVEMENT_SPEED_BASE: number
+      /** @deprecated */
       PIXELS_PER_UNIT: number
       PX_PER_UNIT: number
       PX_PER_UNIT_ZOOMED: number
+      /** @deprecated */
       RANGE_MELEE_BASE: number
       RANGED_RANGE: number
       VERSION: number
@@ -924,7 +927,7 @@ declare namespace DeepestWorld {
      *
      * @group Entity
      */
-    findClosestTree(filter?: (entity: Tree) => boolean): Tree | undefined
+    findClosestTree(filter?: (entity: Station) => boolean): Station | undefined
 
     /**
      * Find all entities matching a filter criteria.
@@ -957,12 +960,10 @@ declare namespace DeepestWorld {
     fps: number
 
     /**
-     * Gather a resource, requires specific tool for each resource.
-     * `axe` for trees, `pickaxe` for rocks and `ores`, `sickle` for plants.
-     * @param toolBagIndex
-     * @param target
+     * Gather a resource.
+     * @param targetId
      */
-    gather(toolBagIndex: number, target: number | { id: number }): void
+    gather(targetId: number): void
 
     /**
      * Retrieve something from `localStorage`, it will have been `JSON.parse`d already.
@@ -1801,6 +1802,9 @@ declare namespace DeepestWorld {
     maxHp: number
     hps: number
 
+    isSafe?: number
+    wild?: number
+
     /** @deprecated */
     l: number
     x: number
@@ -1844,8 +1848,6 @@ declare namespace DeepestWorld {
     | Character
     | Monster
     | NPC
-    | Tree
-    | Ore
     | Station
 
   type Events = {
@@ -2176,20 +2178,6 @@ declare namespace DeepestWorld {
     questIds: Array<number>
   }
 
-  export interface Ore extends BaseEntity {
-    /** Means that this is an ore. Value is always 1. */
-    ore: 1
-    /** Quality */
-    qual: number
-  }
-
-  export interface Tree extends BaseEntity {
-    /** Means that this is a tree. Value is always 1. */
-    tree: 1
-    /** Quality */
-    qual: number
-  }
-
   export interface Skill {
     cost: number
     md: string
@@ -2207,8 +2195,6 @@ declare namespace DeepestWorld {
   }
 
   export interface Station extends BaseEntity {
-    /** Means that this is a station. Value is always 1. */
-    station: 1
     /** Indicating whether you are the owner. */
     owner: number
     /** Owner Database ID */
@@ -2216,8 +2202,6 @@ declare namespace DeepestWorld {
     level: number
     lvl: number
     qual: number
-    safe: number
-    wild: number
     /** Storage of items */
     storage: Array<Item | null> | Record<string, Item>
     /** Storage of items */
@@ -2234,6 +2218,10 @@ declare namespace DeepestWorld {
     /** Item inventory */
     bag: Array<Item | null>
 
+    /** Indicator whether the character is currently casting */
+    casting?: number
+
+    /** Indicator whether the character is currently crafting */
     crafting?: number
 
     /** Gem pyramid in skill bar */
@@ -2364,10 +2352,6 @@ declare namespace DeepestWorld {
     }
   >
 
-  interface Hitbox extends Float32Array {
-    length: 2
-  }
-
   type Plot = {
     /** Server ID */
     id: number
@@ -2396,6 +2380,7 @@ declare namespace DeepestWorld {
   }>
 
   type OldMetaDataEntity = {
+    /** @deprecated */
     ai?: true
     canChop?: true
     canHarvest?: true
@@ -2404,7 +2389,6 @@ declare namespace DeepestWorld {
     canCollide?: true
     /** @deprecated use canCollide instead */
     collidable?: true
-    hitbox?: [number, number]
     isBox?: true
     isMonster?: true
     isNpc?: true
@@ -2477,6 +2461,7 @@ declare namespace DeepestWorld {
     canMine?: true
     canOpen?: true
     cd?: number
+    /** @deprecated */
     collidable?: true
     isAccessory?: true
     isArmor?: true
@@ -2523,7 +2508,7 @@ declare namespace DeepestWorld {
       | 'shield'
       | 'mainHand'
       )[]
-    tags?: Set<symbol>
+    tags?: Set<string>
     type?: string
   }
 

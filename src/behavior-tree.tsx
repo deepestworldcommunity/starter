@@ -38,24 +38,20 @@ async function ChooseRune() {
   let runeMd = 'attackRune'
   if (dw.c.gear.mainHand) {
     const weaponTags = dw.mdInfo[dw.c.gear.mainHand?.md]?.tags
-    if (weaponTags instanceof Set && weaponTags?.has(dw.enums.Tag.RANGED)) {
-      runeMd = 'rangedRune'
+    if (weaponTags?.has('rangedWeapon')) {
+      runeMd = 'aimingRune'
     }
 
-    if (weaponTags instanceof Set && weaponTags?.has(dw.enums.Tag.CASTER)) {
-      runeMd = 'physbolt1'
+    if (weaponTags?.has('casterWeapon')) {
+      runeMd = 'castingRune'
     }
   }
 
-  blackboard.skillIndex = dw.character.skills.findIndex(
+  blackboard.skillIndex = dw.character.skillBag.findIndex(
     (skill) => skill && skill.md === runeMd
   )
-  if (blackboard.skillIndex === -1) {
-    // No attackRune found
-    return false
-  }
 
-  return true
+  return blackboard.skillIndex !== -1
 }
 
 async function TargetInRangeForRune() {
@@ -76,13 +72,13 @@ async function UseRune() {
     return false
   }
 
-  if (!dw.isOnCd(blackboard.skillIndex) || !dw.canPayCost(blackboard.skillIndex)) {
-    // Skill is either on cooldown or not enough resources
+  if (dw.isOnCd(blackboard.skillIndex) || !dw.canPayCost(blackboard.skillIndex) || dw.c.casting) {
+    // Skill is either on cooldown, not enough resources or already casting
     return false
   }
 
   dw.stop()
-  dw.useSkill(blackboard.skillIndex, blackboard.target.id)
+  await dw.useSkill(blackboard.skillIndex, blackboard.target.id)
   return true
 }
 

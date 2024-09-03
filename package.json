@@ -14,10 +14,11 @@
   "author": "Kevin Sandow",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^20.16.1",
+    "@types/node": "^20.16.3",
     "dotenv": "^16.4.5",
-    "electron": "^31.4.0",
+    "electron": "^32.0.1",
     "esbuild": "^0.23.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "zod": "^3.23.8"
   }
 }

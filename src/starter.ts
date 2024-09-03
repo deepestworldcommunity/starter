@@ -17,16 +17,16 @@ async function basicAttack() {
   let runeMd = 'attackRune'
   if (dw.c.gear.mainHand) {
     const weaponTags = dw.mdInfo[dw.c.gear.mainHand?.md]?.tags
-    if (weaponTags instanceof Set && weaponTags?.has(dw.enums.Tag.RANGED)) {
-      runeMd = 'rangedRune'
+    if (weaponTags?.has('rangedWeapon')) {
+      runeMd = 'aimingRune'
     }
 
-    if (weaponTags instanceof Set && weaponTags?.has(dw.enums.Tag.CASTER)) {
-      runeMd = 'physbolt1'
+    if (weaponTags?.has('casterWeapon')) {
+      runeMd = 'castingRune'
     }
   }
 
-  const skillIndex = dw.character.skills.findIndex(
+  const skillIndex = dw.character.skillBag.findIndex(
     (skill) => skill && skill.md === runeMd
   )
   if (skillIndex === -1) {
@@ -40,8 +40,8 @@ async function basicAttack() {
     return
   }
 
-  if (!dw.isOnCd(skillIndex) || !dw.canPayCost(skillIndex)) {
-    // Skill is either on cooldown or not enough resources
+  if (dw.isOnCd(skillIndex) || !dw.canPayCost(skillIndex) || dw.c.casting) {
+    // Skill is either on cooldown, not enough resources or we are already casting sth
     return
   }
 
