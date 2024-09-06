@@ -10,14 +10,14 @@ Steps to get up and running:
 3. checkout repository (choose one option) & install dependencies
 ```shell
 # Option 1: Checkout using GIT & HTTPS
-git clone https://github.com/kevinsandow/deepestworld-starter.git
+git clone https://github.com/deepestworldcommunity/starter.git
 # Option 2: Checkout using GIT & SSH
-git clone git@github.com:kevinsandow/deepestworld-starter.git
+git clone git@github.com:deepestworldcommunity/starter.git
 # Option 3: Checkout using GitHub CLI
-gh repo clone kevinsandow/deepestworld-starter
+gh repo clone deepestworldcommunity/starter
 
 # Install dependencies
-cd deepestworld-starter
+cd starter
 npm install
 ```
 4. create a `.env` file or copy the `.env.example` file add edit it accordingly, so it contains your credentials like so:

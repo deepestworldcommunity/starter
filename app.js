@@ -1,5 +1,5 @@
 const { context } = require('esbuild')
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, session } = require('electron')
 const { join } = require("node:path");
 const { versions } = require("node:process");
 const { writeFile } = require('node:fs');
@@ -19,6 +19,23 @@ let codeHash
 
 async function run() {
   await app.whenReady()
+
+  session.defaultSession.cookies.on('changed', function(event, cookie, cause, removed) {
+    if (removed || !cookie.session || cookie.name !== 'PHPSESSID' || cookie.domain !== '.deepestworld.com') {
+      return
+    }
+
+    session.defaultSession.cookies.set({
+      ...cookie,
+      expirationDate: Math.round(Date.now()/1000+60*60*24*7*4),
+      url: 'https://deepestworld.com/',
+    })
+      .catch((err) => {
+        if (err) {
+          console.error('Error trying to persist cookie', err, cookie);
+        }
+      });
+  });
 
   ipcMain.on('send-ws-data', (_event, _data) => {
     // log('>', data)
@@ -104,8 +121,8 @@ async function run() {
   await win.loadURL('https://deepestworld.com/')
 
   await win.webContents.executeJavaScript(`
-    [...document.querySelectorAll('a.nav-link')]
-      .filter((a) => a.innerHTML === 'Log In')
+    [...document.querySelectorAll('a')]
+      .filter((a) => a.innerHTML === 'Log In' || a.innerHTML === 'Play Now')
       .shift()
       ?.click();
   `)
@@ -126,6 +143,7 @@ async function run() {
     }
 
     if (url === 'https://deepestworld.com/') {
+      console.log('url', url);
       await win.webContents.executeJavaScript(`
         [...document.querySelectorAll('a')]
           .filter((a) => a.innerHTML === 'Play Now')
