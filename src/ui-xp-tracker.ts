@@ -32,12 +32,10 @@ function createXPTracker() {
   text.className = 'p-1'
   text.innerHTML = `
     <div class="d-flex justify-content-between small"><span class='text-alt'>XP/h</span><span data-content='xpPerHour'></span></div>
-    <div class="d-flex justify-content-between small"><span class='text-alt'>XP/h - death</span><span data-content='xpPerHour2'></span></div>
     <div class="d-flex justify-content-between small"><span class='text-alt'>xpToLose</span><span data-content='xpToLose'></span></div>
     <div class="d-flex justify-content-between small"><span class='text-alt'>next step</span><span data-content='nextXPStep'></span></div>
     <div class="d-flex justify-content-between small"><span class='text-alt'>next step in</span><span data-content='nextStepIn'></span></div>
     <div class="d-flex justify-content-between small"><span class='text-alt'>level up in</span><span data-content='levelUpIn'></span></div>
-<!--    <div class="d-flex justify-content-between small"><span class='text-alt'>death cost</span><span data-content='deathCost'></span></div>-->
   `
   container.insertBefore(text, container.firstChild)
 
@@ -96,18 +94,8 @@ function updateXPTracker() {
   const first = xpTracker[0]
   const last = xpTracker[xpTracker.length - 1]
 
-  let xpPerHour2 = 0
-  for (let i = 1; i <= xpTracker.length - 1; i++) {
-    const delta = xpTracker[i] - xpTracker[i - 1]
-    if (delta > 0) {
-      xpPerHour2 += delta
-    }
-  }
-  xpPerHour2 = Math.floor(xpPerHour2 / xpTracker.length * 60)
-
   const xpPerHour = Math.floor(Math.max(0, last - first) / xpTracker.length * 60)
   const stepSize = Math.floor(dw.constants.XP_DEATH_PENALTY * max)
-  // const deathToll = Math.floor(stepSize / xpPerHour2 * 3600)
   const xpToLose = Math.floor(((dw.c.xp / max) % dw.constants.XP_DEATH_PENALTY) * max)
   const nextXPStep = stepSize // Math.ceil(stepSize - xpToLose)
 
@@ -157,40 +145,10 @@ function updateXPTracker() {
   }
 
   updateText('xpPerHour', xpPerHour.toLocaleString())
-  updateText('xpPerHour2', xpPerHour2.toLocaleString())
   updateText('xpToLose', xpToLose.toLocaleString())
   updateText('nextXPStep', nextXPStep.toLocaleString())
   updateText('nextStepIn', xpPerHour > 0 ? formatDuration(Math.ceil(nextXPStep / xpPerHour * 3600), true, 1) : '')
   updateText('levelUpIn', xpPerHour > 0 ? formatDuration(Math.ceil((max - dw.c.xp) / xpPerHour * 3600), true, 1) : '')
-  // updateText('deathCost', deathToll.toLocaleString())
-
-  // if (text && isDiv(text)) {
-  //   text.innerHTML = `<table class="container">
-  //     <tr><td class="text-alt">XP/h</td><td class="text-end">${xpPerHour.toLocaleString()}</td></tr>
-  //     <tr><td class="text-alt">XP/h - death</td><td class="text-end">${xpPerHour2.toLocaleString()}</td></tr>
-  //     <tr><td class="text-alt">xpToLose</td><td class="text-end">${xpToLose.toLocaleString()}</td></tr>
-  //     <tr><td class="text-alt">next step</td><td class="text-end">${nextXPStep.toLocaleString()}</td></tr>
-  //     ${xpPerHour2 > 0
-  //     ? `
-  //         <tr>
-  //           <td class="text-alt">next step in</td>
-  //           <td class="text-end">${formatDuration(Math.ceil(nextXPStep / xpPerHour2 * 3600), true)}</td>
-  //       `
-  //     : ''}
-  //     ${xpPerHour > 0
-  //     ? `
-  //         <tr>
-  //           <td class="text-alt">level up in</td>
-  //           <td class="text-end">${formatDuration(Math.ceil((max - dw.c.xp) / xpPerHour * 3600), true)}</td>
-  //         </tr>
-  //         <tr>
-  //           <td class="text-alt">death cost</td>
-  //           <td class="text-end">${formatDuration(deathToll, true)}</td>
-  //         </tr>
-  //       `
-  //     : ''}
-  //   </table>`
-  // }
 
   if (!done) {
     window.top.requestAnimationFrame(updateXPTracker)

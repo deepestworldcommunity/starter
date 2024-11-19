@@ -43,6 +43,11 @@ async function run() {
   })
 
   ipcMain.on('received-ws-data', (event, data) => {
+    if (data instanceof ArrayBuffer) {
+      // TODO: figure out message compression
+      return
+    }
+
     // log('<', data)
     const json = JSON.parse(data)
     if (!Array.isArray(json)) {

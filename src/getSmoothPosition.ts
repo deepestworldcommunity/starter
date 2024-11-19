@@ -3,7 +3,7 @@ const entitiesSmoothPosition = new Map<number, { x: number, y: number }>
 function updateSmoothPosition() {
   const currentEntities = new Set()
 
-  for (const entity of dw.findEntities((e) => 'ai' in e || 'player' in e)) {
+  for (const entity of dw.findAllEntities((e) => 'ai' in e || 'player' in e)) {
     currentEntities.add(entity.id)
 
     if (!entitiesSmoothPosition.has(entity.id)) {
