@@ -1,47 +1,59 @@
-const attackMode = false
+let attackMode = false
 
 async function basicAttack() {
   if (!attackMode) {
+    dw.log('Attack mode is off, edit src/starter.js to enable')
     return
   }
 
   const target = dw.findClosestMonster()
   if (!target) {
-    // No target found
+    dw.log('<span style="color: yellow">No target found</span>')
     return
   }
 
-  // Show target in game UI
-  dw.setTarget(target.id)
+  if (dw.targetId !== target.id) {
+    dw.log(`Switching target to ${target.md}#${target.id}`)
+    dw.setTarget(target.id)
+  }
 
-  let runeMd = 'attackRune'
-  if (dw.c.gear.mainHand) {
-    const weaponTags = dw.mdInfo[dw.c.gear.mainHand?.md]?.tags
-    if (weaponTags?.has('rangedWeapon')) {
-      runeMd = 'aimingRune'
+  let skillMd = 'dmg1'
+  if (dw.character.gear.mainHand) {
+    if ([dw.enums.Type.BOW].includes(dw.character.gear.mainHand.type)) {
+      skillMd = 'dmg2'
     }
 
-    if (weaponTags?.has('casterWeapon')) {
-      runeMd = 'castingRune'
+    if ([dw.enums.Type.WAND].includes(dw.character.gear.mainHand.type)) {
+      skillMd = 'dmg3'
     }
   }
 
-  const skillIndex = dw.character.skillBag.findIndex(
-    (skill) => skill && skill.md === runeMd
+  const skillIndex = dw.character.skills.findIndex(
+    (skill) => skill && skill.md === skillMd
   )
   if (skillIndex === -1) {
-    // No attackRune found
+    dw.log(`<span style="color: red">Could not find ${skillMd}</span>`)
     return
   }
 
   if (!dw.isInRange(skillIndex, target.x, target.y)) {
-    // Too far away
+    dw.log(`Too far away from target, moving closer`)
     dw.move(target.x, target.y)
     return
   }
 
-  if (dw.isOnCd(skillIndex) || !dw.canPayCost(skillIndex) || dw.c.casting) {
-    // Skill is either on cooldown, not enough resources or we are already casting sth
+  if (dw.isOnCd(skillIndex)) {
+    dw.log(`<span style="color: yellow">Skill ${skillMd}#${skillIndex} is on cooldown</span>`)
+    return
+  }
+
+  if (!dw.canPayCost(skillIndex)) {
+    dw.log(`<span style="color: yellow">Not enough resources for ${skillMd}#${skillIndex}</span>`)
+    return
+  }
+
+  if (dw.character.casting > Date.now()) {
+    dw.log(`<span style="color: yellow">Already casting</span>`)
     return
   }
 
