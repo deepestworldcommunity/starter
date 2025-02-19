@@ -1,3 +1,8 @@
+type ToCamelCase<S extends string> =
+  S extends `${infer First}_${infer Rest}`
+    ? `${Lowercase<First>}${Capitalize<ToCamelCase<Rest>>}`
+    : Lowercase<S>;
+
 declare namespace DeepestWorld {
   interface API {
     /**
@@ -82,7 +87,7 @@ declare namespace DeepestWorld {
      *
      * @see character
      */
-    c: YourCharacter
+    c: Character
 
     /**
      * The camera position for the main canvas
@@ -159,7 +164,7 @@ declare namespace DeepestWorld {
      * @deprecated use dw.isInRange instead
      */
     canUseSkillRange(
-      skillIndex,
+      skillIndex: number,
       ...args: [number] | [number, number] | [{ x: number; y: number }]
     ): boolean
 
@@ -177,10 +182,10 @@ declare namespace DeepestWorld {
      *
      * @see character
      */
-    char: YourCharacter
+    char: Character
 
     /** Reference to your character */
-    character: YourCharacter
+    character: Character
 
     /**
      * @deprecated use `dw.gather` instead
@@ -435,7 +440,7 @@ declare namespace DeepestWorld {
         pos: [number, number, number]
         dim: [number, number, number]
       },
-    )
+    ): void
 
     /**
      * Chops down a tree
@@ -566,7 +571,7 @@ declare namespace DeepestWorld {
         dx: number
         dy: number
       },
-    )
+    ): void
 
     emit(
       eventName: 'moveItem',
@@ -608,7 +613,7 @@ declare namespace DeepestWorld {
     emit(
       eventName: 'placeBlock',
       data: { i: number; x: number; y: number; z: number },
-    )
+    ): void
 
     /**
      * Places a station into the world (can only be done at your spawn area)
@@ -633,7 +638,7 @@ declare namespace DeepestWorld {
       },
     ): void
 
-    emit(eventName: 'pour', data: { i: number; id: number })
+    emit(eventName: 'pour', data: { i: number; id: number }): void
 
     emit(eventName: 'realEstateTable', data: { id: number }): void
 
@@ -645,7 +650,7 @@ declare namespace DeepestWorld {
 
     emit(eventName: 'saveCode', data: { code: string }): void
 
-    emit(eventName: 'sellLand', data: { benchId: number; id: number })
+    emit(eventName: 'sellLand', data: { benchId: number; id: number }): void
 
     emit(eventName: 'sendPartyInvite', data: { name: string }): void
 
@@ -701,14 +706,14 @@ declare namespace DeepestWorld {
     emit(
       eventName: 'stationInfo',
       data: { id: number; info?: string | Record<string, unknown> },
-    )
+    ): void
 
     emit(
       eventName: 'takeBlock',
       data: { i: number; x: number; y: number; z: number },
-    )
+    ): void
 
-    emit(eventName: 'takeItem', data: { i: number; id: number })
+    emit(eventName: 'takeItem', data: { i: number; id: number }): void
 
     emit(eventName: 'talkGlobal', data: { m: string }): void
 
@@ -869,9 +874,7 @@ declare namespace DeepestWorld {
      *
      * @group Mission
      */
-    fetchMissions(
-      missionType: string,
-    ): Promise<void>
+    fetchMissions(missionType: string): Promise<void>
 
     /**
      * Fill a bucket in toolBag with water from a water source at x, y, z
@@ -909,9 +912,7 @@ declare namespace DeepestWorld {
      *
      * @group Entity
      */
-    findClosestMonster(
-      filter?: (entity: Monster) => boolean,
-    ): Monster | undefined
+    findClosestMonster(filter?: (entity: Entity) => boolean): Entity | undefined
 
     /**
      * Find the closest tree matching a filter criteria.
@@ -920,7 +921,7 @@ declare namespace DeepestWorld {
      *
      * @group Entity
      */
-    findClosestTree(filter?: (entity: Station) => boolean): Station | undefined
+    findClosestTree(filter?: (entity: Entity) => boolean): Entity | undefined
 
     /**
      * @deprecated use `dw.findAllEntities` instead
@@ -963,8 +964,6 @@ declare namespace DeepestWorld {
      * @group Other
      */
     get<T = unknown>(key: string): T | null
-
-
 
     /**
      * @deprecated will be removed sooner or later
@@ -1146,10 +1145,8 @@ declare namespace DeepestWorld {
     isReady(skillIndex?: number): boolean
 
     /**
-     * Checks whether the target would be in range for spell.
-     * @param skillIndex
-     * @param args
      * @deprecated use dw.canUseSkillRange instead
+     * @see canUseSkillRange
      */
     isSkillInRange(
       skillIndex: number,
@@ -1353,7 +1350,7 @@ declare namespace DeepestWorld {
      *
      * @param eventName
      */
-    offAll<E extends keyof Events>(eventName: E)
+    offAll<E extends keyof Events>(eventName: E): void
 
     /**
      * Adds an event listener that will be called every time when the specified event is triggered.
@@ -1719,7 +1716,7 @@ declare namespace DeepestWorld {
      *
      * @group Item
      */
-    takeAllItems(bag): Promise<void>
+    takeAllItems(bag: unknown): Promise<void>
 
     /**
      * purely internally used map to keep track of items possible to take
@@ -1736,12 +1733,10 @@ declare namespace DeepestWorld {
     takeBlock(x: number, y: number, z: number): void
 
     /**
-     * @param toolBagIndex
-     * @param itemId
-     *
-     * @group Building
+     * @deprecated use `dw.takeStation` instead
+     * @see takeStation
      */
-    takeItem(toolBagIndex: number, itemId): Promise<void>
+    takeItem(itemId: number): Promise<void>
 
     /**
      * @param orderId
@@ -1751,11 +1746,11 @@ declare namespace DeepestWorld {
     takeOrder(orderId: number): Promise<void>
 
     /**
-     * @param stationId
+     * @param itemId
      *
      * @group Building
      */
-    takeStation(stationId: number): Promise<void>
+    takeStation(itemId: number): Promise<void>
 
     /**
      * @deprecated use `dw.whisper` instead
@@ -1808,7 +1803,7 @@ declare namespace DeepestWorld {
      *
      * @group Item
      */
-    unequip(slotName: string, inventoryIndex?: number): Promsie<void>
+    unequip(slotName: string, inventoryIndex?: number): Promise<void>
 
     /**
      * Unlocks all items on the station.
@@ -1898,65 +1893,233 @@ declare namespace DeepestWorld {
     ws: WebSocket
   }
 
-  interface BaseEntity {
-    id: number
-    /** Metadata ID */
-    md: string
-
-    // Portals or stations have an owner
+  interface Entity {
+    ai?: number
+    aid?: number
+    bad?: number
+    badCd?: number
+    bag?: (Item | null)[]
+    bankTabs?: {
+      name: string
+      items: (Item | null)[]
+    }[]
+    c?: Record<string, Condition>
+    carId?: number
+    casting?: number
+    cds?: Record<string, number>
     cid?: number
-
-    hp: number
-    maxHp: number
-    hps: number
-
+    class: number
+    classMd: ToCamelCase<ClassMd>
+    combat?: number
+    conditions?: Record<string, Condition>
+    crafting?: number
+    dx?: number
+    dy?: number
+    effects?: Record<string, OldCondition>
+    elvl?: number
+    favor?: number
+    fx?: Record<string, OldCondition>
+    gcd?: number
+    gcdValue?: number
+    gear?: Record<Slot, Item | null>
+    gold?: number
+    h: number
+    hp?: number
+    hps?: number
+    i?: (Item | null)[]
+    id: number
+    inventory?: (Item | null)[]
+    isCollidable?: true
+    isOpaque?: true
     isSafe?: number
+    learnedPassives?: Record<string, {
+      lvl: number
+      tier: number
+    }>
+    learnedSkills?: Record<string, {
+      lvl: number
+      pts?: number
+      tier: number
+    }>
+    learnedStats?: Record<string, {
+      lvl: number
+      pts: number
+      tier: number
+    }>
+    level?: number
+    loadout?: {
+      name: string
+      gear: Record<Slot, Item | null>
+      skills: {}[]
+    }[]
+    lvl?: number
+    mailbox?: (Item & {
+      mailId: number
+    } | null)[]
+    matType?: number
+    matTypeMd?: ToCamelCase<MatTypeMd>
+    maxGold?: number
+    maxHp?: number
+    maxMp?: number
+    maxShopGold?: number
+    md: ToCamelCase<TypeMd>
+    mission?: {}
+    mods?: Record<string, number>
+    mogs?: Record<string, string>
+    moveSpeed?: number
+    mp?: number
+    mtx?: {
+      face: number
+      skin: number
+      showHelmer: number
+      helmet?: unknown
+      chest?: unknown
+    }
+    name?: string
+    output?: (Item | null)[]
+    owner?: number
+    party?: {
+      dbId: number
+      name: string
+      level: number
+      id: number
+      uid: number
+      lvl: number
+      isLeader?: number
+      leader?: number
+    }[]
+    player?: number
+    plots?: {
+      id: number
+      pos: [number, number, number]
+      dim: [number, number, number]
+      x: number
+      y: number
+      z: number
+      w: number
+      h: number
+      d: number
+    }[]
+    powerOn?: number
+    profession?: number
+    professionMd?: ToCamelCase<ProfessionMd>
+    professions?: Record<ToCamelCase<ProfessionMd>, {
+      level: number
+      lvl: number
+      profession: number
+      xp: number
+    }>
+    qual?: number
+    r?: number
+    recycler?: {
+      input: (Item | null)[]
+      output: (Item | null)[]
+    }
+    rep?: number
+    safe?: number
+    share?: number
+    silver?: number
+    skills?: (Skill | null)[]
+    skin?: number
+    skinMd?: string
+    spawn?: {
+      x: number
+      y: number
+      z: number
+    }
+    stage?: number
+    stageMd?: ToCamelCase<StageMd>
+    station?: number
+    stats?: {
+      block: number
+      climbSpeed: number
+      critRes: number
+      dagger: number
+      dexDef: number
+      doubleHit: number
+      eleChance: Record<Lowercase<DmgTypeMd>, number>
+      hp: number
+      hpRegen: number
+      intDef: number
+      moveSpeed: number
+      mp: number
+      mpRegen: number
+      parry: number
+      pen: Record<Lowercase<DmgTypeMd>, number>
+      res: Record<Lowercase<DmgTypeMd>, number>
+      strDef: number
+      threatMult: number
+    }
+    storage?: (Item | null)[] | Record<string, Item>
+    tags?: {}
+    targetId?: number
+    terrain?: number
+    threat?: number
+    tree?: number
+    type: number
+    typeMd: ToCamelCase<TypeMd>
+    uid?: number
+    v?: number
+    w: number
     wild?: number
-
-    /** @deprecated */
-    l: number
     x: number
+    xmogs?: any
+    xp?: number
     y: number
     z: number
   }
 
-  export interface Character extends LivingEntity {
-    /** Means that this is a player. Value is always 1. */
-    player: 1
-    /** Character's name */
-    name: string
-    /** Equipped items */
-    gear: Record<string, Item | null>
-    /** threat modifier */
-    threatMod: number
-    /** Character's appearance */
-    mtx: Record<string, number>
+  type RequiredCharacterProps =
+    | "aid"
+    | "bag"
+    | "carId"
+    | "casting"
+    | "cds"
+    | "cid"
+    | "combat"
+    | "crafting"
+    | "dx"
+    | "dy"
+    | "effects"
+    | "fx"
+    | "gcd"
+    | "gear"
+    | "gold"
+    | "hp"
+    | "i"
+    | "inventory"
+    | "learnedPassives"
+    | "learnedSkills"
+    | "learnedStats"
+    | "level"
+    | "loadout"
+    | "lvl"
+    | "mailbox"
+    | "maxGold"
+    | "maxHp"
+    | "maxMp"
+    | "maxShopGold"
+    | "mods"
+    | "mogs"
+    | "moveSpeed"
+    | "mp"
+    | "mtx"
+    | "name"
+    | "party"
+    | "plots"
+    | "professions"
+    | "recycler"
+    | "rep"
+    | "silver"
+    | "spawn"
+    | "stats"
+    | "tags"
+    | "uid"
+    | "xp"
 
-    /** Account id */
-    aid: number
-    /** Character id */
-    cid: number
-  }
+  interface Character extends Omit<Entity, RequiredCharacterProps>, Pick<Required<Entity>, RequiredCharacterProps> {}
 
   export type Chunk = Array<Array<Array<number>>>
-
-  export type Dimension2 = {
-    /**
-     * Length on x
-     */
-    w: number
-    /**
-     * Length on y
-     */
-    h: number
-  }
-
-  export type Entity =
-    | YourCharacter
-    | Character
-    | Monster
-    | NPC
-    | Station
 
   type Events = {
     /**
@@ -2248,44 +2411,6 @@ declare namespace DeepestWorld {
     s?: number
   }
 
-  export interface LivingEntity extends BaseEntity {
-    level: number
-    /** Mana */
-    mp: number
-    maxMp: number
-    /** Movement speed. World units per second. Multiply by 96 to get pixels per second. */
-    moveSpeed: number
-    /**
-     * Buffs & debuffs will be accessible here.
-     */
-    fx: Record<string, unknown>
-    dx?: number
-    dy?: number
-    /** Current, if any*/
-    targetId?: number
-  }
-
-  export interface Monster extends LivingEntity {
-    /** Means that this is a monster. Value is always 1. */
-    ai: 1
-    /** Indicated whether the monster will attack you on sight */
-    bad?: number
-    /** time of activation */
-    badCd?: number
-    /** 1 is a normal monster. 2+ are bosses. */
-    r: number
-    /** Coop shield. */
-    hps: number
-    /** Terrain type on which the monster spawned */
-    terrain: number
-  }
-
-  export interface NPC extends Monster {
-    race: string
-    skin: number
-    questIds: Array<number>
-  }
-
   export interface Skill {
     cost: number
     md: string
@@ -2300,147 +2425,6 @@ declare namespace DeepestWorld {
     critMult?: number
     speed?: number
     cd?: number
-  }
-
-  export interface Station extends BaseEntity {
-    /** Indicating whether you are the owner. */
-    owner: number
-    /** Owner Database ID */
-    aid: number
-    level: number
-    lvl: number
-    qual: number
-    /** Storage of items */
-    storage: Array<Item | null> | Record<string, Item>
-    /** Storage of items */
-    output?: Array<Item | null> | Record<string, Item>
-    powerOn?: boolean
-    v?: number
-  }
-
-  export interface YourCharacter extends Character {
-    acidArmor: number
-
-    armor: number
-
-    /** Item inventory */
-    bag: Array<Item | null>
-
-    /** Indicator whether the character is currently casting */
-    casting?: number
-
-    /** Indicator whether the character is currently crafting */
-    crafting?: number
-
-    /** Gem pyramid in skill bar */
-    cardBag: Array<Item | null>
-
-    /** Skill specific timestamps of their cooldowns */
-    cds: Record<string, number>
-
-    coldArmor: number
-
-    /** Indicator whether the character is currently in combat */
-    combat?: number
-
-    elecArmor: number
-
-    fireArmor: number
-
-    /** Timestamp of the global cooldown */
-    gcd?: number
-
-    gcdValue: number
-
-    /** the amount of mana points you restore every 1.5s */
-    hpRegen: number
-
-    mission?: {
-      x: number
-      y: number
-      z: number
-
-      item: Item
-
-      /**
-       * Percentage progress e.g. 6.0990909%
-       */
-      progress: number
-
-      reward: number
-
-      deaths: number
-    }
-
-    /** the amount of mana points you restore every 1.5s */
-    mpRegen: number
-
-    /**
-     * Party information
-     */
-    party: Array<{
-      dbId: number
-      name: string
-      level: number
-      id: number
-      leader?: number
-    }>
-
-    professions: Record<
-      Profession,
-      {
-        md: string
-        level: number
-        xp: number
-      }
-    >
-
-    physArmor: number
-
-    silver: number
-
-    /** Skills in skill bar */
-    skillBag: Array<Item | null>
-
-    /** Skill info for skills in skill bar */
-    skills: Array<Skill | 0>
-
-    spawn: {
-      x: number
-      y: number
-      z: number
-    }
-
-    toolBag: Array<Item | null>
-
-    quests: Array<{
-      data: {
-        name: string
-      } & Record<string, unknown>
-      id: number
-      items: Array<Item>
-      maxProgress: number
-      md: string
-      progress: number
-      silver: number
-    }>
-
-    recipes: Record<string, number>
-
-    rep: number
-
-    /**
-     * @deprecated use spawn instead
-     */
-    respawn: {
-      l: number
-      x: number
-      y: number
-    }
-
-    xmogs: Record<string, Item>
-
-    xp: number
   }
 
   type DungeonBoard = Array<{
@@ -2459,26 +2443,6 @@ declare namespace DeepestWorld {
       y: number
     }
   >
-
-  type Plot = {
-    /** Server ID */
-    id: number
-    x: number
-    y: number
-    z: number
-    /** length on x-axis */
-    w: number
-    /** length on y-axis */
-    h: number
-    /** length on z-axis */
-    d: number
-    /** Timestamp when you can sell the plot */
-    sellCd: number
-    /** @deprecated use `w`, `h`, `l` instead */
-    dim: [number, number, number]
-    /** @deprecated use `x`, `y`, `z` instead */
-    pos: [number, number, number]
-  }
 
   type Projectile = {
     id: number
@@ -2518,7 +2482,7 @@ declare namespace DeepestWorld {
       >
       minLvl?: number
       minLevel?: number
-      professions?: Profession[]
+      professions?: ToCamelCase<ProfessionMd>[]
     }
   >
 
@@ -2526,34 +2490,23 @@ declare namespace DeepestWorld {
     slots?: Slot[]
   }
 
-  type MissionTable = Record<string, number>
+  type OldCondition = {
+    od?: number
+    d?: number
+    s?: number | null
+    v?: number | null
+    timerElements?: unknown[]
+    conditionElements?: unknown[]
+  }
 
-  type Profession =
-    | 'armorsmith'
-    | 'axesmith'
-    | 'boomerangsmith'
-    | 'bowsmith'
-    | 'crossbowsmith'
-    | 'daggersmith'
-    | 'gemcutting'
-    | 'herbalism'
-    | 'hunting'
-    | 'leatherworking'
-    | 'macesmith'
-    | 'metalworking'
-    | 'mining'
-    | 'plantFarming'
-    | 'runecrafting'
-    | 'sceptersmith'
-    | 'shieldsmith'
-    | 'spearsmith'
-    | 'staffsmith'
-    | 'stoneworking'
-    | 'swordsmith'
-    | 'tailoring'
-    | 'wandsmith'
-    | 'woodcutting'
-    | 'woodworking'
+  type Condition = {
+    duration: number
+    expireAt: number
+    numStacks: number | null
+    value: number | null
+  }
+
+  type MissionTable = Record<string, number>
 
   type Slot =
     | 'amulet'
@@ -2566,8 +2519,6 @@ declare namespace DeepestWorld {
     | 'belt'
     | 'shield'
     | 'mainHand'
-
-  type Rarity = number
 
   type Tag = symbol
 
