@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
     "esModuleInterop": true,
     "jsx": "react",
     "jsxFactory": "jsx",
@@ -9,5 +11,6 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
+    "types": ["dw"]
   }
 }

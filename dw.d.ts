@@ -2111,6 +2111,7 @@ declare namespace DeepestWorld {
     | "recycler"
     | "rep"
     | "silver"
+    | "skills"
     | "spawn"
     | "stats"
     | "tags"
@@ -2376,39 +2377,35 @@ declare namespace DeepestWorld {
   }
 
   export interface Item {
-    /** Indicated the item is locked, preventing deleteItem, disenchant, sendItem, sendMail, enchant */
-    l?: number
-
-    /** Metadata ID */
-    md: string
-
-    /** Count, or 1 if undefined */
+    class?: number
+    classMd?: ToCamelCase<ClassMd>
+    crafted?: 1
+    dmgType?: DmgType
+    dmgTypeMd?: ToCamelCase<DmgTypeMd>
+    ele?: number
+    from?: string
+    h?: number
+    items?: unknown[]
+    lbl: number
+    matTier?: Tier
+    matType?: MatType
+    matTypeMd?: ToCamelCase<MatTypeMd>
+    md: ToCamelCase<TypeMd>
+    mods?: Record<string, unknown>
     n?: number
-
-    /**
-     * The rarity
-     * 0 = white
-     * 1 = green
-     * 2 = blue
-     * 3 = purple
-     * 4 = orange
-     */
-    r?: number
-
-    /** The item level / quality*/
+    name?: string
     qual: number
-
-    /** The base multipliers for the specific item */
-    base?: Record<string, number>
-
-    /** The modifiers on the item */
-    mods?: Record<string, number>
-
-    /** The components on the item (currently runes only) */
-    cmps?: Record<string, number>
-
-    /** Number of skulls (missions only) */
+    r?: number
+    rarityMd?: ToCamelCase<RarityMd>
     s?: number
+    skin?: number
+    stage?: number
+    stageMd?: ToCamelCase<StageMd>
+    terrain?: Terrain
+    tier?: Tier
+    type?: Type
+    typeMd?: ToCamelCase<TypeMd>
+    w?: number
   }
 
   export interface Skill {
