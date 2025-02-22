@@ -1166,7 +1166,7 @@ declare namespace DeepestWorld {
      * @param script
      * @param opts
      */
-    loadScript(script: string, opts?: { attrs: Record<string, string> }): Promise<void>
+    loadScript(script: string, opts?: { attr: Record<string, string> }): Promise<void>
 
     /**
      * Switches to the loadout of the station.
