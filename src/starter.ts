@@ -18,12 +18,21 @@ async function basicAttack() {
   }
 
   let skillMd = 'dmg1'
-  if (dw.character.gear.mainHand) {
-    if ([dw.enums.Type.BOW].includes(dw.character.gear.mainHand.type)) {
+  const weaponType = dw.character.gear.mainHand?.type
+  if (weaponType !== undefined) {
+    if ([
+      dw.enums.Type.BOW,
+      dw.enums.Type.BOOMERANG,
+      dw.enums.Type.CROSSBOW,
+    ].includes(weaponType)) {
       skillMd = 'dmg2'
     }
 
-    if ([dw.enums.Type.WAND].includes(dw.character.gear.mainHand.type)) {
+    if ([
+      dw.enums.Type.SCEPTER,
+      dw.enums.Type.STAFF,
+      dw.enums.Type.WAND,
+    ].includes(weaponType)) {
       skillMd = 'dmg3'
     }
   }
@@ -42,7 +51,7 @@ async function basicAttack() {
     return
   }
 
-  if (dw.isOnCd(skillIndex)) {
+  if (dw.isReady(skillIndex)) {
     dw.log(`<span style="color: yellow">Skill ${skillMd}#${skillIndex} is on cooldown</span>`)
     return
   }
