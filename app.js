@@ -1,26 +1,52 @@
 const { context } = require('esbuild')
-const { app, BrowserWindow, ipcMain, session } = require('electron')
+const { app, net, BrowserWindow, protocol, ipcMain, session } = require('electron')
 const { join } = require("node:path");
-const { versions } = require("node:process");
+const { pathToFileURL } = require('node:url')
 const { writeFile } = require('node:fs');
 
 const config = require('./config')
 const tracking = require('./tracking')
 
 app.setPath('userData', join(__dirname, 'data'))
-const chromeVersion = versions.chrome.split('.').shift()
 
+/** @param {any[]} args */
 function log(...args) {
   console.log(new Date().toLocaleTimeString('en-GB'), ...args)
 }
 
+/** @type {number | undefined} */
 let characterId
+/** @type {string | undefined} */
 let codeHash
 
 async function run() {
+  protocol.registerSchemesAsPrivileged([
+    {
+      scheme: 'dw',
+      privileges: {
+        standard: true,
+        secure: true,
+        supportFetchAPI: true,
+        corsEnabled: true,
+        bypassCSP: true,
+      }
+    }
+  ])
+
   await app.whenReady()
 
-  session.defaultSession.cookies.on('changed', function(event, cookie, cause, removed) {
+  protocol.handle('dw', (req) => {
+    const url = new URL(req.url)
+    const srcPath = join(__dirname, 'src')
+    const path =  join(__dirname, 'src', url.hostname, url.pathname).replace(/\/$/, '')
+    if (!path.startsWith(srcPath)) {
+      throw new Error('Invalid path')
+    }
+    const filePath = pathToFileURL(path).toString()
+    return net.fetch(filePath)
+  })
+
+  session.defaultSession.cookies.on('changed', function(_event, cookie, _cause, removed) {
     if (removed || !cookie.session || cookie.name !== 'PHPSESSID' || cookie.domain !== '.deepestworld.com') {
       return
     }
@@ -42,7 +68,7 @@ async function run() {
     // event.
   })
 
-  ipcMain.on('received-ws-data', (event, data) => {
+  ipcMain.on('received-ws-data', (_event, data) => {
     if (data instanceof ArrayBuffer) {
       // TODO: figure out message compression
       return
@@ -91,7 +117,7 @@ async function run() {
     }
   })
 
-  ipcMain.on('death-recording', (event, dataUrl) => {
+  ipcMain.on('death-recording', (_event, dataUrl) => {
     if (!config.recordDeaths) {
       if (!config.hideHints) {
         log('Death detected, but recording is disabled, enable via DW_RECORD_DEATHS=true or hide this hint via DW_HIDE_HINTS=true')
@@ -121,6 +147,7 @@ async function run() {
     },
   })
 
+  /** @type {import('esbuild').BuildContext | undefined} */
   let ctx
 
   await win.loadURL('https://deepestworld.com/')
@@ -132,7 +159,7 @@ async function run() {
       ?.click();
   `)
 
-  win.webContents.on('did-navigate', async (event, url) => {
+  win.webContents.on('did-navigate', async (_event, url) => {
     if (ctx) {
       log(`Pausing file watcher`)
       await ctx.dispose()
@@ -176,7 +203,9 @@ async function run() {
       ctx = await context({
         entryPoints: [config.script],
         bundle: true,
-        target: `chrome${chromeVersion}`,
+        format: 'esm',
+        target: 'esnext',
+        minify: false,
         plugins: [{
           name: 'watch-plugin',
           setup: (build) => {
@@ -192,12 +221,14 @@ async function run() {
                 console.warn(message)
               })
 
-              if (codeHash === result.outputFiles[0].hash) {
+              const hash = result.outputFiles?.[0]?.hash
+
+              if (codeHash === hash) {
                 log(`Code unchanged`)
                 return
               }
 
-              codeHash = result.outputFiles[0].hash
+              codeHash = result.outputFiles?.[0]?.hash
 
               log('Updating code in game')
 
@@ -209,7 +240,7 @@ async function run() {
 
                 await win.webContents.executeJavaScript(`
                   document.querySelector("[data-click='stopCode']").click();
-                  dw.editor.session.setValue(${JSON.stringify(result.outputFiles[0].text)});
+                  dw.editor.session.setValue(${JSON.stringify(result.outputFiles?.[0]?.text ?? '')});
                   document.querySelector("[data-click='startCode']").click();
                 `)
 
