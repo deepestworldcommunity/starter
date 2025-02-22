@@ -710,14 +710,12 @@ const apiSchema = z.strictObject({
   destroyBuilding: z.function(),
   destroyStation: z.function(),
   distance: z.function(),
-  donate: z.function(),
   draw: z.boolean(),
   e: z.array(entitySchema),
   editor: z.unknown(),
   emit: z.function(),
   enchant: z.function(),
   enchantItem: z.function(),
-  enterCar: z.function(),
   enterMagicShrub: z.function(),
   enterPortal: z.function(),
   entities: z.array(entitySchema),
@@ -736,9 +734,7 @@ const apiSchema = z.strictObject({
   }),
   equip: z.function(),
   eventDispatcher: z.unknown(),
-  exitCar: z.function(),
   fetchMissions: z.function(),
-  fillItem: z.function(),
   findAllEntities: z.function(),
   findClosestEntity: z.function(),
   findClosestMonster: z.function(),
@@ -806,7 +802,6 @@ const apiSchema = z.strictObject({
   })),
   mine: z.function(),
   move: z.function(),
-  moveCar: z.function(),
   moveItem: z.function(),
   // @ts-ignore
   moveItemMap: z.instanceof(top.Map),
@@ -829,7 +824,6 @@ const apiSchema = z.strictObject({
   placeItem: z.function(),
   placeOrder: z.function(),
   placeStation: z.function(),
-  pourItem: z.function(),
   projectiles: z.array(z.strictObject({
     id: z.number(),
     x: z.number(),
@@ -839,6 +833,13 @@ const apiSchema = z.strictObject({
     dy: z.number(),
     speed: z.number(),
     elapsed: z.number(),
+    duration: z.number(),
+    w: z.number(),
+    h: z.number(),
+    targetId: z.number().optional(),
+    targetX: z.number().optional(),
+    targetY: z.number().optional(),
+    targetZ: z.number().optional(),
   })),
   recycle: z.function(),
   removeAllListeners: z.function(),
@@ -903,3 +904,7 @@ try {
 
   console.error('API validation failed', error)
 }
+
+setInterval(() => {
+  console.log(JSON.stringify(dw.projectiles))
+}, 100)

@@ -399,16 +399,6 @@ declare namespace DeepestWorld {
     distance(x1: number, y1: number, x2: number, y2: number): number
 
     /**
-     * Donates to an altar
-     * @param altarId
-     * @param amount
-     *
-     * @example
-     * dw.donate(altar.id, 30)
-     */
-    donate(altarId: number, amount: number): Promise<void>
-
-    /**
      * Indicates that the game will draw the world
      */
     draw: boolean
@@ -496,8 +486,6 @@ declare namespace DeepestWorld {
       },
     ): void
 
-    emit(eventName: 'enterCar', data: { id: number }): void
-
     emit(eventName: 'enterPortal', data: { id: number }): void
 
     emit(eventName: 'enterMission', data: { id: number; i: number }): void
@@ -512,8 +500,6 @@ declare namespace DeepestWorld {
     ): void
 
     emit(eventName: 'eventBoard', data: { id: number }): void
-
-    emit(eventName: 'exitCar'): void
 
     emit(
       eventName: 'fill',
@@ -561,15 +547,6 @@ declare namespace DeepestWorld {
           name?: string
         }
         fId?: number
-      },
-    ): void
-
-    emit(
-      eventName: 'moveCar',
-      data: {
-        id: number
-        dx: number
-        dy: number
       },
     ): void
 
@@ -792,15 +769,6 @@ declare namespace DeepestWorld {
     ): Promise<void>
 
     /**
-     * Enter a car
-     * @param carId
-     *
-     * @example
-     * dw.enterCar(car.id)
-     */
-    enterCar(carId: number): void
-
-    /**
      * Use a magic shrub to teleport to a new location
      * @param magicShrubId
      *
@@ -860,32 +828,11 @@ declare namespace DeepestWorld {
     }
 
     /**
-     * Exists the car
-     *
-     * @example
-     * dw.exitCar()
-     */
-    exitCar(): void
-
-    /**
      * Retrieve missions. Requires a nearby mission station.
-     *
-     * @param missionType
      *
      * @group Mission
      */
-    fetchMissions(missionType: string): Promise<void>
-
-    /**
-     * Fill a bucket in toolBag with water from a water source at x, y, z
-     * Possibly no longer works, since there are no more buckets.
-     *
-     * @param toolBagIndex
-     * @param x
-     * @param y
-     * @param z
-     */
-    fillItem(toolBagIndex: number, x: number, y: number, z: number): void
+    fetchMissions(): Promise<void>
 
     /**
      * Find all entities matching a filter criteria.
@@ -1284,16 +1231,6 @@ declare namespace DeepestWorld {
     move(x: number, y: number): void
 
     /**
-     * Move the car
-     * @param cardId
-     * @param dx
-     * @param dy
-     *
-     * @group Travel
-     */
-    moveCar(cardId: number, dx: number, dy: number): void
-
-    /**
      * Your character bag names are: 'bag', 'craftIn', 'abilities', 'abilityBag'.
      * Other objects bag names are: 'storage'.
      * @param bagNameFrom Name of the bag
@@ -1531,13 +1468,6 @@ declare namespace DeepestWorld {
     ): Promise<void>
 
     /**
-     * Pour an item onto a station.
-     *
-     * @param targetId
-     */
-    pourItem(targetId: number): void
-
-    /**
      * Projectiles flying through the air.
      */
     projectiles: Projectile[]
@@ -1691,12 +1621,11 @@ declare namespace DeepestWorld {
     /**
      * Requires a nearby Mission station.
      *
-     * @param missionType
      * @param missionLvl
      *
      * @group Mission
      */
-    startMission(missionType: string, missionLvl: number): Promise<void>
+    startMission(missionLvl: number): Promise<void>
 
     /**
      * Stops your character from moving.
@@ -2450,6 +2379,13 @@ declare namespace DeepestWorld {
     dy: number
     speed: number
     elapsed: number
+    duration: number
+    w: number
+    h: number
+    targetId?: number
+    targetX?: number
+    targetY?: number
+    targetZ?: number
   }
 
   type RealEstateTable = Array<{
