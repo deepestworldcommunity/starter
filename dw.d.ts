@@ -2051,7 +2051,7 @@ declare namespace DeepestWorld {
       threatMult: number
     }
     storage?: (Item | null)[] | Record<string, Item>
-    tags?: {}
+    tags: Set<string>
     targetId?: number
     terrain?: number
     threat?: number
