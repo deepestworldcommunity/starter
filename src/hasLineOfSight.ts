@@ -71,7 +71,7 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
       continue
     }
 
-    if (!dw.mdInfo[entity.md].canCollide) {
+    if (!entity.isCollidable) {
       // Doesn't have collision
       continue
     }
@@ -81,10 +81,9 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
       variant = entity.v
     }
 
-    const { w, h } = dw.getHitbox(entity.md, variant)
-    const x1 = entity.x - w / 2
-    const x2 = entity.x + w / 2
-    const y1 = entity.y - h
+    const x1 = entity.x - entity.w / 2
+    const x2 = entity.x + entity.w / 2
+    const y1 = entity.y - entity.h
     const y2 = entity.y
 
     if (doesIntersect(cx, cy, target.x, target.y, x1, y1, x2, y1)) {
