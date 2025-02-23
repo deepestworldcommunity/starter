@@ -889,22 +889,23 @@ const apiSchema = z.strictObject({
   ws: z.instanceof(top.WebSocket),
 })
 
-try {
-  apiSchema.parse(dw)
-  console.log('API is valid')
-} catch (error) {
-  if (error instanceof ZodError) {
-    // console.error(JSON.stringify(error.errors[0], null, 2))
-    error.errors
-      // .filter((e) => e.message === 'Required' && e?.received === 'undefined')
-      .map((e) => console.error(JSON.stringify(e, null, 2)))
-    // console.log([...new Set(error.errors.map((e) => e.message))])
-    console.log(`${error.errors.length} errors`)
-  }
+function validateApiSchema () {
+  try {
+    apiSchema.parse(dw)
+    console.log('API is valid')
+  } catch (error) {
+    if (error instanceof ZodError) {
+      // console.error(JSON.stringify(error.errors[0], null, 2))
+      error.errors
+        // .filter((e) => e.message === 'Required' && e?.received === 'undefined')
+        .map((e) => console.error(JSON.stringify(e, null, 2)))
+      // console.log([...new Set(error.errors.map((e) => e.message))])
+      console.log(`${error.errors.length} errors`)
+    }
 
-  console.error('API validation failed', error)
+    console.error('API validation failed', error)
+  }
 }
 
-setInterval(() => {
-  console.log(JSON.stringify(dw.projectiles))
-}, 100)
+validateApiSchema()
+setInterval(validateApiSchema, 60 * 60 * 1000)
