@@ -12,8 +12,8 @@ dw.on('drawUnder', (ctx) => {
     let dy = entity.dy ?? 1
     const dLength = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
 
-    dx *= entity.moveSpeed / dLength
-    dy *= entity.moveSpeed / dLength
+    dx *= (entity.moveSpeed ?? 0.25) / dLength
+    dy *= (entity.moveSpeed ?? 0.25) / dLength
 
     const tx = dw.toCanvasX(entity.x + dx)
     const ty = dw.toCanvasY(entity.y + dy)
@@ -32,23 +32,19 @@ dw.on('drawUnder', (ctx) => {
     ctx.lineTo(tx - headLength * Math.cos(tAngle + Math.PI / 6), ty - headLength * Math.sin(tAngle + Math.PI / 6))
     ctx.stroke()
 
-    if (!entity.bad || !dw.mdInfo[entity.md].isMonster) {
+    if (!entity.bad || entity.class !== dw.enums.Class.MONSTER) {
       continue
     }
 
-    if (entity.dx === undefined || entity.dy === undefined) {
-      ctx.beginPath()
-      ctx.fillStyle = '#ffff0040'
-      ctx.arc(x, y, 3 * dw.constants.PX_PER_UNIT_ZOOMED, 0, Math.PI * 2)
-      ctx.fill()
-    }
-
+    ctx.beginPath()
     if (entity.dx !== undefined && entity.dy !== undefined) {
       const angle = Math.atan2(entity.dy, entity.dx)
-      ctx.beginPath()
       ctx.fillStyle = '#ff000040'
       ctx.arc(x, y, 3 * dw.constants.PX_PER_UNIT_ZOOMED, angle - Math.PI / 2, angle + Math.PI / 2)
-      ctx.fill()
+    } else {
+      ctx.fillStyle = '#ffff0040'
+      ctx.arc(x, y, 3 * dw.constants.PX_PER_UNIT_ZOOMED, 0, Math.PI * 2)
     }
+    ctx.fill()
   }
 })
