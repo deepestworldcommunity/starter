@@ -40,10 +40,14 @@ const { ipcRenderer } = require('electron')
 //   })
 //   mediaRecorder.start()
 // }
-//
+
 class WebSocketProxy extends window.WebSocket {
-  constructor(...args) {
-    super(...args)
+  /**
+   * @param {string | URL} url
+   * @param {string | string[]}protocols
+   */
+  constructor(url, protocols = []) {
+    super(url, protocols)
 
     this.addEventListener('message', (event) => {
       ipcRenderer.send('received-ws-data', event.data)
@@ -69,6 +73,9 @@ class WebSocketProxy extends window.WebSocket {
     })
   }
 
+  /**
+   * @param {any} data
+   */
   send(data) {
     ipcRenderer.send('send-ws-data', data)
     super.send(data)

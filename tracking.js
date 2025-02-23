@@ -1,13 +1,9 @@
 const crypto = require('node:crypto')
 
 const BASE_URL = 'https://dw.kvn.wtf'
-/**
- * @type {Map<string, string>}
- */
+/** @type {Map<string, string>} */
 const seenChunks = new Map()
-/**
- * @type {Set<string>}
- */
+/** @type {Set<string>} */
 const seenObjects = new Set()
 
 /**
@@ -21,6 +17,10 @@ function hashChunk(chunk) {
     .digest('hex')
 }
 
+/**
+ * @param {Record<string, number[][]>} chunks
+ * @returns {Promise<void>}
+ */
 async function onSeenChunks(chunks) {
   const requests = []
 
@@ -47,6 +47,10 @@ async function onSeenChunks(chunks) {
   await Promise.allSettled(requests)
 }
 
+/**
+ * @param {any[]} entities
+ * @returns {Promise<void>}
+ */
 async function onSeenObjects(entities) {
   const requests = []
 
@@ -83,6 +87,10 @@ async function onSeenObjects(entities) {
   await Promise.allSettled(requests)
 }
 
+/**
+ * @param {{ item: { mods: Record<string, number>, n?: number} }[]} entries
+ * @returns {Promise<void>}
+ */
 async function onLoot(entries){
   const requests = []
 
