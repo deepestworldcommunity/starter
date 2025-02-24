@@ -5,9 +5,6 @@ import { addMenuButton } from './ui-buttons'
 
 const ZOOM = dw.constants.PX_PER_UNIT_ZOOMED / dw.constants.PX_PER_UNIT
 
-const icons = new Image()
-icons.src = '/images/icons.png'
-
 const COLOR_HP = '#c55050'
 const COLOR_BORDER = '#3c3c3c'
 const COLOR_BACKGROUND = '#0c0c0c'
@@ -21,18 +18,6 @@ addMenuButton('💯', 'Toggle BattleScore', () => {
 })
 
 dw.on('drawEnd', (ctx, cx, cy) => {
-  const drawBackdrop = (x: number, y: number) => {
-    ctx.fillStyle = COLOR_BACKGROUND
-    ctx.beginPath()
-    ctx.arc(x, y, 16, 0, 2 * Math.PI)
-    // ctx.rect(x-16, y-16, 32, 32)
-    ctx.fill()
-  }
-
-  const drawIcon = (i: number, j: number, x: number, y: number) => {
-    ctx.drawImage(icons, i * 16, j * 16, 16, 16, x, y, 32, 32)
-  }
-
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
     if (entity.z !== dw.c.z) {
@@ -55,9 +40,8 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.fillText(debug, x, y + 4)
     }
 
-    const metaData = dw.mdInfo[entity.md]
-    const isGatherable =  !!metaData?.canHarvest || !!metaData?.canChop || !!metaData?.canMine
-    if (!isGatherable && 'station' in entity && entity.hp <= entity.maxHp - 10) {
+    const isGatherable =  dw.isGatherable(entity)
+    if (!isGatherable && 'station' in entity && (entity.hp ?? 100) <= (entity.maxHp ?? 100) - 10) {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'white'
       ctx.fillStyle = 'red'
@@ -69,7 +53,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       continue
     }
 
-    if (isGatherable && 'station' in entity) {
+    if (isGatherable) {
       ctx.lineWidth = 4
       ctx.strokeStyle = 'blue'
       ctx.fillStyle = 'lightblue'
@@ -96,7 +80,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Name + BattleScore?
       ctx.textAlign = 'left'
       ctx.font = `${5 * ZOOM}px ${fontFamily}`
-      let name = entity.name
+      let name = entity.name ?? ''
       if (dw.c.name === entity.name && showBattleScore) {
         name += ` · ${getCharacterBattleScore().toLocaleString([], { maximumFractionDigits: 0 })}`
       }
@@ -114,7 +98,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current HP
       ctx.fillStyle = COLOR_HP
       ctx.beginPath()
-      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED, dw.constants.PX_PER_UNIT_ZOOMED * entity.hp / entity.maxHp, 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED, dw.constants.PX_PER_UNIT_ZOOMED * (entity.hp ?? 100) / (entity.maxHp ?? 100), 8)
       ctx.fill()
 
       // Border
@@ -126,7 +110,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current MP
       ctx.fillStyle = 'blue'
       ctx.beginPath()
-      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED + 8, dw.constants.PX_PER_UNIT_ZOOMED * entity.mp / entity.maxMp, 2)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED + 8, dw.constants.PX_PER_UNIT_ZOOMED * (entity.mp ?? 100) / (entity.maxMp ?? 100), 2)
       ctx.fill()
 
       // Border
@@ -139,8 +123,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     }
 
     if ('ai' in entity) {
-      const fxs = Object.entries(entity.fx).sort((a, b) => a[0].localeCompare(b[0]))
-      const isBoss = bosses.includes(entity.md)
+      const isBoss = bosses.includes(entity.type)
 
       ctx.lineWidth = 4
 
@@ -149,7 +132,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       if (entity.bad) {
         ctx.fillStyle = 'orange'
       }
-      if (dw.mdInfo[entity.md]?.isPlayer) {
+      if (entity.player) {
         ctx.fillStyle = '#00ff00'
       }
       if (entity.targetId === dw.c.id) {
@@ -159,13 +142,13 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.font = `${(isBoss ? 16 : 11) * ZOOM}px ${fontFamily}`
       ctx.textAlign = 'right'
       let level = `${entity.level}`
-      // if (entity.aiType.includes('ealer')) {
-      //   level = '❤️‍🩹' + level
-      // }
+      if (entity.tags.has('heal')) {
+        level = '❤️‍🩹' + level
+      }
       // if (entity.md.includes('alarm')) {
       //   level = '🔔' + level
       // }
-      if (dw.mdInfo[entity.md]?.canHunt) {
+      if (entity.profession === dw.enums.Profession.HUNTING) {
         level = '🎯' + level
       }
       ctx.strokeText(level, x - dw.constants.PX_PER_UNIT_ZOOMED / 2 - 4, y - dw.constants.PX_PER_UNIT_ZOOMED + 8)
@@ -174,7 +157,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Name + BattleScore?
       ctx.textAlign = 'left'
       ctx.font = `${(isBoss ? 6 : 5) * ZOOM}px ${fontFamily}`
-      let name = dw.mdInfo[entity.md]?.name ?? entity.md
+      let name = entity.name ?? entity.md
 
       if (showBattleScore) {
         name += ` · ${getMonsterBattleScore(entity).toLocaleString([], { maximumFractionDigits: 0 })}`
@@ -204,13 +187,13 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       // Current shield
       ctx.fillStyle = 'white'
       ctx.beginPath()
-      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED * entity.hps / entity.maxHp, isBoss ? 12 : 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED * (entity.hps ?? 100) / (entity.maxHp ?? 100), isBoss ? 12 : 8)
       ctx.fill()
 
       // Current HP
       ctx.fillStyle = COLOR_HP
       ctx.beginPath()
-      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED * entity.hp / entity.maxHp, isBoss ? 12 : 8)
+      ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED * (entity.hp ?? 100) / (entity.maxHp ?? 100), isBoss ? 12 : 8)
       ctx.fill()
 
       // Border
@@ -218,116 +201,6 @@ dw.on('drawEnd', (ctx, cx, cy) => {
       ctx.beginPath()
       ctx.rect(x - dw.constants.PX_PER_UNIT_ZOOMED * 0.5, y - dw.constants.PX_PER_UNIT_ZOOMED - (isBoss ? 4 : 0), dw.constants.PX_PER_UNIT_ZOOMED, isBoss ? 12 : 8)
       ctx.stroke()
-
-      if (dw.mdInfo[entity.md]?.isMonster) {
-        let fxX = x - dw.constants.PX_PER_UNIT_ZOOMED / 2
-        const fxY = y - dw.constants.PX_PER_UNIT_ZOOMED - 48 - (isBoss ? 12 : 2)
-        for (let i = 0; i < fxs.length; i++) {
-          const fx = fxs[i]
-
-          switch (fx[0]) {
-            case 'skull':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(6, 0, fxX, fxY)
-              break
-            case 'merge':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(12, 59, fxX, fxY)
-              break
-            // this is a player only buff
-            // case 'frenzy':
-            //   drawBackdrop(fxX + 16, fxY + 16)
-            //   drawIcon(0, 56, fxX, fxY)
-            //   drawIcon(9, 14, fxX, fxY)
-            //   drawIcon(0, 29, fxX, fxY)
-            //   break
-            case 'bloodlust':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(3, 15, fxX, fxY)
-              break
-            case 'moreDmgMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(7, 58, fxX, fxY)
-              break
-            case 'hpIncMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(1, 0, fxX, fxY)
-              break
-            case 'resMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(15, 11, fxX, fxY)
-              break
-            case 'physDmgMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(10, 1, fxX, fxY)
-              break
-            case 'fireDmgMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(11, 1, fxX, fxY)
-              break
-            case 'coldDmgMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(12, 1, fxX, fxY)
-              break
-            case 'elecDmgMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(13, 1, fxX, fxY)
-              break
-            case 'acidDmgMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(14, 1, fxX, fxY)
-              break
-            case 'critMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(15, 0, fxX, fxY)
-              break
-            case 'strDefMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(8, 0, fxX, fxY)
-              break
-            case 'dexDefMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(15, 1, fxX, fxY)
-              break
-            case 'quickMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(0, 58, fxX, fxY)
-              break
-            case 'hpRegenMission':
-              drawBackdrop(fxX + 16, fxY + 16)
-              drawIcon(9, 14, fxX, fxY)
-              drawIcon(2, 58, fxX, fxY)
-              break
-            default:
-              continue
-          }
-
-          const fxData = fx[1]
-          if (fxData && typeof fxData === 'object' && 's' in fxData && typeof fxData.s === 'number') {
-            const s = `${fxData.s}`
-            ctx.font = `${5 * ZOOM}px ${fontFamily}`
-            ctx.textAlign = 'right'
-            ctx.fillStyle = 'white'
-            ctx.strokeStyle = 'black'
-            ctx.strokeText(s, fxX + 32, fxY + 32)
-            ctx.fillText(s, fxX + 32, fxY + 32)
-          }
-
-          fxX += 34
-        }
-      }
     }
   }
 })

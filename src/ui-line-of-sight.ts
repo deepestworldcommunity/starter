@@ -25,15 +25,6 @@ dw.on('drawUnder', (ctx) => {
       return
     }
 
-    if (
-      !dw.mdInfo[entity.md].ai
-      && !dw.mdInfo[entity.md].canChop
-      && !dw.mdInfo[entity.md].canHarvest
-      && !dw.mdInfo[entity.md].canMine
-    ) {
-      return
-    }
-
     const x = dw.toCanvasX(entity.x)
     const y = dw.toCanvasY(entity.y)
     ctx.strokeStyle = hasLineOfSight(entity) ? '#00ff0080' : '#ff000080'
