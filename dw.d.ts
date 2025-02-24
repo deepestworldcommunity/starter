@@ -131,7 +131,7 @@ declare namespace DeepestWorld {
     ): boolean
 
     /**
-     * Combined check for `isReady`, `canPayCost` and `isInRange`.\
+     * Combined check for `isReady`, `canPayCost` and `isInRange`.
      *
      * @param skillIndex Index of the Skill object in dw.character.skills
      * @param args Target entity or target entity id or target coordinates
