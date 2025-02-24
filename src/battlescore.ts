@@ -1,5 +1,3 @@
-import { bosses } from './bosses'
-
 export function getCharacterBattleScore() {
   let maxDmg = 0
   dw.character.skills.forEach((skill) => {
@@ -23,13 +21,13 @@ export function getCharacterBattleScore() {
   return Math.sqrt(maxDmg * dw.character.maxHp)
 }
 
-export function getMonsterBattleScore(monster: DeepestWorld.Monster) {
-  let dmg = 19 * Math.pow(1.1, monster.level)
+export function getMonsterBattleScore(monster: DeepestWorld.Entity) {
+  let dmg = 19 * Math.pow(1.1, monster.level!)
 
   // Factor in critical hits
   dmg += 1 + 0.05 * 0.5
 
-  const skullData = monster.fx.skulls
+  const skullData = monster.fx!.skulls
   let skullCount = 0
   if (
     skullData &&
@@ -43,17 +41,17 @@ export function getMonsterBattleScore(monster: DeepestWorld.Monster) {
   // Scale based on skulls on mob, extra 25% for bosses
   dmg *= 1
     + skullCount * 0.5
-    + (bosses.includes(monster.md) ? 0.25 : 0)
+    + (monster.tags.has('boss') ? 0.25 : 0)
 
   // Powerful mobs deal 25% more dmg
-  if (monster.fx.dmgMore) {
+  if (monster.fx!.dmgMore) {
     dmg *= 1.25
   }
 
   // Quick mobs attack 20% more often, thus deal more dmg
-  if (monster.fx.quick) {
+  if (monster.fx!.quick) {
     dmg *= 1.2
   }
 
-  return Math.sqrt(dmg * monster.maxHp)
+  return Math.sqrt(dmg * monster.maxHp!)
 }

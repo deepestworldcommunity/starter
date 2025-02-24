@@ -3,16 +3,16 @@ const PLAYER = '#ff0000';
 const WALL = '#000000';
 const FALLBACK = '#dddddd';
 const TERRAIN_COLORS: Record<number, string> = {
-  [dw.constants.TERRAIN_EMPTY]: '#ff00ff', // Magenta
-  [dw.constants.TERRAIN_GRASS]: '#228b22', // Forest Green
-  [dw.constants.TERRAIN_CLOUD]: '#ADD8E6', // Light Blue (more distinct)
-  [dw.constants.TERRAIN_DIRT]: '#8B4513', // Saddle Brown (darker for contrast)
-  [dw.constants.TERRAIN_DESERT]: '#F4A460', // Sandy Brown (brighter)
-  [dw.constants.TERRAIN_STONE]: '#808080', // Grey (adjusted for contrast)
-  [dw.constants.TERRAIN_TREE]: '#006400', // Dark Green (for distinctiveness from grass)
-  [dw.constants.TERRAIN_UNDERWATER]: '#4682B4', // Steel Blue (less cyan, more distinct from water)
-  [dw.constants.TERRAIN_WATER]: '#1E90FF', // Dodger Blue (more vibrant)
-  [dw.constants.TERRAIN_WINTER]: '#E0FFFF', // Light Cyan (for a chilly feel, more distinct from white)
+  [dw.enums.Terrain.EMPTY]: '#ff00ff', // Magenta
+  [dw.enums.Terrain.GRASS]: '#228b22', // Forest Green
+  [dw.enums.Terrain.CLOUD]: '#ADD8E6', // Light Blue (more distinct)
+  [dw.enums.Terrain.DIRT]: '#8B4513', // Saddle Brown (darker for contrast)
+  [dw.enums.Terrain.DESERT]: '#F4A460', // Sandy Brown (brighter)
+  [dw.enums.Terrain.STONE]: '#808080', // Grey (adjusted for contrast)
+  [dw.enums.Terrain.TREE]: '#006400', // Dark Green (for distinctiveness from grass)
+  [dw.enums.Terrain.UNDERWATER]: '#4682B4', // Steel Blue (less cyan, more distinct from water)
+  [dw.enums.Terrain.WATER]: '#1E90FF', // Dodger Blue (more vibrant)
+  [dw.enums.Terrain.WINTER]: '#E0FFFF', // Light Cyan (for a chilly feel, more distinct from white)
 } as const;
 
 const CONTAINER_SELECTOR = '#minimap'
@@ -80,8 +80,8 @@ function updateMinimap() {
 
   for (let dy = -RANGE; dy <= RANGE; dy++) {
     for (let dx = -RANGE; dx <= RANGE; dx++) {
-      const wall = dw.getTerrain(ex+dx, ey+dy, ez)
-      const floor = dw.getTerrain(ex+dx, ey+dy, ez - 1)
+      const wall = dw.getTerrainAt(ex+dx, ey+dy, ez)
+      const floor = dw.getTerrainAt(ex+dx, ey+dy, ez - 1)
       if (wall === undefined || wall > 0) {
         ctx.fillStyle = WALL
       } else if (floor === undefined) {

@@ -1,7 +1,7 @@
 function gatherer() {
   // Find the closest tree
   const target = dw.findClosestEntity(
-    (e) => !!dw.mdInfo[e.md]?.isResource && !e.isSafe,
+    (e) => dw.isGatherable(e),
   )
 
   if (!target) {
@@ -18,7 +18,7 @@ function gatherer() {
     return
   }
 
-  if (dw.isOnGcd()) {
+  if (!dw.isReady()) {
     // We have to wait for GCD
     return
   }

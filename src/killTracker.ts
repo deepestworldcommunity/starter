@@ -1,5 +1,3 @@
-import { bosses } from "./bosses"
-
 const tracker = {
   levels: 0,
   total: 0,
@@ -20,10 +18,10 @@ dw.on('hit', (hits) => {
         return
       }
 
-      tracker.levels += entity.level
+      tracker.levels += entity.level ?? 1
       tracker.total++
 
-      if (bosses.includes(entity.md)) {
+      if (entity.tags.has('boss')) {
         tracker.bossKills++
         return
       }

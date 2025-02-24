@@ -5,7 +5,7 @@ export function addDataPanel(key: string, label: string, data: () => string, upd
     return []
   }
 
-  const container = window.top.document.querySelector('#coords')
+  const container = window.top.document.querySelector('#minimap')
   if (!container) {
     return []
   }
@@ -35,7 +35,7 @@ function onUnload() {
     window.top.clearInterval(interval)
   }
 
-  for (const elem of window.top.document.querySelectorAll('#coords .custom-data-panel')) {
+  for (const elem of window.top.document.querySelectorAll('#minimap .custom-data-panel')) {
     elem.remove()
   }
 }

@@ -76,11 +76,6 @@ export function hasLineOfSight(target: { x: number, y: number, z: number, id?: n
       continue
     }
 
-    let variant = 0
-    if ('v' in entity && typeof entity.v === 'number') {
-      variant = entity.v
-    }
-
     const x1 = entity.x - entity.w / 2
     const x2 = entity.x + entity.w / 2
     const y1 = entity.y - entity.h

@@ -1,5 +1,4 @@
 import { getMonsterBattleScore, getCharacterBattleScore } from './battlescore'
-import { bosses } from './bosses'
 import getSmoothPosition from './getSmoothPosition'
 import { addMenuButton } from './ui-buttons'
 
@@ -123,7 +122,7 @@ dw.on('drawEnd', (ctx, cx, cy) => {
     }
 
     if ('ai' in entity) {
-      const isBoss = bosses.includes(entity.type)
+      const isBoss = entity.tags.has('boss')
 
       ctx.lineWidth = 4
 
