@@ -1,7 +1,5 @@
 import { addMenuButton } from './ui-buttons'
 
-const playerHitbox = dw.getHitbox(dw.c.md, 0)
-
 export type CollisionObject = {
   id?: number
   ref?: string
@@ -72,20 +70,18 @@ dw.on('unseenChunks', (chunkName) => {
   collisionObjects = collisionObjects.filter(o => o.ref !== chunkName)
 })
 
-for (let i = 0; i < dw.entities.length; i++) {
-  const entity = dw.entities[i]
-  if (!dw.mdInfo[entity.md].canCollide) {
+for (const entity of dw.entities) {
+  if (!entity.isCollidable) {
     continue
   }
 
-  const {w, h} = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
   collisionObjects.push({
     id: entity.id,
     x: entity.x,
     y: entity.y,
     z: entity.z,
-    w,
-    h,
+    w: entity.w,
+    h: entity.h,
     c: '#0000FF',
   })
 }
@@ -93,7 +89,7 @@ for (let i = 0; i < dw.entities.length; i++) {
 dw.on('seenObjects', () => {
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
-    if (!dw.mdInfo[entity.md].canCollide) {
+    if (!entity.isCollidable) {
       continue
     }
 
@@ -101,14 +97,13 @@ dw.on('seenObjects', () => {
       continue
     }
 
-    const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
     collisionObjects.push({
       id: entity.id,
       x: entity.x,
       y: entity.y,
       z: entity.z,
-      w,
-      h,
+      w: entity.w,
+      h: entity.h,
       c: '#0000FF',
     })
   }
@@ -137,30 +132,6 @@ dw.on('drawEnd', (ctx) => {
   const collisionObjectsInCurrentLayer = collisionObjects.filter(o => o.z === dw.c.z)
 
   ctx.lineWidth = 2
-
-  for (let i = 0; i < dw.entities.length; i++) {
-    const entity = dw.entities[i]
-    const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
-    const { w: pw, h: ph } = dw.getPlacebox(entity.md, 'v' in entity ? entity.v : 0)
-
-    if (w === pw && h === ph) {
-      continue
-    }
-
-    const x = dw.toCanvasX(entity.x)
-    const y = dw.toCanvasY(entity.y - ph)
-    ctx.strokeStyle = '#FF000080'
-    ctx.fillStyle = '#FF000020'
-    ctx.beginPath()
-    ctx.rect(
-      x - pw * dw.constants.PX_PER_UNIT_ZOOMED / 2,
-      y,
-      pw * dw.constants.PX_PER_UNIT_ZOOMED,
-      ph * dw.constants.PX_PER_UNIT_ZOOMED,
-    )
-    ctx.stroke()
-    ctx.fill()
-  }
 
   for (const collisionObject of collisionObjectsInCurrentLayer) {
     if (dw.c.z !== collisionObject.z) {
@@ -194,11 +165,11 @@ dw.on('drawEnd', (ctx) => {
 
   for (let i = 0; i < dw.entities.length; i++) {
     const entity = dw.entities[i]
-    if (dw.c.z !== entity.z || dw.mdInfo[entity.md].isPlayer || dw.mdInfo[entity.md].canCollide) {
+    if (dw.c.z !== entity.z || entity.player || entity.isCollidable) {
       continue
     }
 
-    const { w, h } = dw.getHitbox(entity.md, 'v' in entity ? entity.v : 0)
+    const { w, h } = entity
 
     const x = dw.toCanvasX(entity.x)
     const y = dw.toCanvasY(entity.y - h)
@@ -220,10 +191,10 @@ dw.on('drawEnd', (ctx) => {
   ctx.fillStyle = ctx.strokeStyle + '40'
   ctx.beginPath()
   ctx.rect(
-    mx - playerHitbox.w * dw.constants.PX_PER_UNIT_ZOOMED / 2,
-    my - playerHitbox.h * dw.constants.PX_PER_UNIT_ZOOMED,
-    playerHitbox.w * dw.constants.PX_PER_UNIT_ZOOMED,
-    playerHitbox.h * dw.constants.PX_PER_UNIT_ZOOMED,
+    mx - dw.c.w * dw.constants.PX_PER_UNIT_ZOOMED / 2,
+    my - dw.c.h * dw.constants.PX_PER_UNIT_ZOOMED,
+    dw.c.w * dw.constants.PX_PER_UNIT_ZOOMED,
+    dw.c.h * dw.constants.PX_PER_UNIT_ZOOMED,
   )
   ctx.stroke()
   ctx.fill()
@@ -237,7 +208,7 @@ dw.on('drawUnder', (ctx) => {
   ctx.lineWidth = 2
   ctx.strokeStyle = '#FFFFFF7F'
 
-  for (const plot of dw.a.plots) {
+  for (const plot of dw.c.plots) {
     if (dw.distance(dw.c.x, dw.c.y, plot.x, plot.y) > 32) {
       continue
     }
