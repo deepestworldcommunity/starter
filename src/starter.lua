@@ -3,7 +3,7 @@ local dw = js.global.dw
 
 local attackMode = true
 
-function basicAttack()
+function BasicAttack()
   if not attackMode then
     dw.log(dw, "Attack mode is off, edit src/starter.lua to enable")
     return
@@ -77,4 +77,4 @@ function basicAttack()
   dw.useSkill(dw, skillIndex, target.id)
 end
 
-js.global.setInterval(js.global, basicAttack, 250)
+js.global.setInterval(js.global, BasicAttack, 250)
