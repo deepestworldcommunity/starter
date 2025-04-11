@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/node": "^20.17.24",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "electron": "^34.3.0",
     "esbuild": "^0.25.1",
     "typescript": "^5.8.2",
